@@ -1,0 +1,25 @@
+{
+  "name": "pnpm-sync",
+  "version": "0.0.6",
+  "description": "The pnpm-sync should be invoked for any library projects that have been installed as an injected dependency.",
+  "scripts": {
+    "build": "tsc",
+    "start": "tsc -w",
+    "prepublishOnly": "npm run build"
+  },
+  "files": [
+    "dist"
+  ],
+  "bin": {
+    "pnpm-sync": "bin/pnpm-sync.js"
+  },
+  "author": "chao.guo@bytedance.com",
+  "dependencies": {
+    "commander": "^11.1.0",
+    "pnpm-sync-lib": "~0.0.1"
+  },
+  "devDependencies": {
+    "@types/node": "^20.8.10",
+    "typescript": "^5.2.2"
+  }
+}

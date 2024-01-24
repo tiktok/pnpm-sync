@@ -403,6 +403,14 @@
     //   "tags": [ "tools" ]
     // }
     {
+      "packageName": "pnpm-sync",
+      "projectFolder": "libraries/pnpm-sync"
+    },
+    {
+      "packageName": "pnpm-sync-lib",
+      "projectFolder": "libraries/pnpm-sync-lib"
+    },
+    {
       "packageName": "lib1",
       "projectFolder": "libraries/lib1"
     },

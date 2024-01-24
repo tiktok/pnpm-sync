@@ -1,0 +1,27 @@
+{
+  "name": "pnpm-sync-lib",
+  "version": "0.0.1",
+  "description": "It provides two APIs, pnpmSync and pnpmSyncPrepare.",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "scripts": {
+    "build": "tsc",
+    "start": "tsc -w",
+    "prepublishOnly": "npm run build"
+  },
+  "files": [
+    "dist"
+  ],
+  "author": "chao.guo@bytedance.com",
+  "dependencies": {
+    "@rushstack/node-core-library": "^3.61.0",
+    "@rushstack/package-extractor": "^0.6.12",
+    "@microsoft/rush-lib": "~5.110.1",
+    "@pnpm/lockfile-file": "~8.1.4",
+    "@pnpm/logger": "~5.0.0"
+  },
+  "devDependencies": {
+    "@types/node": "^20.8.10",
+    "typescript": "^5.2.2"
+  }
+}

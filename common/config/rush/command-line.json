@@ -174,6 +174,13 @@
     //    */
     //   // "autoinstallerName": "my-task"
     // }
+    {
+      "commandKind": "global",
+      "name": "after-install",
+      "summary": "Demo the pnpm-sync --prepare",
+      "description": "Two parameters, --lockfile and --store",
+      "shellCommand": "cd libraries/pnpm-sync && pnpm run build && node bin/pnpm-sync.js prepare --lockfile=../../common/temp/pnpm-lock.yaml --store=../../common/temp/node_modules/.pnpm"
+    }
   ],
   /**
    * Custom "parameters" introduce new parameters for specified Rush command-line commands.
