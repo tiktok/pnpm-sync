@@ -1,0 +1,147 @@
+lockfileVersion: '6.0'
+
+settings:
+  autoInstallPeers: false
+  excludeLinksFromLockfile: false
+
+importers:
+
+  .: {}
+
+  ../../apps/app1:
+    dependencies:
+      lib1:
+        specifier: workspace:*
+        version: file:../../libraries/lib1(react@17.0.2)
+      react:
+        specifier: ~17.0.0
+        version: 17.0.2
+    devDependencies:
+      '@types/node':
+        specifier: ^20.8.10
+        version: 20.11.5
+      typescript:
+        specifier: ^5.2.2
+        version: 5.3.3
+    dependenciesMeta:
+      lib1:
+        injected: true
+
+  ../../apps/app2:
+    dependencies:
+      lib1:
+        specifier: workspace:*
+        version: file:../../libraries/lib1(react@18.0.0)
+      react:
+        specifier: ~18.0.0
+        version: 18.0.0
+    devDependencies:
+      '@types/node':
+        specifier: ^20.8.10
+        version: 20.11.5
+      typescript:
+        specifier: ^5.2.2
+        version: 5.3.3
+    dependenciesMeta:
+      lib1:
+        injected: true
+
+  ../../apps/app3:
+    dependencies:
+      lib1:
+        specifier: workspace:*
+        version: link:../../libraries/lib1
+      react:
+        specifier: ~18.2.0
+        version: 18.2.0
+    devDependencies:
+      '@types/node':
+        specifier: ^20.8.10
+        version: 20.11.5
+      typescript:
+        specifier: ^5.2.2
+        version: 5.3.3
+
+  ../../libraries/lib1:
+    devDependencies:
+      '@types/node':
+        specifier: ^20.8.10
+        version: 20.11.5
+      react:
+        specifier: ~17.0.2
+        version: 17.0.2
+      typescript:
+        specifier: ^5.2.2
+        version: 5.3.3
+
+packages:
+
+  /@types/node@20.11.5:
+    resolution: {integrity: sha512-g557vgQjUUfN76MZAN/dt1z3dzcUsimuysco0KeluHgrPdJXkP/XdAURgyO2W9fZWHRtRBiVKzKn8vyOAwlG+w==}
+    dependencies:
+      undici-types: 5.26.5
+    dev: true
+
+  /js-tokens@4.0.0:
+    resolution: {integrity: sha512-RdJUflcE3cUzKiMqQgsCu06FPu9UdIJO0beYbPhHN4k6apgJtifcoCtT9bcxOpYBtpD2kCM6Sbzg4CausW/PKQ==}
+
+  /loose-envify@1.4.0:
+    resolution: {integrity: sha512-lyuxPGr/Wfhrlem2CL/UcnUc1zcqKAImBDzukY7Y5F/yQiNdko6+fRLevlw1HgMySw7f611UIY408EtxRSoK3Q==}
+    hasBin: true
+    dependencies:
+      js-tokens: 4.0.0
+
+  /object-assign@4.1.1:
+    resolution: {integrity: sha512-rJgTQnkUnH1sFw8yT6VSU3zD3sWmu6sZhIseY8VX+GRu3P6F7Fu+JNDoXfklElbLJSnc3FUQHVe4cU5hj+BcUg==}
+    engines: {node: '>=0.10.0'}
+
+  /react@17.0.2:
+    resolution: {integrity: sha512-gnhPt75i/dq/z3/6q/0asP78D0u592D5L1pd7M8P+dck6Fu/jJeL6iVVK23fptSUZj8Vjf++7wXA8UNclGQcbA==}
+    engines: {node: '>=0.10.0'}
+    dependencies:
+      loose-envify: 1.4.0
+      object-assign: 4.1.1
+
+  /react@18.0.0:
+    resolution: {integrity: sha512-x+VL6wbT4JRVPm7EGxXhZ8w8LTROaxPXOqhlGyVSrv0sB1jkyFGgXxJ8LVoPRLvPR6/CIZGFmfzqUa2NYeMr2A==}
+    engines: {node: '>=0.10.0'}
+    dependencies:
+      loose-envify: 1.4.0
+    dev: false
+
+  /react@18.2.0:
+    resolution: {integrity: sha512-/3IjMdb2L9QbBdWiW5e3P2/npwMBaU9mHCSCUzNln0ZCYbcfTsGbTJrU/kGemdH2IWmB2ioZ+zkxtmq6g09fGQ==}
+    engines: {node: '>=0.10.0'}
+    dependencies:
+      loose-envify: 1.4.0
+    dev: false
+
+  /typescript@5.3.3:
+    resolution: {integrity: sha512-pXWcraxM0uxAS+tN0AG/BF2TyqmHO014Z070UsJ+pFvYuRSq8KH8DmWpnbXe0pEPDHXZV3FcAbJkijJ5oNEnWw==}
+    engines: {node: '>=14.17'}
+    hasBin: true
+    dev: true
+
+  /undici-types@5.26.5:
+    resolution: {integrity: sha512-JlCMO+ehdEIKqlFxk6IfVoAUVmgz7cU7zD/h9XZ0qzeosSHmUJVOzSQvvYSYWXkFXC+IfLKSIffhv0sVZup6pA==}
+    dev: true
+
+  file:../../libraries/lib1(react@17.0.2):
+    resolution: {directory: ../../libraries/lib1, type: directory}
+    id: file:../../libraries/lib1
+    name: lib1
+    peerDependencies:
+      react: 17 || 18
+    dependencies:
+      react: 17.0.2
+    dev: false
+
+  file:../../libraries/lib1(react@18.0.0):
+    resolution: {directory: ../../libraries/lib1, type: directory}
+    id: file:../../libraries/lib1
+    name: lib1
+    peerDependencies:
+      react: 17 || 18
+    dependencies:
+      react: 18.0.0
+    dev: false
