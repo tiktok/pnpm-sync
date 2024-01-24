@@ -177,7 +177,7 @@
     {
       "commandKind": "global",
       "name": "after-install",
-      "summary": "Demo the pnpm-sync --prepare",
+      "summary": "Demo the pnpm-sync prepare",
       "description": "Two parameters, --lockfile and --store",
       "shellCommand": "cd libraries/pnpm-sync && pnpm run build && node bin/pnpm-sync.js prepare --lockfile=../../common/temp/pnpm-lock.yaml --store=../../common/temp/node_modules/.pnpm"
     }

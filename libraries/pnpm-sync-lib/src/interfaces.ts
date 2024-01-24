@@ -15,5 +15,3 @@ export interface TargetFolder {
   folderPath: string
 }
 
-export const ALL_APP = 'all';
-
