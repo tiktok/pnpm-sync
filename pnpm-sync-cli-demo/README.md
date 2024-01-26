@@ -45,7 +45,7 @@ pnpm install pnpm-sync@latest -g
 You can check `node_modules` folder under each app to see the installation difference for injected dependencies and normal dependencies.<br>
 For projects have the injected workspace dependency `lib1`, the `lib1` will link to pnpm store.
 ```
-lib1 -> ../../../../node_modules/.pnpm/file+examples+use-pnpm-sync+lib1_@types+node@20.11.6_react@17.0.2/node_modules/lib1
+lib1 -> ../../../node_modules/.pnpm/file+pnpm-sync-cli-demo+lib1_react@17.0.2/node_modules/lib1cd 
 ```
 For projects have the normal workspace dependency `lib1`, the `lib1` will link to the source code.
 ```
@@ -55,9 +55,9 @@ lib1 -> ../../lib1
 ### 3. Run `pnpm-sync prepare` to generate the `pnpm-sync.json` file.
 
 The `pnpm-sync prepare` command takes two required arguments, the `pnpm-lock.yaml` file path and `.pnpm` folder path.<br> 
-Assuming you are under `examples/use-pnpm-sync` folder, then in this example, the command will be:
+Assuming you are under `pnpm-sync-cli-demo` folder, then in this example, the command will be:
 ```
-pnpm-sync prepare --lockfile=../../pnpm-lock.yaml --store=../../node_modules/.pnpm
+pnpm-sync prepare --lockfile=../pnpm-lock.yaml --store=../node_modules/.pnpm
 ```
 After run this command, you can check `node_modules` folder under lib1, you will the `pnpm-sync.json` file, like below:
 ```
@@ -66,7 +66,7 @@ After run this command, you can check `node_modules` folder under lib1, you will
     "sourceFolder": "../..",
     "targetFolders": [
       {
-        "folderPath": "../../../../../node_modules/.pnpm/file+examples+use-pnpm-sync+lib1_@types+node@20.11.6_react@17.0.2/node_modules/lib1"
+        "folderPath": "../../../../node_modules/.pnpm/file+pnpm-sync-cli-demo+lib1_@types+node@20.11.7_react@17.0.2/node_modules/lib1"
       }
     ]
   }
