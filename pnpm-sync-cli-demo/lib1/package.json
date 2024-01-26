@@ -17,9 +17,6 @@
   "files": [
     "dist"
   ],
-  "dependencies": {
-    "pnpm-sync": "0.0.6"
-  },
   "devDependencies": {
     "@types/node": "^20.8.10",
     "typescript": "^5.2.2",
