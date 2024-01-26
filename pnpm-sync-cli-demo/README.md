@@ -45,7 +45,7 @@ pnpm install pnpm-sync@latest -g
 You can check `node_modules` folder under each app to see the installation difference for injected dependencies and normal dependencies.<br>
 For projects have the injected workspace dependency `lib1`, the `lib1` will link to pnpm store.
 ```
-lib1 -> ../../../node_modules/.pnpm/file+pnpm-sync-cli-demo+lib1_react@17.0.2/node_modules/lib1cd 
+lib1 -> ../../../node_modules/.pnpm/file+pnpm-sync-cli-demo+lib1_@types+node@20.11.7_react@17.0.2/node_modules/lib1 
 ```
 For projects have the normal workspace dependency `lib1`, the `lib1` will link to the source code.
 ```
