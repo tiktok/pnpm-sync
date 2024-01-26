@@ -1,3 +1,4 @@
 packages:
-  - 'packages/**'
-  - 'examples/**'
+  - 'packages/*'
+  - 'pnpm-sync-api-demo/*'
+  - 'pnpm-sync-cli-demo/*'
