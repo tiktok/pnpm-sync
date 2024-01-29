@@ -26,6 +26,28 @@ The `pnpm-sync` command provides a way to resync injected dependencies when usin
 | [./pnpm-sync-cli-demo](./pnpm-sync-cli-demo/) | Demonstrates usage of the `pnpm-sync` CLI in a workspace project. |
 | [./pnpm-sync-api-demo](./pnpm-sync-api-demo/) | Demonstrates usage of the `pnpm-sync` APIs. |
 
+## How to build this monorepo
+
+1. Install the PNPM tool: https://pnpm.io/installation
+
+2. Clone the repo:
+
+   git clone https://github.com/tiktok/pnpm-sync.git
+
+3. Install the dependencies:
+
+   ```bash
+   cd pnpm-sync
+
+   pnpm install
+   ```
+
+4. Build all projects:
+
+   ```bash
+   pnpm --recursive run build
+   ```
+
 ## 💬 Tell us what you think
 
 GitHub issues and pull requests are welcome.  For general discussions about the feature idea, please comment on the upstream GitHub issue:
