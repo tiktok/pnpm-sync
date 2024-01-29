@@ -8,7 +8,7 @@ The `pnpm-sync` command provides a way to resync injected dependencies when usin
 
 **Solution:** The `pnpm-sync` tool provides a way to perform this copying. It is invoked for each project that is an injected dependency provider in the PNPM workspace. It should be run after the project finishes building (before its consumers are built).  The operation can be performed via a command-line interface (CLI) or via an application program interface (API) for toolchain integration.
 
-**Setup:** The operation is optimized by precomputing the source/target folder locations and storing this information in a new file (**&lt;your-library&gt;/node_modules/.pnpm-sync.json**). In our implementation, the `pnpm-sync prepare` step should be performed after `pnpm install` to write the JSON file.  Then, during the build the `pnpm-sync` step will read that JSON file and perform the copy.
+**Setup:** The operation is optimized by precomputing the source/target folder locations and storing this information in a new file (**&lt;your-library&gt;/node_modules/.pnpm-sync.json**). In our implementation, the `pnpm-sync prepare` step should be performed after `pnpm install` to write the JSON file.  Then, during the build the `pnpm-sync copy` step will read that JSON file and perform the copy.
 
 **Roadmap:** We're now working on integrating this feature into the [RushJS](https://rushjs.io) build tool (as part of the upcoming Rush "subspaces" feature). If that is successful, we will then propose to integrate the `pnpm-sync` functionality directly into the official PNPM package manager.  Although subspaces motivate heavier reliance on injected workspaces, the `pnpm-sync` feature does not require Rush subspaces and is useful wherever injected dependencies are needed.
 

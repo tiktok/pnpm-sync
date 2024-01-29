@@ -1,6 +1,6 @@
 {
   "name": "pnpm-sync",
-  "version": "0.0.6",
+  "version": "0.0.7",
   "description": "The pnpm-sync CLI package. This package is intended to be used where you want to run pnpm-sync as a CLI tool.",
   "license": "MIT",
   "scripts": {
@@ -13,7 +13,7 @@
   },
   "dependencies": {
     "commander": "^11.1.0",
-    "pnpm-sync-lib": "~0.0.1"
+    "pnpm-sync-lib": "0.0.2"
   },
   "devDependencies": {
     "@rushstack/eslint-config": "^3.6.2",

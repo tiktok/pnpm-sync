@@ -3,7 +3,7 @@ import fs from 'fs';
 import { FileSystem, Async } from '@rushstack/node-core-library';
 import { PackageExtractor } from '@rushstack/package-extractor';
 
-export async function pnpmSync(pnpmSyncJsonPath: string = ''): Promise<void> {
+export async function pnpmSyncCopy(pnpmSyncJsonPath: string = ''): Promise<void> {
   if (pnpmSyncJsonPath === '') {
     // if user does not input .pnpm-sync.json file path
     // then we assume .pnpm-sync.json is always under node_modules folder
