@@ -1,0 +1,27 @@
+{
+  "name": "pnpm-sync",
+  "version": "0.0.6",
+  "description": "The pnpm-sync CLI package. This package is intended to be used where you want to run pnpm-sync as a CLI tool.",
+  "license": "MIT",
+  "scripts": {
+    "build": "heft build --clean",
+    "test": "heft test --clean",
+    "prepublishOnly": "npm run build"
+  },
+  "bin": {
+    "pnpm-sync": "bin/pnpm-sync.js"
+  },
+  "dependencies": {
+    "commander": "^11.1.0",
+    "pnpm-sync-lib": "~0.0.1"
+  },
+  "devDependencies": {
+    "@rushstack/eslint-config": "^3.6.2",
+    "@rushstack/heft": "^0.64.3",
+    "@rushstack/heft-node-rig": "^2.4.5",
+    "@types/heft-jest": "1.0.6",
+    "@types/node": "18.17.15",
+    "typescript": "~5.3.3",
+    "eslint": "~8.7.0"
+  }
+}

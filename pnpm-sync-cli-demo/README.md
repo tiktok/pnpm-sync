@@ -1,4 +1,4 @@
-# use-pnpm-sync
+# pnpm-sync-cli-demo
 
 Here, we will show an example on how to use `pnpm-sync` in a workspace scenario. 
 
