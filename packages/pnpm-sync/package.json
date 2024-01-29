@@ -1,12 +1,36 @@
 {
   "name": "pnpm-sync",
   "version": "0.0.7",
-  "description": "The pnpm-sync CLI package. This package is intended to be used where you want to run pnpm-sync as a CLI tool.",
+  "description": "Recopy injected dependencies whenever a project is rebuilt in your PNPM workspace",
+  "keywords": [
+    "rush",
+    "subspaces",
+    "peer",
+    "content",
+    "addressable",
+    "store",
+    "lockfile",
+    "lock",
+    "yaml",
+    "node_modules",
+    "node",
+    "modules",
+    "local",
+    "install",
+    "copy",
+    "package",
+    "packages"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/tiktok/pnpm-sync.git",
+    "directory": "packages/pnpm-sync"
+  },
   "license": "MIT",
   "scripts": {
     "build": "heft build --clean",
     "test": "heft test --clean",
-    "prepublishOnly": "npm run build"
+    "prepublishOnly": "heft build --clean"
   },
   "bin": {
     "pnpm-sync": "bin/pnpm-sync.js"
