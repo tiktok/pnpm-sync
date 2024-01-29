@@ -1,13 +1,13 @@
 import { Command } from 'commander';
-import { pnpmSync, pnpmSyncPrepare } from 'pnpm-sync-lib';
+import { pnpmSyncCopy, pnpmSyncPrepare } from 'pnpm-sync-lib';
 
 const program = new Command();
 
 program.version(require('../package.json').version);
 
-program
+program.command('copy')
   .description('Execute the copy action based on the plan defined under node_modules/.pnpm-sync.json')
-  .action(pnpmSync);
+  .action(pnpmSyncCopy);
 
 program.command('prepare')
   .description('Generate the pnpm-sync.json based on pnpm-lock.yaml file path and .pnpm folder path')

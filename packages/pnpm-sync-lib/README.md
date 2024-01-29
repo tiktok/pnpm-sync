@@ -1,6 +1,6 @@
 # pnpm-sync-lib
 
-The pnpm-sync API package. This packaged is intended to be used where you want to integrate the pnpm-sync APIs into your own Monorepo manager tool.
+The pnpm-sync API package. This package is intended to be used where you want to integrate the pnpm-sync APIs into your own Monorepo management tools.
 
 # Building
 

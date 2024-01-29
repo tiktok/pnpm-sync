@@ -12,7 +12,7 @@ importers:
         specifier: ^11.1.0
         version: 11.1.0
       pnpm-sync-lib:
-        specifier: ~0.0.1
+        specifier: 0.0.2
         version: link:../pnpm-sync-lib
     devDependencies:
       '@rushstack/eslint-config':

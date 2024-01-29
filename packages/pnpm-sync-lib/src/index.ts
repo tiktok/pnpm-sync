@@ -1,2 +1,2 @@
-export { pnpmSync } from "./pnpmSync";
+export { pnpmSyncCopy } from "./pnpmSyncCopy";
 export { pnpmSyncPrepare } from "./pnpmSyncPrepare";
