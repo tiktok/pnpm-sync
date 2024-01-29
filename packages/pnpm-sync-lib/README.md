@@ -1,17 +1,3 @@
 # pnpm-sync-lib
 
-The pnpm-sync API package. This package is intended to be used where you want to integrate the pnpm-sync APIs into your own Monorepo management tools.
-
-# Building
-
-Install the dependencies:
-
-```bash
-pnpm install
-```
-
-Build the project:
-
-```bash
-pnpm run build
-```
+?? This is the API library for the [pnpm-sync project](https://www.npmjs.com/package/pnpm-sync).  Please see its documentation for details.
