@@ -94,7 +94,7 @@ Typical workflow:
    pnpm-sync prepare --lockfile=../pnpm-lock.yaml --store=../node_modules/.pnpm
    ```
 
-4. Build the projects, invoking `pnpm-sync` at the appropriate times:
+4. Build the projects, invoking `pnpm-sync copy` at the appropriate times:
 
    ```bash
    cd packages/my-lib
@@ -102,7 +102,7 @@ Typical workflow:
    pnpm run build
 
    # Recopies "packages/my-lib" outputs into the doppelganger folder under "my-app/node_modules"
-   pnpm-sync
+   pnpm-sync copy
    ```
 
    ```bash
