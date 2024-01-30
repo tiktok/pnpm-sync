@@ -13,10 +13,10 @@ jobs:
       - uses: actions/checkout@v3
       - uses: actions/setup-node@v3
         with:
-          node-version: 16
+          node-version: 20.11.0
       - uses: pnpm/action-setup@v2
-          with:
-            version: 8
+        with:
+          version: 8.15.1
       - run: pnpm --filter pnpm-sync run build
       - run: pnpm --filter pnpm-sync run test
 
@@ -27,11 +27,11 @@ jobs:
       - uses: actions/checkout@v3
       - uses: actions/setup-node@v3
         with:
-          node-version: 16
+          node-version: 20.11.0
           registry-url: https://registry.npmjs.org/
       - uses: pnpm/action-setup@v2
-          with:
-            version: 8
+        with:
+          version: 8.15.1
       - run: pnpm --filter pnpm-sync publish
         env:
           NODE_AUTH_TOKEN: ${{secrets.npm_token}}
