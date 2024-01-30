@@ -68,6 +68,8 @@ jspm_packages/
 
 # build result
 build
+lib
+temp
 dist
 build_*
 

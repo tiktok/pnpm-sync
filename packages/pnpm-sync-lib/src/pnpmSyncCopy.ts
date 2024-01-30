@@ -1,0 +1,88 @@
+import path from "path";
+import fs from "fs";
+import { FileSystem, Async } from "@rushstack/node-core-library";
+import { PackageExtractor } from "@rushstack/package-extractor";
+
+/**
+ * For each library project that acts as an injected dependency of other consuming projects
+ * within a PNPM workspace, this operation should be invoked whenever that library is rebuilt.
+ * It will copy the latest build output into the `node_modules` installation folder.
+ *
+ * @remarks
+ * This operation reads the `.npm-sync.json` file which should have been prepared after
+ * `pnpm install` by calling the {@link pnpmSyncPrepare} function.
+ *
+ * @param pnpmSyncJsonPath - optionally customizes the location of the `.pnpm-sync.json` file
+ *
+ * @beta
+ */
+export async function pnpmSyncCopy(
+  pnpmSyncJsonPath: string = ""
+): Promise<void> {
+  if (pnpmSyncJsonPath === "") {
+    // if user does not input .pnpm-sync.json file path
+    // then we assume .pnpm-sync.json is always under node_modules folder
+    pnpmSyncJsonPath = "node_modules/.pnpm-sync.json";
+  }
+
+  if (!FileSystem.exists(pnpmSyncJsonPath)) {
+    console.warn(
+      "You are executing pnpm-sync for a package, but we can not find the .pnpm-sync.json inside node_modules folder"
+    );
+    return;
+  }
+
+  //read the .pnpm-sync.json
+  const pnpmSyncJson = JSON.parse(
+    FileSystem.readFile(pnpmSyncJsonPath).toString()
+  );
+  const { sourceFolder, targetFolders } = pnpmSyncJson.postbuildInjectedCopy;
+  const sourcePath = path.resolve(pnpmSyncJsonPath, sourceFolder);
+
+  //get npmPackFiles
+  const npmPackFiles: string[] =
+    await PackageExtractor.getPackageIncludedFilesAsync(sourcePath);
+
+  console.time(
+    `pnpm-sync => ${sourcePath}, total ${npmPackFiles.length} files`
+  );
+
+  //clear the destination folder first
+  for (const targetFolder of targetFolders) {
+    const destinationPath = path.resolve(
+      pnpmSyncJsonPath,
+      targetFolder.folderPath
+    );
+    await FileSystem.deleteFolderAsync(destinationPath);
+  }
+
+  await Async.forEachAsync(
+    npmPackFiles,
+    async (npmPackFile: string) => {
+      for (const targetFolder of targetFolders) {
+        const destinationPath = path.resolve(
+          pnpmSyncJsonPath,
+          targetFolder.folderPath
+        );
+
+        const copySourcePath: string = path.join(sourcePath, npmPackFile);
+        const copyDestinationPath: string = path.join(
+          destinationPath,
+          npmPackFile
+        );
+
+        await FileSystem.ensureFolderAsync(path.dirname(copyDestinationPath));
+
+        // create a hard link to the destination path
+        await fs.promises.link(copySourcePath, copyDestinationPath);
+      }
+    },
+    {
+      concurrency: 10,
+    }
+  );
+
+  console.timeEnd(
+    `pnpm-sync => ${sourcePath}, total ${npmPackFiles.length} files`
+  );
+}
