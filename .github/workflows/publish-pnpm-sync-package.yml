@@ -18,7 +18,7 @@ jobs:
       - run: pnpm --filter pnpm-sync run test
 
   publish-npm:
-    needs: build
+    needs: test
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
