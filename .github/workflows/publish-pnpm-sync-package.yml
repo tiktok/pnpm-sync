@@ -17,6 +17,7 @@ jobs:
       - uses: pnpm/action-setup@v2
         with:
           version: 8.15.1
+      - run: pnpm install
       - run: pnpm --filter pnpm-sync run build
       - run: pnpm --filter pnpm-sync run test
 
@@ -32,6 +33,7 @@ jobs:
       - uses: pnpm/action-setup@v2
         with:
           version: 8.15.1
+      - run: pnpm install
       - run: pnpm --filter pnpm-sync publish
         env:
           NODE_AUTH_TOKEN: ${{secrets.npm_token}}
