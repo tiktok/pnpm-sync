@@ -90,7 +90,7 @@ Typical workflow:
    ```bash
    cd packages/my-app
 
-   # Creates packages/my-app/node_modules/.pnpm-sync-json
+   # Creates packages/my-app/node_modules/.pnpm-sync.json
    pnpm-sync prepare --lockfile=../pnpm-lock.yaml --store=../node_modules/.pnpm
    ```
 

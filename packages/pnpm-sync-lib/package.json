@@ -8,7 +8,7 @@
     "directory": "packages/pnpm-sync-lib"
   },
   "main": "lib/index.js",
-  "types": "lib/index.d.ts",
+  "types": "dist/pnpm-sync-lib.d.ts",
   "license": "MIT",
   "scripts": {
     "build": "heft build --clean",
