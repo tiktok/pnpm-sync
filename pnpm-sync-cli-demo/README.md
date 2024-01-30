@@ -1,4 +1,4 @@
-# use-pnpm-sync
+# pnpm-sync-cli-demo
 
 Here, we will show an example on how to use `pnpm-sync` in a workspace scenario. 
 
@@ -76,6 +76,6 @@ After run this command, you can check `node_modules` folder under lib1, you will
 ### 4. Run `pnpm-sync` for injected workspace dependency `lib1`
 
 Since `app1` sets `lib1` as the injected workspace dependency, now, every time after `lib1` re-build, its build output needs to be copied to the corresponding `pnpm-store` location.<br>
-To achieve that, you can simply run `pnpm-sync` under `lib1` folder. <br>
+To achieve that, you can simply run `pnpm-sync copy` under `lib1` folder. <br>
 After that, the build output of `lib1` are copied to the corresponding `pnpm-store` properly. 
 

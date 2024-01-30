@@ -1,0 +1,34 @@
+{
+  "name": "pnpm-sync-lib",
+  "version": "0.0.2",
+  "description": "API library for integrating \"pnpm-sync\" with your toolchain",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/tiktok/pnpm-sync.git",
+    "directory": "packages/pnpm-sync-lib"
+  },
+  "main": "lib/index.js",
+  "types": "dist/pnpm-sync-lib.d.ts",
+  "license": "MIT",
+  "scripts": {
+    "build": "heft build --clean",
+    "test": "heft test --clean",
+    "prepublishOnly": "heft build --clean"
+  },
+  "dependencies": {
+    "@rushstack/node-core-library": "^3.61.0",
+    "@rushstack/package-extractor": "^0.6.12",
+    "@microsoft/rush-lib": "~5.110.1",
+    "@pnpm/lockfile-file": "~8.1.4",
+    "@pnpm/logger": "~5.0.0"
+  },
+  "devDependencies": {
+    "@rushstack/eslint-config": "^3.6.2",
+    "@rushstack/heft": "^0.64.3",
+    "@rushstack/heft-node-rig": "^2.4.5",
+    "@types/heft-jest": "1.0.6",
+    "@types/node": "18.17.15",
+    "typescript": "~5.3.3",
+    "eslint": "~8.7.0"
+  }
+}
