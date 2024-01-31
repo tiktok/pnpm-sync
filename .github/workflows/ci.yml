@@ -17,6 +17,10 @@ jobs:
       - uses: pnpm/action-setup@v2
         with:
           version: 8.15.1
-      - run: pnpm install
-      - run: pnpm --filter pnpm-sync-lib run build
-      - run: pnpm --filter pnpm-sync-lib run test
+      - name: Install Depdendencies
+        run: pnpm install
+      - name: Build and run tests for pnpm-sync
+        run: pnpm --filter pnpm-sync run build && pnpm --filter pnpm-sync run test
+      - name: Build and run tests for pnpm-sync-lib
+        run: pnpm --filter pnpm-sync-lib run build && pnpm --filter pnpm-sync-lib run test
+             
