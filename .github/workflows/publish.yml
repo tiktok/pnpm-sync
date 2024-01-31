@@ -1,0 +1,31 @@
+name: CI
+on:
+  push:
+    branches: ['main']
+  # Allows you to run this workflow manually from the Actions tab
+  workflow_dispatch:
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/setup-node@v3
+        with:
+          node-version: 20.11.0
+      - uses: pnpm/action-setup@v2
+        with:
+          version: 8.15.1
+      - name: Install Depdendencies
+        run: pnpm install
+      - name: Build and run tests for pnpm-sync-lib
+        run: pnpm --filter pnpm-sync-lib run build && pnpm --filter pnpm-sync-lib run test
+      - name: Build and run tests for pnpm-sync
+        run: pnpm --filter pnpm-sync run build && pnpm --filter pnpm-sync run test
+      - name: Publish pnpm-sync-lib to NPM
+        run: pnpm --filter pnpm-sync-lib publish
+        env:
+          NODE_AUTH_TOKEN: ${{secrets.npm_token}}
+      - name: Publish pnpm-sync to NPM
+        run: pnpm --filter pnpm-sync publish
+        env:
+          NODE_AUTH_TOKEN: ${{secrets.npm_token}}
