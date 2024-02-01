@@ -1,6 +1,6 @@
 {
   "name": "pnpm-sync",
-  "version": "0.0.7",
+  "version": "0.1.0",
   "description": "Recopy injected dependencies whenever a project is rebuilt in your PNPM workspace",
   "keywords": [
     "rush",
@@ -37,7 +37,7 @@
   },
   "dependencies": {
     "commander": "^11.1.0",
-    "pnpm-sync-lib": "0.0.2"
+    "pnpm-sync-lib": "0.1.0"
   },
   "devDependencies": {
     "@rushstack/eslint-config": "^3.6.2",
