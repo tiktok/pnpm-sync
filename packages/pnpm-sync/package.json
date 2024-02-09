@@ -30,6 +30,7 @@
   "scripts": {
     "build": "heft build --clean",
     "test": "heft test --clean",
+    "lint": "eslint src/**",
     "prepublishOnly": "heft build --clean"
   },
   "bin": {
@@ -42,6 +43,7 @@
   "devDependencies": {
     "@rushstack/eslint-config": "^3.6.2",
     "@rushstack/heft": "^0.64.3",
+    "@rushstack/eslint-patch": "^1.7.2",
     "@rushstack/heft-node-rig": "^2.4.5",
     "@types/heft-jest": "1.0.6",
     "@types/node": "18.17.15",

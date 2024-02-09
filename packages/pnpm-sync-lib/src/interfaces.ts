@@ -1,17 +1,17 @@
-export interface PnpmSyncCliArgs {
+export interface IPnpmSyncCliArgs {
   prepare: boolean,
   lockfile: string,
   store: string
 } 
 
-export interface PnpmSyncJson {
+export interface IPnpmSyncJson {
   postbuildInjectedCopy: {
     sourceFolder: string,
-    targetFolders: Array<TargetFolder>
+    targetFolders: Array<ITargetFolder>
   }
 }
 
-export interface TargetFolder {
+export interface ITargetFolder {
   folderPath: string
 }
 

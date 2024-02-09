@@ -1,4 +1,4 @@
-import { PnpmSyncJson } from "./interfaces";
+import { IPnpmSyncJson } from "./interfaces";
 import {
   readWantedLockfile,
   type Lockfile,
@@ -98,7 +98,7 @@ export async function pnpmSyncPrepare(
 
     const pnpmSyncJsonPath = `${projectFolder}/node_modules/.pnpm-sync.json`;
 
-    let pnpmSyncJsonFile: PnpmSyncJson = {
+    let pnpmSyncJsonFile: IPnpmSyncJson = {
       postbuildInjectedCopy: {
         sourceFolder: "../..",
         targetFolders: [],
@@ -167,15 +167,15 @@ function transferFilePathToPnpmStorePath(
 
 // process dependencies and devDependencies to generate injectedDependencyToFilePath
 function getInjectedDependencyToVersion(
+  // eslint-disable-next-line @rushstack/no-new-null
   pnpmLockfile: Lockfile | null
 ): Map<string, Set<string>> {
   const injectedDependencyToVersion: Map<string, Set<string>> = new Map();
   for (const importerKey in pnpmLockfile?.importers) {
-    const dependenciesMeta =
-      pnpmLockfile?.importers[importerKey]?.dependenciesMeta;
-    if (!dependenciesMeta) {
+    if (!pnpmLockfile?.importers[importerKey]?.dependenciesMeta){
       continue;
     }
+    const dependenciesMeta = pnpmLockfile?.importers[importerKey]?.dependenciesMeta;
 
     for (const dependency in dependenciesMeta) {
       if (dependenciesMeta[dependency]?.injected) {
@@ -200,13 +200,12 @@ function getInjectedDependencyToVersion(
       injectedDependencyToVersion
     );
   }
-
   return injectedDependencyToVersion;
 }
 function processDependencies(
   dependencies: Dependencies | undefined,
   injectedDependencyToVersion: Map<string, Set<string>>
-) {
+): void {
   if (dependencies) {
     for (const dependency in dependencies) {
       if (injectedDependencyToVersion.has(dependency)) {
