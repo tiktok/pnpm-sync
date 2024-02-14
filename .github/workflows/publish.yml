@@ -26,4 +26,5 @@ jobs:
           NPM_AUTH_TOKEN: ${{secrets.NPM_TOKEN}}
         run: |
           npm config set "//registry.npmjs.org/:_authToken" "${NPM_AUTH_TOKEN}"
-          pnpm --filter pnpm-sync publish && pnpm --filter pnpm-sync-lib publish --no-git-checks
+          pnpm --filter pnpm-sync-lib publish --no-git-checks
+          pnpm --filter pnpm-sync publish --no-git-checks
