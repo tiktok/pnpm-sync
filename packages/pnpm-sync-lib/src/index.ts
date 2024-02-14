@@ -5,5 +5,14 @@
  * @packageDocumentation
  */
 
-export { pnpmSyncCopy } from "./pnpmSyncCopy";
-export { pnpmSyncPrepare } from "./pnpmSyncPrepare";
+export { pnpmSyncCopyAsync, type IPnpmSyncCopyOptions } from "./pnpmSyncCopy";
+export {
+  pnpmSyncPrepareAsync,
+  type IPnpmSyncPrepareOptions,
+} from "./pnpmSyncPrepare";
+export type {
+  ILockfile,
+  ILockfileImporter,
+  IVersionSpecifier,
+  IDependencyMeta,
+} from "./interfaces";
