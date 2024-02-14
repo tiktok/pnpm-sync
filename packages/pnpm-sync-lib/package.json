@@ -1,6 +1,6 @@
 {
   "name": "pnpm-sync-lib",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "API library for integrating \"pnpm-sync\" with your toolchain",
   "repository": {
     "type": "git",
