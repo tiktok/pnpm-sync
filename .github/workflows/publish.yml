@@ -24,4 +24,4 @@ jobs:
       - name: Publish to NPM
         run: pnpm --filter pnpm-sync publish && pnpm --filter pnpm-sync-lib publish --no-git-checks
         env:
-          NPM_TOKEN: ${{secrets.npm_token}}
+          NPM_TOKEN: ${{secrets.NPM_TOKEN}}
