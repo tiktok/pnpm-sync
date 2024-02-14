@@ -22,6 +22,9 @@ jobs:
       - name: Build and run tests for pnpm-sync
         run: pnpm --filter pnpm-sync run build && pnpm --filter pnpm-sync run test
       - name: Publish to NPM
-        run: pnpm --filter pnpm-sync publish && pnpm --filter pnpm-sync-lib publish
         env:
-          NPM_AUTH_TOKEN: ${{secrets.npm_token}}
+          NPM_AUTH_TOKEN: ${{secrets.NPM_TOKEN}}
+        run: |
+          npm config set "//registry.npmjs.org/:_authToken" "${NPM_AUTH_TOKEN}"
+          pnpm --filter pnpm-sync-lib publish --no-git-checks
+          pnpm --filter pnpm-sync publish --no-git-checks
