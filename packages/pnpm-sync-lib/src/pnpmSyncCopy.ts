@@ -12,7 +12,7 @@ export interface IPnpmSyncCopyOptions {
     callback: (item: TItem) => Promise<void>,
     options: { concurrency: number }
   ) => Promise<void>;
-  ensureFolderAsync: (folderPath: string) => Promise<void>;
+  ensureFolder: (folderPath: string) => Promise<void>;
 }
 
 /**
@@ -32,7 +32,7 @@ export async function pnpmSyncCopyAsync({
   pnpmSyncJsonPath = "",
   getPackageIncludedFiles,
   forEachAsyncWithConcurrency,
-  ensureFolderAsync,
+  ensureFolder,
 }: IPnpmSyncCopyOptions): Promise<void> {
   if (pnpmSyncJsonPath === "") {
     // if user does not input .pnpm-sync.json file path
@@ -92,7 +92,7 @@ export async function pnpmSyncCopyAsync({
           npmPackFile
         );
 
-        await ensureFolderAsync(path.dirname(copyDestinationPath));
+        await ensureFolder(path.dirname(copyDestinationPath));
 
         // create a hard link to the destination path
         await fs.promises.link(copySourcePath, copyDestinationPath);

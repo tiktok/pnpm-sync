@@ -31,7 +31,7 @@ export interface ILockfileImporter {
 // @beta (undocumented)
 export interface IPnpmSyncCopyOptions {
     // (undocumented)
-    ensureFolderAsync: (folderPath: string) => Promise<void>;
+    ensureFolder: (folderPath: string) => Promise<void>;
     // (undocumented)
     forEachAsyncWithConcurrency: <TItem>(iterable: Iterable<TItem>, callback: (item: TItem) => Promise<void>, options: {
         concurrency: number;
@@ -60,7 +60,7 @@ export type IVersionSpecifier = string | {
 };
 
 // @beta
-export function pnpmSyncCopyAsync({ pnpmSyncJsonPath, getPackageIncludedFiles, forEachAsyncWithConcurrency, ensureFolderAsync, }: IPnpmSyncCopyOptions): Promise<void>;
+export function pnpmSyncCopyAsync({ pnpmSyncJsonPath, getPackageIncludedFiles, forEachAsyncWithConcurrency, ensureFolder, }: IPnpmSyncCopyOptions): Promise<void>;
 
 // @beta
 export function pnpmSyncPrepareAsync({ lockfilePath, storePath, readWantedLockfile, }: IPnpmSyncPrepareOptions): Promise<void>;

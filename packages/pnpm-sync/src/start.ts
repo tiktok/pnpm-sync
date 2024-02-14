@@ -18,7 +18,7 @@ program
       await pnpmSyncCopyAsync({
         getPackageIncludedFiles: PackageExtractor.getPackageIncludedFilesAsync,
         forEachAsyncWithConcurrency: Async.forEachAsync,
-        ensureFolderAsync: FileSystem.ensureFolderAsync,
+        ensureFolder: FileSystem.ensureFolderAsync,
       })
   );
 
