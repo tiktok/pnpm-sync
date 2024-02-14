@@ -59,7 +59,7 @@ Assuming you are under `pnpm-sync-cli-demo` folder, then in this example, the co
 ```
 pnpm-sync prepare --lockfile=../pnpm-lock.yaml --store=../node_modules/.pnpm
 ```
-After run this command, you can check `node_modules` folder under lib1, you will the `pnpm-sync.json` file, like below:
+After run this command, you can check `node_modules` folder under lib1, you will see the `pnpm-sync.json` file, like below:
 ```
 {
   "postbuildInjectedCopy": {
@@ -75,7 +75,7 @@ After run this command, you can check `node_modules` folder under lib1, you will
 
 ### 4. Run `pnpm-sync` for injected workspace dependency `lib1`
 
-Since `app1` sets `lib1` as the injected workspace dependency, now, every time after `lib1` re-build, its build output needs to be copied to the corresponding `pnpm-store` location.<br>
+Since `app1` sets `lib1` as the injected workspace dependency, now, every time after `lib1` re-built, its build output needs to be copied to the corresponding `pnpm-store` location.<br>
 To achieve that, you can simply run `pnpm-sync copy` under `lib1` folder. <br>
 After that, the build output of `lib1` are copied to the corresponding `pnpm-store` properly. 
 

@@ -1,7 +1,19 @@
 import path from "path";
 import fs from "fs";
-import { FileSystem, Async } from "@rushstack/node-core-library";
-import { PackageExtractor } from "@rushstack/package-extractor";
+
+/**
+ * @beta
+ */
+export interface IPnpmSyncCopyOptions {
+  pnpmSyncJsonPath?: string;
+  getPackageIncludedFiles: (packagePath: string) => Promise<string[]>;
+  forEachAsyncWithConcurrency: <TItem>(
+    iterable: Iterable<TItem>,
+    callback: (item: TItem) => Promise<void>,
+    options: { concurrency: number }
+  ) => Promise<void>;
+  ensureFolder: (folderPath: string) => Promise<void>;
+}
 
 /**
  * For each library project that acts as an injected dependency of other consuming projects
@@ -10,38 +22,47 @@ import { PackageExtractor } from "@rushstack/package-extractor";
  *
  * @remarks
  * This operation reads the `.npm-sync.json` file which should have been prepared after
- * `pnpm install` by calling the {@link pnpmSyncPrepare} function.
+ * `pnpm install` by calling the {@link pnpmSyncPrepareAsync} function.
  *
  * @param pnpmSyncJsonPath - optionally customizes the location of the `.pnpm-sync.json` file
  *
  * @beta
  */
-export async function pnpmSyncCopy(
-  pnpmSyncJsonPath: string = ""
-): Promise<void> {
+export async function pnpmSyncCopyAsync({
+  pnpmSyncJsonPath = "",
+  getPackageIncludedFiles,
+  forEachAsyncWithConcurrency,
+  ensureFolder,
+}: IPnpmSyncCopyOptions): Promise<void> {
   if (pnpmSyncJsonPath === "") {
     // if user does not input .pnpm-sync.json file path
     // then we assume .pnpm-sync.json is always under node_modules folder
     pnpmSyncJsonPath = "node_modules/.pnpm-sync.json";
   }
 
-  if (!FileSystem.exists(pnpmSyncJsonPath)) {
-    console.warn(
-      "You are executing pnpm-sync for a package, but we can not find the .pnpm-sync.json inside node_modules folder"
-    );
-    return;
+  let pnpmSyncJsonContents: string;
+  try {
+    pnpmSyncJsonContents = (
+      await fs.promises.readFile(pnpmSyncJsonPath)
+    ).toString();
+  } catch (e) {
+    if ((e as NodeJS.ErrnoException).code === "ENOENT") {
+      console.warn(
+        "You are executing pnpm-sync for a package, but we can not find the .pnpm-sync.json inside node_modules folder"
+      );
+      return;
+    } else {
+      throw e;
+    }
   }
 
   //read the .pnpm-sync.json
-  const pnpmSyncJson = JSON.parse(
-    FileSystem.readFile(pnpmSyncJsonPath).toString()
-  );
+  const pnpmSyncJson = JSON.parse(pnpmSyncJsonContents);
   const { sourceFolder, targetFolders } = pnpmSyncJson.postbuildInjectedCopy;
   const sourcePath = path.resolve(pnpmSyncJsonPath, sourceFolder);
 
   //get npmPackFiles
-  const npmPackFiles: string[] =
-    await PackageExtractor.getPackageIncludedFilesAsync(sourcePath);
+  const npmPackFiles: string[] = await getPackageIncludedFiles(sourcePath);
 
   console.time(
     `pnpm-sync => ${sourcePath}, total ${npmPackFiles.length} files`
@@ -53,10 +74,10 @@ export async function pnpmSyncCopy(
       pnpmSyncJsonPath,
       targetFolder.folderPath
     );
-    await FileSystem.deleteFolderAsync(destinationPath);
+    await fs.promises.rm(destinationPath, { recursive: true });
   }
 
-  await Async.forEachAsync(
+  await forEachAsyncWithConcurrency(
     npmPackFiles,
     async (npmPackFile: string) => {
       for (const targetFolder of targetFolders) {
@@ -71,7 +92,7 @@ export async function pnpmSyncCopy(
           npmPackFile
         );
 
-        await FileSystem.ensureFolderAsync(path.dirname(copyDestinationPath));
+        await ensureFolder(path.dirname(copyDestinationPath));
 
         // create a hard link to the destination path
         await fs.promises.link(copySourcePath, copyDestinationPath);

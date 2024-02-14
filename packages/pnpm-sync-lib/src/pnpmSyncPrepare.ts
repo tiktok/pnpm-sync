@@ -1,17 +1,26 @@
-import { IPnpmSyncJson } from "./interfaces";
-import {
-  readWantedLockfile,
-  type Lockfile,
-  type Dependencies,
-} from "@pnpm/lockfile-file";
 import path from "path";
 import fs from "fs";
 import { cwd } from "process";
 
+import type { ILockfile, IPnpmSyncJson, IVersionSpecifier } from "./interfaces";
+
+/**
+ * @beta
+ */
+export interface IPnpmSyncPrepareOptions {
+  lockfilePath: string;
+  storePath: string;
+  readWantedLockfile: (
+    lockfilePath: string,
+    options: { ignoreIncompatible: boolean }
+    // eslint-disable-next-line @rushstack/no-new-null
+  ) => Promise<ILockfile | null>;
+}
+
 /**
  * For each workspace project has injected dependencies in a PNPM workspace, this API
  * should be invoked to prepare its `pnpm-sync.json` file.  While building projects,
- * that file will be used by {@link pnpmSyncCopy} to recopy the build outputs into
+ * that file will be used by {@link pnpmSyncCopyAsync} to recopy the build outputs into
  * injected dependency installation folders under the `node_modules` folder.
  *
  * @param lockfile - the path to the `pnpm-lock.yaml` file
@@ -19,15 +28,16 @@ import { cwd } from "process";
  *
  * @beta
  */
-export async function pnpmSyncPrepare(
-  lockfile: string,
-  store: string
-): Promise<void> {
+export async function pnpmSyncPrepareAsync({
+  lockfilePath,
+  storePath,
+  readWantedLockfile,
+}: IPnpmSyncPrepareOptions): Promise<void> {
   console.log("Generate pnpm-sync.json ...");
 
   // get the pnpm-lock.yaml path
-  const lockfilePath = path.resolve(cwd(), lockfile);
-  const storePath = path.resolve(cwd(), store);
+  lockfilePath = path.resolve(cwd(), lockfilePath);
+  storePath = path.resolve(cwd(), storePath);
 
   console.log("The pnpm-lock.yaml file path =>", lockfilePath);
   console.log("The .pnpm folder path =>", storePath);
@@ -168,14 +178,15 @@ function transferFilePathToPnpmStorePath(
 // process dependencies and devDependencies to generate injectedDependencyToFilePath
 function getInjectedDependencyToVersion(
   // eslint-disable-next-line @rushstack/no-new-null
-  pnpmLockfile: Lockfile | null
+  pnpmLockfile: ILockfile | null
 ): Map<string, Set<string>> {
   const injectedDependencyToVersion: Map<string, Set<string>> = new Map();
   for (const importerKey in pnpmLockfile?.importers) {
-    if (!pnpmLockfile?.importers[importerKey]?.dependenciesMeta){
+    if (!pnpmLockfile?.importers[importerKey]?.dependenciesMeta) {
       continue;
     }
-    const dependenciesMeta = pnpmLockfile?.importers[importerKey]?.dependenciesMeta;
+    const dependenciesMeta =
+      pnpmLockfile?.importers[importerKey]?.dependenciesMeta;
 
     for (const dependency in dependenciesMeta) {
       if (dependenciesMeta[dependency]?.injected) {
@@ -203,15 +214,15 @@ function getInjectedDependencyToVersion(
   return injectedDependencyToVersion;
 }
 function processDependencies(
-  dependencies: Dependencies | undefined,
+  dependencies: Record<string, IVersionSpecifier> | undefined,
   injectedDependencyToVersion: Map<string, Set<string>>
 ): void {
   if (dependencies) {
-    for (const dependency in dependencies) {
+    for (const [dependency, specifier] of Object.entries(dependencies)) {
       if (injectedDependencyToVersion.has(dependency)) {
-        injectedDependencyToVersion
-          .get(dependency)
-          ?.add(dependencies[dependency]);
+        const specifierToUse: string =
+          typeof specifier === "string" ? specifier : specifier.version;
+        injectedDependencyToVersion.get(dependency)?.add(specifierToUse);
       }
     }
   }

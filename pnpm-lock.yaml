@@ -8,12 +8,24 @@ importers:
 
   packages/pnpm-sync:
     dependencies:
+      '@pnpm/lockfile-file':
+        specifier: ~8.1.4
+        version: 8.1.7(@pnpm/logger@5.0.0)
+      '@pnpm/logger':
+        specifier: ~5.0.0
+        version: 5.0.0
+      '@rushstack/node-core-library':
+        specifier: ^3.61.0
+        version: 3.64.2(@types/node@18.17.15)
+      '@rushstack/package-extractor':
+        specifier: ^0.6.12
+        version: 0.6.26(@types/node@18.17.15)
       commander:
         specifier: ^11.1.0
         version: 11.1.0
       pnpm-sync-lib:
-        specifier: 0.1.0
-        version: 0.1.0(@types/node@18.17.15)
+        specifier: workspace:*
+        version: link:../pnpm-sync-lib
     devDependencies:
       '@rushstack/eslint-config':
         specifier: ^3.6.2
@@ -41,19 +53,6 @@ importers:
         version: 5.3.3
 
   packages/pnpm-sync-lib:
-    dependencies:
-      '@pnpm/lockfile-file':
-        specifier: ~8.1.4
-        version: 8.1.6(@pnpm/logger@5.0.0)
-      '@pnpm/logger':
-        specifier: ~5.0.0
-        version: 5.0.0
-      '@rushstack/node-core-library':
-        specifier: ^3.61.0
-        version: 3.64.2(@types/node@18.17.15)
-      '@rushstack/package-extractor':
-        specifier: ^0.6.12
-        version: 0.6.23(@types/node@18.17.15)
     devDependencies:
       '@rushstack/eslint-config':
         specifier: ^3.6.2
@@ -871,8 +870,8 @@ packages:
       rfc4648: 1.5.3
     dev: false
 
-  /@pnpm/dependency-path@2.1.7:
-    resolution: {integrity: sha512-/q3xNNgAEKkG0FvU8o/6B06nrBhSl1i34ZMEQDOhHFMDzS0mWqnIogb54seVKySNxfdJdyqfedjNnNIzKrPbkg==}
+  /@pnpm/dependency-path@2.1.8:
+    resolution: {integrity: sha512-ywBaTjy0iSEF7lH3DlF8UXrdL2bw4AQFV2tTOeNeY7wc1W5CE+RHSJhf9MXBYcZPesqGRrPiU7Pimj3l05L9VA==}
     engines: {node: '>=16.14'}
     dependencies:
       '@pnpm/crypto.base32-hash': 2.0.0
@@ -919,14 +918,14 @@ packages:
       ramda: 0.27.2
     dev: false
 
-  /@pnpm/lockfile-file@8.1.6(@pnpm/logger@5.0.0):
-    resolution: {integrity: sha512-ObCi2cONJ5DXqWu+h5TxlRvHTlGN9E63zGW/kghqiJFG562OxIS1pDndqwtSvqPyCt7DuoKSR/LVd/+XkpZwiw==}
+  /@pnpm/lockfile-file@8.1.7(@pnpm/logger@5.0.0):
+    resolution: {integrity: sha512-TbK1o2yUDog4P0Y0V7USodamk8qEGiSaoEqoQS29v2F+w7PdOaVJcwbybV8Q/ec3Epmr1Cmoq8ar0iSHJsSJSw==}
     engines: {node: '>=16.14'}
     peerDependencies:
       '@pnpm/logger': ^5.0.0
     dependencies:
       '@pnpm/constants': 7.1.1
-      '@pnpm/dependency-path': 2.1.7
+      '@pnpm/dependency-path': 2.1.8
       '@pnpm/error': 5.0.2
       '@pnpm/git-utils': 1.0.0
       '@pnpm/lockfile-types': 5.1.5
@@ -956,7 +955,7 @@ packages:
     resolution: {integrity: sha512-YfcB2QrX+Wx1o6LD1G2Y2fhDhOix/bAY/oAnMpHoNLsKkWIRbt1oKLkIFvxBMzLwAEPqnYWguJrYC+J6i4ywbw==}
     engines: {node: '>=12.17'}
     dependencies:
-      bole: 5.0.10
+      bole: 5.0.11
       ndjson: 2.0.0
     dev: false
 
@@ -1256,6 +1255,24 @@ packages:
       semver: 7.5.4
       z-schema: 5.0.5
 
+  /@rushstack/node-core-library@3.66.0(@types/node@18.17.15):
+    resolution: {integrity: sha512-nXyddNe3T9Ph14TrIfjtLZ+GDzC7HL/wF+ZKC18qmRVtz2xXLd1ZzreVgiAgGDwn8ZUWZ/7q//gQJk96iWjSrg==}
+    peerDependencies:
+      '@types/node': '*'
+    peerDependenciesMeta:
+      '@types/node':
+        optional: true
+    dependencies:
+      '@types/node': 18.17.15
+      colors: 1.2.5
+      fs-extra: 7.0.1
+      import-lazy: 4.0.0
+      jju: 1.4.0
+      resolve: 1.22.8
+      semver: 7.5.4
+      z-schema: 5.0.5
+    dev: false
+
   /@rushstack/operation-graph@0.2.6(@types/node@18.17.15):
     resolution: {integrity: sha512-zSbfOgTGxfb6jlt6jv3pWXp1xR3aDnFYy+0zK775lb608nJUfED1DE8dJ4Gabn8RtpAvEh1GnDySYZM+OdJ+EA==}
     peerDependencies:
@@ -1268,12 +1285,12 @@ packages:
       '@types/node': 18.17.15
     dev: true
 
-  /@rushstack/package-extractor@0.6.23(@types/node@18.17.15):
-    resolution: {integrity: sha512-ySRr7yLFWwibh7XPqDokMK7N6UAfT+j+34JoP+Ta6oKYcDqFRqW/lbV923wW26rrx7L8lHQOldUDskIssn39dw==}
+  /@rushstack/package-extractor@0.6.26(@types/node@18.17.15):
+    resolution: {integrity: sha512-zza3OvakKvsIkQfoiGjF3rUXBuS4tGYuYkBWEQIEDF79CoiyTtDoZlNPXXpX6Dxz1DXhbDD27IUFNiQ+0WK15Q==}
     dependencies:
       '@pnpm/link-bins': 5.3.25
-      '@rushstack/node-core-library': 3.64.2(@types/node@18.17.15)
-      '@rushstack/terminal': 0.7.20(@types/node@18.17.15)
+      '@rushstack/node-core-library': 3.66.0(@types/node@18.17.15)
+      '@rushstack/terminal': 0.7.23(@types/node@18.17.15)
       ignore: 5.1.9
       jszip: 3.8.0
       minimatch: 3.0.8
@@ -1290,15 +1307,15 @@ packages:
       strip-json-comments: 3.1.1
     dev: true
 
-  /@rushstack/terminal@0.7.20(@types/node@18.17.15):
-    resolution: {integrity: sha512-e23GExH43r1VSpcudhvXNlatjDn/jZiajaW3Bs/Nd9wyRPsWxs1b+6iEFdZSDoBDRwAKxrSv96no9qCszOSmkQ==}
+  /@rushstack/terminal@0.7.23(@types/node@18.17.15):
+    resolution: {integrity: sha512-IwEbY4CMZUT6+lNih63t9KETr51IkqGcIWz6e0Kn15N2B7Nd4R307o4bQ1QxsmiSyz4IB5V/Iq1J0Eki5T9qFw==}
     peerDependencies:
       '@types/node': '*'
     peerDependenciesMeta:
       '@types/node':
         optional: true
     dependencies:
-      '@rushstack/node-core-library': 3.64.2(@types/node@18.17.15)
+      '@rushstack/node-core-library': 3.66.0(@types/node@18.17.15)
       '@types/node': 18.17.15
     dev: false
 
@@ -1845,8 +1862,8 @@ packages:
     engines: {node: '>=8'}
     dev: true
 
-  /bole@5.0.10:
-    resolution: {integrity: sha512-5IiUWQ8QRQ8yHf46VPQ7GH3nj0Jy7P4heaENBVmsGfHP1Gtd0wqkvK6C3iHLUMdG3SMFx2DD8FqoIQcnMpdIdQ==}
+  /bole@5.0.11:
+    resolution: {integrity: sha512-KB0Ye0iMAW5BnNbnLfMSQcnI186hKUzE2fpkZWqcxsoTR7eqzlTidSOMYPHJOn/yR7VGH7uSZp37qH9q2Et0zQ==}
     dependencies:
       fast-safe-stringify: 2.1.1
       individual: 3.0.0
@@ -3988,17 +4005,6 @@ packages:
     engines: {node: '>= 6'}
     dev: true
 
-  /pnpm-sync-lib@0.1.0(@types/node@18.17.15):
-    resolution: {integrity: sha512-s+LzY+TElBBMPMRTQJWsWxvMIXqHgiDhmKp4F0ZvNlBnnB0MAQjsyARtJm29NlJiDT+TX3L1FSCFi8HEooAAEw==}
-    dependencies:
-      '@pnpm/lockfile-file': 8.1.6(@pnpm/logger@5.0.0)
-      '@pnpm/logger': 5.0.0
-      '@rushstack/node-core-library': 3.64.2(@types/node@18.17.15)
-      '@rushstack/package-extractor': 0.6.23(@types/node@18.17.15)
-    transitivePeerDependencies:
-      - '@types/node'
-    dev: false
-
   /prelude-ls@1.2.1:
     resolution: {integrity: sha512-vkcDPrRZo1QZLbn5RLGPpg/WmIQ65qoWWhcGKf/b5eplkkarX0m9z8ppCat4mlOqUsWpyNuYgO3VRyrYHSzX5g==}
     engines: {node: '>= 0.8.0'}
@@ -4088,7 +4094,7 @@ packages:
     engines: {node: '>= 6'}
     dependencies:
       inherits: 2.0.4
-      string_decoder: 1.3.0
+      string_decoder: 1.1.1
       util-deprecate: 1.0.2
     dev: false
 
@@ -4195,10 +4201,6 @@ packages:
 
   /safe-buffer@5.1.2:
     resolution: {integrity: sha512-Gd2UZBJDkXlY7GbJxfsE8/nvKkUEU1G38c1siN6QP6a9PT9MmHB8GnpscSmMJSoF8LOIrt8ud/wPtojys4G6+g==}
-    dev: false
-
-  /safe-buffer@5.2.1:
-    resolution: {integrity: sha512-rp3So07KcdmmKbGvgaNxQSJr7bGVSVk5S9Eq1F+ppbRo70+YeaDxkw5Dd8NPN+GD6bjnYm2VuPuCXmpuYvmCXQ==}
     dev: false
 
   /safe-execa@0.1.2:
@@ -4310,7 +4312,7 @@ packages:
     resolution: {integrity: sha512-kN9dJbvnySHULIluDHy32WHRUu3Og7B9sbY7tsFLctQkIqnMh3hErYgdMjTYuqmcXX+lK5T1lnUt3G7zNswmZA==}
     dependencies:
       spdx-expression-parse: 3.0.1
-      spdx-license-ids: 3.0.16
+      spdx-license-ids: 3.0.17
     dev: false
 
   /spdx-exceptions@2.4.0:
@@ -4321,11 +4323,11 @@ packages:
     resolution: {integrity: sha512-cbqHunsQWnJNE6KhVSMsMeH5H/L9EpymbzqTQ3uLwNCLZ1Q481oWaofqH7nO6V07xlXwY6PhQdQ2IedWx/ZK4Q==}
     dependencies:
       spdx-exceptions: 2.4.0
-      spdx-license-ids: 3.0.16
+      spdx-license-ids: 3.0.17
     dev: false
 
-  /spdx-license-ids@3.0.16:
-    resolution: {integrity: sha512-eWN+LnM3GR6gPu35WxNgbGl8rmY1AEmoMDvL/QD6zYmPWgywxWqJWNdLGT+ke8dKNWrcYgYjPpG5gbTfghP8rw==}
+  /spdx-license-ids@3.0.17:
+    resolution: {integrity: sha512-sh8PWc/ftMqAAdFiBu6Fy6JUOYjqDJBJvIhpfDMyHrr0Rbp5liZqd4TjtQ/RgfLjKFZb+LMx5hpml5qOWy0qvg==}
     dev: false
 
   /split2@3.2.2:
@@ -4401,12 +4403,6 @@ packages:
     resolution: {integrity: sha512-n/ShnvDi6FHbbVfviro+WojiFzv+s8MPMHBczVePfUpDJLwoLT0ht1l4YwBCbi8pJAveEEdnkHyPyTP/mzRfwg==}
     dependencies:
       safe-buffer: 5.1.2
-    dev: false
-
-  /string_decoder@1.3.0:
-    resolution: {integrity: sha512-hkRX8U1WjJFd8LsDJ2yQ/wWWxaopEsABU1XfkM8A+j0+85JAGppt16cr1Whg6KIbb4okU6Mql6BOj+uup/wKeA==}
-    dependencies:
-      safe-buffer: 5.2.1
     dev: false
 
   /strip-ansi@6.0.1:

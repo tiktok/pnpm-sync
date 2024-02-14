@@ -37,8 +37,12 @@
     "pnpm-sync": "bin/pnpm-sync.js"
   },
   "dependencies": {
+    "@pnpm/lockfile-file": "~8.1.4",
+    "@pnpm/logger": "~5.0.0",
+    "@rushstack/node-core-library": "^3.61.0",
+    "@rushstack/package-extractor": "^0.6.12",
     "commander": "^11.1.0",
-    "pnpm-sync-lib": "0.1.0"
+    "pnpm-sync-lib": "workspace:*"
   },
   "devDependencies": {
     "@rushstack/eslint-config": "^3.6.2",
