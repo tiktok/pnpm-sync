@@ -2,7 +2,7 @@ import { Command } from "commander";
 import { pnpmSyncCopyAsync, pnpmSyncPrepareAsync } from "pnpm-sync-lib";
 import { FileSystem, Async } from "@rushstack/node-core-library";
 import { PackageExtractor } from "@rushstack/package-extractor";
-import { readWantedLockfile } from "@pnpm/lockfile-file";
+import { readWantedLockfile, Lockfile } from "@pnpm/lockfile-file";
 
 const program: Command = new Command();
 
@@ -35,7 +35,23 @@ program
       await pnpmSyncPrepareAsync({
         lockfilePath: lockfile,
         storePath: store,
-        readWantedLockfile,
+        readPnpmLockfile: async (lockfilePath: string, options: {
+          ignoreIncompatible: boolean
+        }) => {
+
+          const pnpmLockFolder = lockfilePath.slice(
+            0,
+            lockfilePath.length - "pnpm-lock.yaml".length
+          );
+
+          const lockfile: Lockfile | null = await readWantedLockfile(pnpmLockFolder, options);
+
+          if(lockfile === null){
+            return undefined;
+          } else {
+            return lockfile
+          }
+        },
       });
     } catch (error) {
       console.log(error);
