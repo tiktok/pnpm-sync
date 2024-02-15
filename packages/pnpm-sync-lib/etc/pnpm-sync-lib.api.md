@@ -47,9 +47,9 @@ export interface IPnpmSyncPrepareOptions {
     // (undocumented)
     lockfilePath: string;
     // (undocumented)
-    readWantedLockfile: (lockfilePath: string, options: {
+    readPnpmLockfile: (lockfilePath: string, options: {
         ignoreIncompatible: boolean;
-    }) => Promise<ILockfile | null>;
+    }) => Promise<ILockfile | undefined>;
     // (undocumented)
     storePath: string;
 }
@@ -63,6 +63,6 @@ export type IVersionSpecifier = string | {
 export function pnpmSyncCopyAsync({ pnpmSyncJsonPath, getPackageIncludedFiles, forEachAsyncWithConcurrency, ensureFolder, }: IPnpmSyncCopyOptions): Promise<void>;
 
 // @beta
-export function pnpmSyncPrepareAsync({ lockfilePath, storePath, readWantedLockfile, }: IPnpmSyncPrepareOptions): Promise<void>;
+export function pnpmSyncPrepareAsync({ lockfilePath, storePath, readPnpmLockfile, }: IPnpmSyncPrepareOptions): Promise<void>;
 
 ```
