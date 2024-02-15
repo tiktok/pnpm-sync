@@ -10,11 +10,10 @@ import type { ILockfile, IPnpmSyncJson, IVersionSpecifier } from "./interfaces";
 export interface IPnpmSyncPrepareOptions {
   lockfilePath: string;
   storePath: string;
-  readWantedLockfile: (
+  readPnpmLockfile: (
     lockfilePath: string,
     options: { ignoreIncompatible: boolean }
-    // eslint-disable-next-line @rushstack/no-new-null
-  ) => Promise<ILockfile | null>;
+  ) => Promise<ILockfile | undefined>;
 }
 
 /**
@@ -31,7 +30,7 @@ export interface IPnpmSyncPrepareOptions {
 export async function pnpmSyncPrepareAsync({
   lockfilePath,
   storePath,
-  readWantedLockfile,
+  readPnpmLockfile,
 }: IPnpmSyncPrepareOptions): Promise<void> {
   console.log("Generate pnpm-sync.json ...");
 
@@ -49,11 +48,7 @@ export async function pnpmSyncPrepareAsync({
   console.time(`pnpm-sync prepare`);
 
   // read the pnpm-lock.yaml
-  const pnpmLockFolder = lockfilePath.slice(
-    0,
-    lockfilePath.length - "pnpm-lock.yaml".length
-  );
-  const pnpmLockfile = await readWantedLockfile(pnpmLockFolder, {
+  const pnpmLockfile = await readPnpmLockfile(lockfilePath, {
     ignoreIncompatible: true,
   });
 
@@ -62,6 +57,12 @@ export async function pnpmSyncPrepareAsync({
     string,
     Set<string>
   > = getInjectedDependencyToVersion(pnpmLockfile);
+
+  // get pnpm-lock.yaml folder path
+  const pnpmLockFolder = lockfilePath.slice(
+    0,
+    lockfilePath.length - "pnpm-lock.yaml".length
+  );
 
   // generate a map, where key is the actual path of the injectedDependency, value is all available paths in .pnpm folder
   const injectedDependencyToFilePathSet: Map<string, Set<string>> = new Map();
@@ -177,8 +178,7 @@ function transferFilePathToPnpmStorePath(
 
 // process dependencies and devDependencies to generate injectedDependencyToFilePath
 function getInjectedDependencyToVersion(
-  // eslint-disable-next-line @rushstack/no-new-null
-  pnpmLockfile: ILockfile | null
+  pnpmLockfile: ILockfile | undefined
 ): Map<string, Set<string>> {
   const injectedDependencyToVersion: Map<string, Set<string>> = new Map();
   for (const importerKey in pnpmLockfile?.importers) {
