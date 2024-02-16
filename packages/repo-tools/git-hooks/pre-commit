@@ -1,0 +1,4 @@
+#!/bin/sh
+
+packages/repo-tools/node_modules/.bin/pretty-quick --staged
+

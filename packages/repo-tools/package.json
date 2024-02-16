@@ -1,0 +1,12 @@
+{
+  "name": "repo-tools",
+  "version": "0.0.0",
+  "private": true,
+  "scripts": {
+    "prepare": "node scripts/install-git-hooks.js"
+  },
+  "dependencies": {
+    "prettier": "^3.2.5",
+    "pretty-quick": "^4.0.0"
+  }
+}
