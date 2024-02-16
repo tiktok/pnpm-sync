@@ -22,4 +22,4 @@ jobs:
       - name: Build and run tests for pnpm-sync-lib
         run: pnpm --filter pnpm-sync-lib run build && pnpm --filter pnpm-sync-lib run test
       - name: Build and run tests for pnpm-sync
-        run: pnpm --filter pnpm-sync run build && pnpm --filter pnpm-sync run test      
+        run: pnpm --filter pnpm-sync run build && pnpm --filter pnpm-sync run test
