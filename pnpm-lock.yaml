@@ -48,9 +48,6 @@ importers:
       eslint:
         specifier: ~8.7.0
         version: 8.7.0
-      repo-tools:
-        specifier: workspace:*
-        version: link:../repo-tools
       typescript:
         specifier: ~5.3.3
         version: 5.3.3
@@ -78,9 +75,6 @@ importers:
       eslint:
         specifier: ~8.7.0
         version: 8.7.0
-      repo-tools:
-        specifier: workspace:*
-        version: link:../repo-tools
       typescript:
         specifier: ~5.3.3
         version: 5.3.3
