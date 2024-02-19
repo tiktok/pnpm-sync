@@ -5,14 +5,6 @@
  * @packageDocumentation
  */
 
-export { pnpmSyncCopyAsync, type IPnpmSyncCopyOptions } from "./pnpmSyncCopy";
-export {
-  pnpmSyncPrepareAsync,
-  type IPnpmSyncPrepareOptions,
-} from "./pnpmSyncPrepare";
-export type {
-  ILockfile,
-  ILockfileImporter,
-  IVersionSpecifier,
-  IDependencyMeta,
-} from "./interfaces";
+export { pnpmSyncCopyAsync, type IPnpmSyncCopyOptions } from './pnpmSyncCopy';
+export { pnpmSyncPrepareAsync, type IPnpmSyncPrepareOptions } from './pnpmSyncPrepare';
+export type { ILockfile, ILockfileImporter, IVersionSpecifier, IDependencyMeta } from './interfaces';
