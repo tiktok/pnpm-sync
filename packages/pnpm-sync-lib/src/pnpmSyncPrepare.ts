@@ -84,6 +84,11 @@ export async function pnpmSyncPrepareAsync({
       continue;
     }
 
+    // make sure the node_modules folder exists
+    if (!fs.existsSync(`${projectFolder}/node_modules`)) {
+      continue;
+    }
+
     const pnpmSyncJsonPath = `${projectFolder}/node_modules/.pnpm-sync.json`;
 
     let pnpmSyncJsonFile: IPnpmSyncJson = {

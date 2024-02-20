@@ -60,9 +60,9 @@ export type IVersionSpecifier = string | {
 };
 
 // @beta
-export function pnpmSyncCopyAsync({ pnpmSyncJsonPath, getPackageIncludedFiles, forEachAsyncWithConcurrency, ensureFolder, }: IPnpmSyncCopyOptions): Promise<void>;
+export function pnpmSyncCopyAsync({ pnpmSyncJsonPath, getPackageIncludedFiles, forEachAsyncWithConcurrency, ensureFolder }: IPnpmSyncCopyOptions): Promise<void>;
 
 // @beta
-export function pnpmSyncPrepareAsync({ lockfilePath, storePath, readPnpmLockfile, }: IPnpmSyncPrepareOptions): Promise<void>;
+export function pnpmSyncPrepareAsync({ lockfilePath, storePath, readPnpmLockfile }: IPnpmSyncPrepareOptions): Promise<void>;
 
 ```
