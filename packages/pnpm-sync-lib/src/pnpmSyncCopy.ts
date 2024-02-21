@@ -67,7 +67,7 @@ export async function pnpmSyncCopyAsync({
   //clear the destination folder first
   for (const targetFolder of targetFolders) {
     const destinationPath = path.resolve(pnpmSyncJsonPath, targetFolder.folderPath);
-    await fs.promises.rm(destinationPath, { recursive: true });
+    await fs.promises.rm(destinationPath, { recursive: true, force: true });
   }
 
   await forEachAsyncWithConcurrency(
