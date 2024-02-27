@@ -29,6 +29,18 @@ export interface ILockfileImporter {
 }
 
 // @beta (undocumented)
+export enum ILogMessageKind {
+    // (undocumented)
+    ERROR = "error",
+    // (undocumented)
+    INFO = "info",
+    // (undocumented)
+    VERBOSE = "verbose",
+    // (undocumented)
+    WARNING = "warning"
+}
+
+// @beta (undocumented)
 export interface IPnpmSyncCopyOptions {
     // (undocumented)
     ensureFolder: (folderPath: string) => Promise<void>;
@@ -39,6 +51,11 @@ export interface IPnpmSyncCopyOptions {
     // (undocumented)
     getPackageIncludedFiles: (packagePath: string) => Promise<string[]>;
     // (undocumented)
+    logMessageCallback: (message: string, messageKind: ILogMessageKind, details?: {
+        fileCount: number;
+        executionTimeInMs: string;
+    }) => void;
+    // (undocumented)
     pnpmSyncJsonPath?: string;
 }
 
@@ -46,6 +63,12 @@ export interface IPnpmSyncCopyOptions {
 export interface IPnpmSyncPrepareOptions {
     // (undocumented)
     lockfilePath: string;
+    // (undocumented)
+    logMessageCallback: (message: string, messageKind: ILogMessageKind, details?: {
+        lockfilePath: string;
+        dotPnpmFolderPath: string;
+        executionTimeInMs: string;
+    }) => void;
     // (undocumented)
     readPnpmLockfile: (lockfilePath: string, options: {
         ignoreIncompatible: boolean;
@@ -60,9 +83,9 @@ export type IVersionSpecifier = string | {
 };
 
 // @beta
-export function pnpmSyncCopyAsync({ pnpmSyncJsonPath, getPackageIncludedFiles, forEachAsyncWithConcurrency, ensureFolder }: IPnpmSyncCopyOptions): Promise<void>;
+export function pnpmSyncCopyAsync({ pnpmSyncJsonPath, getPackageIncludedFiles, forEachAsyncWithConcurrency, ensureFolder, logMessageCallback }: IPnpmSyncCopyOptions): Promise<void>;
 
 // @beta
-export function pnpmSyncPrepareAsync({ lockfilePath, storePath, readPnpmLockfile }: IPnpmSyncPrepareOptions): Promise<void>;
+export function pnpmSyncPrepareAsync({ lockfilePath, storePath, readPnpmLockfile, logMessageCallback }: IPnpmSyncPrepareOptions): Promise<void>;
 
 ```

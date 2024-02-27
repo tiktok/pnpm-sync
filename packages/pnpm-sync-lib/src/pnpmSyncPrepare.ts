@@ -1,8 +1,8 @@
 import path from 'path';
 import fs from 'fs';
-import { cwd } from 'process';
+import { cwd, hrtime } from 'process';
 
-import type { ILockfile, IPnpmSyncJson, IVersionSpecifier } from './interfaces';
+import { ILockfile, ILogMessageKind, IPnpmSyncJson, IVersionSpecifier } from './interfaces';
 
 /**
  * @beta
@@ -14,6 +14,15 @@ export interface IPnpmSyncPrepareOptions {
     lockfilePath: string,
     options: { ignoreIncompatible: boolean }
   ) => Promise<ILockfile | undefined>;
+  logMessageCallback: (
+    message: string,
+    messageKind: ILogMessageKind,
+    details?: {
+      lockfilePath: string;
+      dotPnpmFolderPath: string;
+      executionTimeInMs: string;
+    }
+  ) => void;
 }
 
 /**
@@ -30,22 +39,24 @@ export interface IPnpmSyncPrepareOptions {
 export async function pnpmSyncPrepareAsync({
   lockfilePath,
   storePath,
-  readPnpmLockfile
+  readPnpmLockfile,
+  logMessageCallback
 }: IPnpmSyncPrepareOptions): Promise<void> {
-  console.log('Generate pnpm-sync.json ...');
-
   // get the pnpm-lock.yaml path
   lockfilePath = path.resolve(cwd(), lockfilePath);
   storePath = path.resolve(cwd(), storePath);
-
-  console.log('The pnpm-lock.yaml file path =>', lockfilePath);
-  console.log('The .pnpm folder path =>', storePath);
+  logMessageCallback('pnpm-sync prepare: Starting operation...', ILogMessageKind.VERBOSE);
+  logMessageCallback(
+    `pnpm-sync prepare: The pnpm-lock.yaml file path => ${lockfilePath}`,
+    ILogMessageKind.VERBOSE
+  );
+  logMessageCallback(`pnpm-sync prepare: The .pnpm folder path => ${storePath}`, ILogMessageKind.VERBOSE);
 
   if (!fs.existsSync(lockfilePath)) {
     throw Error('The input pnpm-lock.yaml path is not correct!');
   }
 
-  console.time(`pnpm-sync prepare`);
+  const startTime = hrtime.bigint();
 
   // read the pnpm-lock.yaml
   const pnpmLockfile = await readPnpmLockfile(lockfilePath, {
@@ -119,7 +130,15 @@ export async function pnpmSyncPrepareAsync({
     }
     fs.writeFileSync(pnpmSyncJsonPath, JSON.stringify(pnpmSyncJsonFile, null, 2));
   }
-  console.timeEnd(`pnpm-sync prepare`);
+
+  const endTime = hrtime.bigint();
+  const prepareExecutionTimeInMs: string = (Number(endTime - startTime) / 1e6).toFixed(3) + 'ms';
+  const infoMessage = `pnpm-sync prepare: Regenerated pnpm-sync.json in ${prepareExecutionTimeInMs} for ${lockfilePath}`;
+  logMessageCallback(infoMessage, ILogMessageKind.INFO, {
+    lockfilePath,
+    dotPnpmFolderPath: storePath,
+    executionTimeInMs: prepareExecutionTimeInMs
+  });
 }
 
 function transferFilePathToPnpmStorePath(

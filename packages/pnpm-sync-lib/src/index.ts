@@ -7,4 +7,5 @@
 
 export { pnpmSyncCopyAsync, type IPnpmSyncCopyOptions } from './pnpmSyncCopy';
 export { pnpmSyncPrepareAsync, type IPnpmSyncPrepareOptions } from './pnpmSyncPrepare';
+export { ILogMessageKind } from './interfaces';
 export type { ILockfile, ILockfileImporter, IVersionSpecifier, IDependencyMeta } from './interfaces';

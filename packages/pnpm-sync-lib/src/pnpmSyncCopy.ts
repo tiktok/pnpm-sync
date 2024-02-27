@@ -1,5 +1,7 @@
 import path from 'path';
 import fs from 'fs';
+import { hrtime } from 'node:process';
+import { ILogMessageKind } from './interfaces';
 
 /**
  * @beta
@@ -13,6 +15,14 @@ export interface IPnpmSyncCopyOptions {
     options: { concurrency: number }
   ) => Promise<void>;
   ensureFolder: (folderPath: string) => Promise<void>;
+  logMessageCallback: (
+    message: string,
+    messageKind: ILogMessageKind,
+    details?: {
+      fileCount: number;
+      executionTimeInMs: string;
+    }
+  ) => void;
 }
 
 /**
@@ -32,7 +42,8 @@ export async function pnpmSyncCopyAsync({
   pnpmSyncJsonPath = '',
   getPackageIncludedFiles,
   forEachAsyncWithConcurrency,
-  ensureFolder
+  ensureFolder,
+  logMessageCallback
 }: IPnpmSyncCopyOptions): Promise<void> {
   if (pnpmSyncJsonPath === '') {
     // if user does not input .pnpm-sync.json file path
@@ -45,9 +56,9 @@ export async function pnpmSyncCopyAsync({
     pnpmSyncJsonContents = (await fs.promises.readFile(pnpmSyncJsonPath)).toString();
   } catch (e) {
     if ((e as NodeJS.ErrnoException).code === 'ENOENT') {
-      console.warn(
-        'You are executing pnpm-sync for a package, but we can not find the .pnpm-sync.json inside node_modules folder'
-      );
+      const errorMessage: string =
+        'You are executing pnpm-sync for a package, but we can not find the .pnpm-sync.json inside node_modules folder';
+      logMessageCallback(errorMessage, ILogMessageKind.ERROR);
       return;
     } else {
       throw e;
@@ -62,7 +73,7 @@ export async function pnpmSyncCopyAsync({
   //get npmPackFiles
   const npmPackFiles: string[] = await getPackageIncludedFiles(sourcePath);
 
-  console.time(`pnpm-sync => ${sourcePath}, total ${npmPackFiles.length} files`);
+  const startTime = hrtime.bigint();
 
   //clear the destination folder first
   for (const targetFolder of targetFolders) {
@@ -90,5 +101,11 @@ export async function pnpmSyncCopyAsync({
     }
   );
 
-  console.timeEnd(`pnpm-sync => ${sourcePath}, total ${npmPackFiles.length} files`);
+  const endTime = hrtime.bigint();
+  const copyExecutionTimeInMs: string = (Number(endTime - startTime) / 1e6).toFixed(3) + 'ms';
+  const infoMessage = `pnpm-sync copy: Copied ${npmPackFiles.length} files in ${copyExecutionTimeInMs} from ${sourcePath}`;
+  logMessageCallback(infoMessage, ILogMessageKind.INFO, {
+    fileCount: npmPackFiles.length,
+    executionTimeInMs: copyExecutionTimeInMs
+  });
 }

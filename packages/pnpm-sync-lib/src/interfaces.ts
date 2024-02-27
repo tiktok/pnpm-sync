@@ -18,6 +18,16 @@ export interface ITargetFolder {
 /**
  * @beta
  */
+export enum ILogMessageKind {
+  INFO = 'info',
+  WARNING = 'warning',
+  ERROR = 'error',
+  VERBOSE = 'verbose'
+}
+
+/**
+ * @beta
+ */
 export interface IDependencyMeta {
   injected?: boolean;
 }

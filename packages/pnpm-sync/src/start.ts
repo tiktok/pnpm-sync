@@ -1,5 +1,5 @@
 import { Command } from 'commander';
-import { pnpmSyncCopyAsync, pnpmSyncPrepareAsync } from 'pnpm-sync-lib';
+import { pnpmSyncCopyAsync, pnpmSyncPrepareAsync, ILogMessageKind } from 'pnpm-sync-lib';
 import { FileSystem, Async } from '@rushstack/node-core-library';
 import { PackageExtractor } from '@rushstack/package-extractor';
 import { readWantedLockfile, Lockfile } from '@pnpm/lockfile-file';
@@ -16,7 +16,20 @@ program
       await pnpmSyncCopyAsync({
         getPackageIncludedFiles: PackageExtractor.getPackageIncludedFilesAsync,
         forEachAsyncWithConcurrency: Async.forEachAsync,
-        ensureFolder: FileSystem.ensureFolderAsync
+        ensureFolder: FileSystem.ensureFolderAsync,
+        logMessageCallback: (message: string, messageType: ILogMessageKind) => {
+          switch (messageType) {
+            case ILogMessageKind.ERROR:
+              console.error(message);
+              break;
+            case ILogMessageKind.WARNING:
+              console.warn(message);
+              break;
+            default:
+              console.log(message);
+              break;
+          }
+        }
       })
   );
 
@@ -45,6 +58,19 @@ program
             return undefined;
           } else {
             return lockfile;
+          }
+        },
+        logMessageCallback: (message: string, messageType: ILogMessageKind) => {
+          switch (messageType) {
+            case ILogMessageKind.ERROR:
+              console.error(message);
+              break;
+            case ILogMessageKind.WARNING:
+              console.warn(message);
+              break;
+            default:
+              console.log(message);
+              break;
           }
         }
       });
