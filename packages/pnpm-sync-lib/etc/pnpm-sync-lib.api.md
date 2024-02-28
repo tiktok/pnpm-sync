@@ -29,6 +29,40 @@ export interface ILockfileImporter {
 }
 
 // @beta (undocumented)
+export interface ILogMessageCallbackOptions {
+    // (undocumented)
+    details: {
+        messageIdentifier: LogMessageIdentifier.PREPARE_STARTING;
+        lockfilePath: string;
+        dotPnpmFolderPath: string;
+    } | {
+        messageIdentifier: LogMessageIdentifier.PREPARE_PROCESSING;
+        lockfilePath: string;
+        dotPnpmFolderPath: string;
+    } | {
+        messageIdentifier: LogMessageIdentifier.PREPARE_FINISHING;
+        lockfilePath: string;
+        dotPnpmFolderPath: string;
+        executionTimeInMs: string;
+    } | {
+        messageIdentifier: LogMessageIdentifier.COPY_STARTING;
+        pnpmSyncJsonPath: string;
+    } | {
+        messageIdentifier: LogMessageIdentifier.COPY_PROCESSING;
+        pnpmSyncJsonPath: string;
+    } | {
+        messageIdentifier: LogMessageIdentifier.COPY_FINISHING;
+        pnpmSyncJsonPath: string;
+        fileCount: number;
+        executionTimeInMs: string;
+    };
+    // (undocumented)
+    message: string;
+    // (undocumented)
+    messageKind: LogMessageKind;
+}
+
+// @beta (undocumented)
 export interface IPnpmSyncCopyOptions {
     // (undocumented)
     ensureFolder: (folderPath: string) => Promise<void>;
@@ -39,6 +73,8 @@ export interface IPnpmSyncCopyOptions {
     // (undocumented)
     getPackageIncludedFiles: (packagePath: string) => Promise<string[]>;
     // (undocumented)
+    logMessageCallback: (options: ILogMessageCallbackOptions) => void;
+    // (undocumented)
     pnpmSyncJsonPath?: string;
 }
 
@@ -46,6 +82,8 @@ export interface IPnpmSyncCopyOptions {
 export interface IPnpmSyncPrepareOptions {
     // (undocumented)
     lockfilePath: string;
+    // (undocumented)
+    logMessageCallback: (options: ILogMessageCallbackOptions) => void;
     // (undocumented)
     readPnpmLockfile: (lockfilePath: string, options: {
         ignoreIncompatible: boolean;
@@ -59,10 +97,38 @@ export type IVersionSpecifier = string | {
     version: string;
 };
 
-// @beta
-export function pnpmSyncCopyAsync({ pnpmSyncJsonPath, getPackageIncludedFiles, forEachAsyncWithConcurrency, ensureFolder }: IPnpmSyncCopyOptions): Promise<void>;
+// @beta (undocumented)
+export enum LogMessageIdentifier {
+    // (undocumented)
+    COPY_FINISHING = "copy-finishing",
+    // (undocumented)
+    COPY_PROCESSING = "copy-processing",
+    // (undocumented)
+    COPY_STARTING = "copy-starting",
+    // (undocumented)
+    PREPARE_FINISHING = "prepare-finishing",
+    // (undocumented)
+    PREPARE_PROCESSING = "prepare-processing",
+    // (undocumented)
+    PREPARE_STARTING = "prepare-starting"
+}
+
+// @beta (undocumented)
+export enum LogMessageKind {
+    // (undocumented)
+    ERROR = "error",
+    // (undocumented)
+    INFO = "info",
+    // (undocumented)
+    VERBOSE = "verbose",
+    // (undocumented)
+    WARNING = "warning"
+}
 
 // @beta
-export function pnpmSyncPrepareAsync({ lockfilePath, storePath, readPnpmLockfile }: IPnpmSyncPrepareOptions): Promise<void>;
+export function pnpmSyncCopyAsync({ pnpmSyncJsonPath, getPackageIncludedFiles, forEachAsyncWithConcurrency, ensureFolder, logMessageCallback }: IPnpmSyncCopyOptions): Promise<void>;
+
+// @beta
+export function pnpmSyncPrepareAsync({ lockfilePath, storePath, readPnpmLockfile, logMessageCallback }: IPnpmSyncPrepareOptions): Promise<void>;
 
 ```
