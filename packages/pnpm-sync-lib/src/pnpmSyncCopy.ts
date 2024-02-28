@@ -1,7 +1,7 @@
 import path from 'path';
 import fs from 'fs';
 import { hrtime } from 'node:process';
-import { ILogMessageKind } from './interfaces';
+import { ILogMessageCallbackOptions, LogMessageIdentifier, LogMessageKind } from './interfaces';
 
 /**
  * @beta
@@ -15,14 +15,7 @@ export interface IPnpmSyncCopyOptions {
     options: { concurrency: number }
   ) => Promise<void>;
   ensureFolder: (folderPath: string) => Promise<void>;
-  logMessageCallback: (
-    message: string,
-    messageKind: ILogMessageKind,
-    details?: {
-      fileCount: number;
-      executionTimeInMs: string;
-    }
-  ) => void;
+  logMessageCallback: (options: ILogMessageCallbackOptions) => void;
 }
 
 /**
@@ -51,14 +44,30 @@ export async function pnpmSyncCopyAsync({
     pnpmSyncJsonPath = 'node_modules/.pnpm-sync.json';
   }
 
+  logMessageCallback({
+    message: `pnpm-sync copy: Starting operation...`,
+    messageKind: LogMessageKind.VERBOSE,
+    details: {
+      messageIdentifier: LogMessageIdentifier.COPY_STARTING,
+      pnpmSyncJsonPath
+    }
+  });
+
   let pnpmSyncJsonContents: string;
   try {
     pnpmSyncJsonContents = (await fs.promises.readFile(pnpmSyncJsonPath)).toString();
   } catch (e) {
     if ((e as NodeJS.ErrnoException).code === 'ENOENT') {
-      const errorMessage: string =
-        'You are executing pnpm-sync for a package, but we can not find the .pnpm-sync.json inside node_modules folder';
-      logMessageCallback(errorMessage, ILogMessageKind.ERROR);
+      logMessageCallback({
+        message:
+          'You are executing pnpm-sync for a package, but we can not find the .pnpm-sync.json inside node_modules folder',
+        messageKind: LogMessageKind.ERROR,
+        details: {
+          messageIdentifier: LogMessageIdentifier.COPY_PROCESSING,
+          pnpmSyncJsonPath
+        }
+      });
+
       return;
     } else {
       throw e;
@@ -104,8 +113,15 @@ export async function pnpmSyncCopyAsync({
   const endTime = hrtime.bigint();
   const copyExecutionTimeInMs: string = (Number(endTime - startTime) / 1e6).toFixed(3) + 'ms';
   const infoMessage = `pnpm-sync copy: Copied ${npmPackFiles.length} files in ${copyExecutionTimeInMs} from ${sourcePath}`;
-  logMessageCallback(infoMessage, ILogMessageKind.INFO, {
-    fileCount: npmPackFiles.length,
-    executionTimeInMs: copyExecutionTimeInMs
+
+  logMessageCallback({
+    message: infoMessage,
+    messageKind: LogMessageKind.INFO,
+    details: {
+      messageIdentifier: LogMessageIdentifier.COPY_FINISHING,
+      pnpmSyncJsonPath,
+      fileCount: npmPackFiles.length,
+      executionTimeInMs: copyExecutionTimeInMs
+    }
   });
 }

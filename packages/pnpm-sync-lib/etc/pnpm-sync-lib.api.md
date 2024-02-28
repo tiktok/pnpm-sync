@@ -29,15 +29,37 @@ export interface ILockfileImporter {
 }
 
 // @beta (undocumented)
-export enum ILogMessageKind {
+export interface ILogMessageCallbackOptions {
     // (undocumented)
-    ERROR = "error",
+    details: {
+        messageIdentifier: LogMessageIdentifier.PREPARE_STARTING;
+        lockfilePath: string;
+        dotPnpmFolderPath: string;
+    } | {
+        messageIdentifier: LogMessageIdentifier.PREPARE_PROCESSING;
+        lockfilePath: string;
+        dotPnpmFolderPath: string;
+    } | {
+        messageIdentifier: LogMessageIdentifier.PREPARE_FINISHING;
+        lockfilePath: string;
+        dotPnpmFolderPath: string;
+        executionTimeInMs: string;
+    } | {
+        messageIdentifier: LogMessageIdentifier.COPY_STARTING;
+        pnpmSyncJsonPath: string;
+    } | {
+        messageIdentifier: LogMessageIdentifier.COPY_PROCESSING;
+        pnpmSyncJsonPath: string;
+    } | {
+        messageIdentifier: LogMessageIdentifier.COPY_FINISHING;
+        pnpmSyncJsonPath: string;
+        fileCount: number;
+        executionTimeInMs: string;
+    };
     // (undocumented)
-    INFO = "info",
+    message: string;
     // (undocumented)
-    VERBOSE = "verbose",
-    // (undocumented)
-    WARNING = "warning"
+    messageKind: LogMessageKind;
 }
 
 // @beta (undocumented)
@@ -51,10 +73,7 @@ export interface IPnpmSyncCopyOptions {
     // (undocumented)
     getPackageIncludedFiles: (packagePath: string) => Promise<string[]>;
     // (undocumented)
-    logMessageCallback: (message: string, messageKind: ILogMessageKind, details?: {
-        fileCount: number;
-        executionTimeInMs: string;
-    }) => void;
+    logMessageCallback: (options: ILogMessageCallbackOptions) => void;
     // (undocumented)
     pnpmSyncJsonPath?: string;
 }
@@ -64,11 +83,7 @@ export interface IPnpmSyncPrepareOptions {
     // (undocumented)
     lockfilePath: string;
     // (undocumented)
-    logMessageCallback: (message: string, messageKind: ILogMessageKind, details?: {
-        lockfilePath: string;
-        dotPnpmFolderPath: string;
-        executionTimeInMs: string;
-    }) => void;
+    logMessageCallback: (options: ILogMessageCallbackOptions) => void;
     // (undocumented)
     readPnpmLockfile: (lockfilePath: string, options: {
         ignoreIncompatible: boolean;
@@ -81,6 +96,34 @@ export interface IPnpmSyncPrepareOptions {
 export type IVersionSpecifier = string | {
     version: string;
 };
+
+// @beta (undocumented)
+export enum LogMessageIdentifier {
+    // (undocumented)
+    COPY_FINISHING = "Finishing pnpm-sync copy",
+    // (undocumented)
+    COPY_PROCESSING = "Processing pnpm-sync copy",
+    // (undocumented)
+    COPY_STARTING = "Starting pnpm-sync copy",
+    // (undocumented)
+    PREPARE_FINISHING = "Finishing pnpm-sync prepare",
+    // (undocumented)
+    PREPARE_PROCESSING = "Processing pnpm-sync prepare",
+    // (undocumented)
+    PREPARE_STARTING = "Starting pnpm-sync prepare"
+}
+
+// @beta (undocumented)
+export enum LogMessageKind {
+    // (undocumented)
+    ERROR = "error",
+    // (undocumented)
+    INFO = "info",
+    // (undocumented)
+    VERBOSE = "verbose",
+    // (undocumented)
+    WARNING = "warning"
+}
 
 // @beta
 export function pnpmSyncCopyAsync({ pnpmSyncJsonPath, getPackageIncludedFiles, forEachAsyncWithConcurrency, ensureFolder, logMessageCallback }: IPnpmSyncCopyOptions): Promise<void>;

@@ -1,5 +1,10 @@
 import { Command } from 'commander';
-import { pnpmSyncCopyAsync, pnpmSyncPrepareAsync, ILogMessageKind } from 'pnpm-sync-lib';
+import {
+  pnpmSyncCopyAsync,
+  pnpmSyncPrepareAsync,
+  LogMessageKind,
+  type ILogMessageCallbackOptions
+} from 'pnpm-sync-lib';
 import { FileSystem, Async } from '@rushstack/node-core-library';
 import { PackageExtractor } from '@rushstack/package-extractor';
 import { readWantedLockfile, Lockfile } from '@pnpm/lockfile-file';
@@ -17,12 +22,13 @@ program
         getPackageIncludedFiles: PackageExtractor.getPackageIncludedFilesAsync,
         forEachAsyncWithConcurrency: Async.forEachAsync,
         ensureFolder: FileSystem.ensureFolderAsync,
-        logMessageCallback: (message: string, messageType: ILogMessageKind) => {
-          switch (messageType) {
-            case ILogMessageKind.ERROR:
+        logMessageCallback: (options: ILogMessageCallbackOptions) => {
+          const { message, messageKind } = options;
+          switch (messageKind) {
+            case LogMessageKind.ERROR:
               console.error(message);
               break;
-            case ILogMessageKind.WARNING:
+            case LogMessageKind.WARNING:
               console.warn(message);
               break;
             default:
@@ -60,12 +66,13 @@ program
             return lockfile;
           }
         },
-        logMessageCallback: (message: string, messageType: ILogMessageKind) => {
-          switch (messageType) {
-            case ILogMessageKind.ERROR:
+        logMessageCallback: (options: ILogMessageCallbackOptions) => {
+          const { message, messageKind } = options;
+          switch (messageKind) {
+            case LogMessageKind.ERROR:
               console.error(message);
               break;
-            case ILogMessageKind.WARNING:
+            case LogMessageKind.WARNING:
               console.warn(message);
               break;
             default:

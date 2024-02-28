@@ -2,7 +2,14 @@ import path from 'path';
 import fs from 'fs';
 import { cwd, hrtime } from 'process';
 
-import { ILockfile, ILogMessageKind, IPnpmSyncJson, IVersionSpecifier } from './interfaces';
+import {
+  ILockfile,
+  ILogMessageCallbackOptions,
+  LogMessageKind,
+  LogMessageIdentifier,
+  IPnpmSyncJson,
+  IVersionSpecifier
+} from './interfaces';
 
 /**
  * @beta
@@ -14,15 +21,7 @@ export interface IPnpmSyncPrepareOptions {
     lockfilePath: string,
     options: { ignoreIncompatible: boolean }
   ) => Promise<ILockfile | undefined>;
-  logMessageCallback: (
-    message: string,
-    messageKind: ILogMessageKind,
-    details?: {
-      lockfilePath: string;
-      dotPnpmFolderPath: string;
-      executionTimeInMs: string;
-    }
-  ) => void;
+  logMessageCallback: (options: ILogMessageCallbackOptions) => void;
 }
 
 /**
@@ -45,12 +44,19 @@ export async function pnpmSyncPrepareAsync({
   // get the pnpm-lock.yaml path
   lockfilePath = path.resolve(cwd(), lockfilePath);
   storePath = path.resolve(cwd(), storePath);
-  logMessageCallback('pnpm-sync prepare: Starting operation...', ILogMessageKind.VERBOSE);
-  logMessageCallback(
-    `pnpm-sync prepare: The pnpm-lock.yaml file path => ${lockfilePath}`,
-    ILogMessageKind.VERBOSE
-  );
-  logMessageCallback(`pnpm-sync prepare: The .pnpm folder path => ${storePath}`, ILogMessageKind.VERBOSE);
+
+  logMessageCallback({
+    message:
+      `pnpm-sync prepare: Starting operation...\n` +
+      `pnpm-sync prepare: The pnpm-lock.yaml file path => ${lockfilePath}\n` +
+      `pnpm-sync prepare: The .pnpm folder path => ${storePath}`,
+    messageKind: LogMessageKind.VERBOSE,
+    details: {
+      messageIdentifier: LogMessageIdentifier.PREPARE_STARTING,
+      lockfilePath,
+      dotPnpmFolderPath: storePath
+    }
+  });
 
   if (!fs.existsSync(lockfilePath)) {
     throw Error('The input pnpm-lock.yaml path is not correct!');
@@ -133,11 +139,16 @@ export async function pnpmSyncPrepareAsync({
 
   const endTime = hrtime.bigint();
   const prepareExecutionTimeInMs: string = (Number(endTime - startTime) / 1e6).toFixed(3) + 'ms';
-  const infoMessage = `pnpm-sync prepare: Regenerated pnpm-sync.json in ${prepareExecutionTimeInMs} for ${lockfilePath}`;
-  logMessageCallback(infoMessage, ILogMessageKind.INFO, {
-    lockfilePath,
-    dotPnpmFolderPath: storePath,
-    executionTimeInMs: prepareExecutionTimeInMs
+
+  logMessageCallback({
+    message: `pnpm-sync prepare: Regenerated pnpm-sync.json in ${prepareExecutionTimeInMs} for ${lockfilePath}`,
+    messageKind: LogMessageKind.INFO,
+    details: {
+      messageIdentifier: LogMessageIdentifier.PREPARE_FINISHING,
+      lockfilePath,
+      dotPnpmFolderPath: storePath,
+      executionTimeInMs: prepareExecutionTimeInMs
+    }
   });
 }
 
