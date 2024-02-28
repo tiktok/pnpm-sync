@@ -1,10 +1,5 @@
 import { Command } from 'commander';
-import {
-  pnpmSyncCopyAsync,
-  pnpmSyncPrepareAsync,
-  LogMessageKind,
-  type ILogMessageCallbackOptions
-} from 'pnpm-sync-lib';
+import { pnpmSyncCopyAsync, pnpmSyncPrepareAsync, type ILogMessageCallbackOptions } from 'pnpm-sync-lib';
 import { FileSystem, Async } from '@rushstack/node-core-library';
 import { PackageExtractor } from '@rushstack/package-extractor';
 import { readWantedLockfile, Lockfile } from '@pnpm/lockfile-file';
@@ -25,10 +20,10 @@ program
         logMessageCallback: (options: ILogMessageCallbackOptions) => {
           const { message, messageKind } = options;
           switch (messageKind) {
-            case LogMessageKind.ERROR:
+            case 'error':
               console.error(message);
               break;
-            case LogMessageKind.WARNING:
+            case 'warning':
               console.warn(message);
               break;
             default:
@@ -69,10 +64,10 @@ program
         logMessageCallback: (options: ILogMessageCallbackOptions) => {
           const { message, messageKind } = options;
           switch (messageKind) {
-            case LogMessageKind.ERROR:
+            case 'error':
               console.error(message);
               break;
-            case LogMessageKind.WARNING:
+            case 'warning':
               console.warn(message);
               break;
             default:

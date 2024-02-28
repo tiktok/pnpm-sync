@@ -29,12 +29,12 @@ export enum LogMessageKind {
  * @beta
  */
 export enum LogMessageIdentifier {
-  PREPARE_STARTING = 'Starting pnpm-sync prepare',
-  PREPARE_PROCESSING = 'Processing pnpm-sync prepare',
-  PREPARE_FINISHING = 'Finishing pnpm-sync prepare',
-  COPY_STARTING = 'Starting pnpm-sync copy',
-  COPY_PROCESSING = 'Processing pnpm-sync copy',
-  COPY_FINISHING = 'Finishing pnpm-sync copy'
+  PREPARE_STARTING = 'prepare-starting',
+  PREPARE_PROCESSING = 'prepare-processing',
+  PREPARE_FINISHING = 'prepare-finishing',
+  COPY_STARTING = 'copy-starting',
+  COPY_PROCESSING = 'copy-processing',
+  COPY_FINISHING = 'copy-finishing'
 }
 
 /**

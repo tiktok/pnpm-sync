@@ -100,17 +100,17 @@ export type IVersionSpecifier = string | {
 // @beta (undocumented)
 export enum LogMessageIdentifier {
     // (undocumented)
-    COPY_FINISHING = "Finishing pnpm-sync copy",
+    COPY_FINISHING = "copy-finishing",
     // (undocumented)
-    COPY_PROCESSING = "Processing pnpm-sync copy",
+    COPY_PROCESSING = "copy-processing",
     // (undocumented)
-    COPY_STARTING = "Starting pnpm-sync copy",
+    COPY_STARTING = "copy-starting",
     // (undocumented)
-    PREPARE_FINISHING = "Finishing pnpm-sync prepare",
+    PREPARE_FINISHING = "prepare-finishing",
     // (undocumented)
-    PREPARE_PROCESSING = "Processing pnpm-sync prepare",
+    PREPARE_PROCESSING = "prepare-processing",
     // (undocumented)
-    PREPARE_STARTING = "Starting pnpm-sync prepare"
+    PREPARE_STARTING = "prepare-starting"
 }
 
 // @beta (undocumented)
