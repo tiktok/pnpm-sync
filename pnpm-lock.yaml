@@ -88,6 +88,37 @@ importers:
         specifier: ^4.0.0
         version: 4.0.0(prettier@3.2.5)
 
+  pnpm-sync-api-demo:
+    dependencies:
+      pnpm-sync-lib:
+        specifier: workspace:*
+        version: link:../packages/pnpm-sync-lib
+    devDependencies:
+      '@rushstack/eslint-config':
+        specifier: ^3.6.2
+        version: 3.6.2(eslint@8.7.0)(typescript@5.3.3)
+      '@rushstack/eslint-patch':
+        specifier: ^1.7.2
+        version: 1.7.2
+      '@rushstack/heft':
+        specifier: ^0.64.3
+        version: 0.64.3(@types/node@18.17.15)
+      '@rushstack/heft-node-rig':
+        specifier: ^2.4.5
+        version: 2.4.5(@rushstack/heft@0.64.3)(@types/node@18.17.15)
+      '@types/heft-jest':
+        specifier: 1.0.6
+        version: 1.0.6
+      '@types/node':
+        specifier: 18.17.15
+        version: 18.17.15
+      eslint:
+        specifier: ~8.7.0
+        version: 8.7.0
+      typescript:
+        specifier: ~5.3.3
+        version: 5.3.3
+
   pnpm-sync-cli-demo/app1:
     dependencies:
       lib1:

@@ -1,0 +1,25 @@
+{
+  "name": "pnpm-sync-api-demo",
+  "version": "0.1.4",
+  "description": "Examples on how to use pnpm-sync-lib",
+  "license": "MIT",
+  "scripts": {
+    "build": "heft build --clean",
+    "test": "heft test --clean",
+    "lint": "eslint src/**"
+  },
+  "main": "lib/index.js",
+  "dependencies": {
+    "pnpm-sync-lib": "workspace:*"
+  },
+  "devDependencies": {
+    "@rushstack/eslint-config": "^3.6.2",
+    "@rushstack/heft": "^0.64.3",
+    "@rushstack/eslint-patch": "^1.7.2",
+    "@rushstack/heft-node-rig": "^2.4.5",
+    "@types/heft-jest": "1.0.6",
+    "@types/node": "18.17.15",
+    "typescript": "~5.3.3",
+    "eslint": "~8.7.0"
+  }
+}
