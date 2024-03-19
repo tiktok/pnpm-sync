@@ -108,5 +108,6 @@ export interface ILockfileImporter {
  * @beta
  */
 export interface ILockfile {
+  lockfileVersion: number | string;
   importers: Record<string, ILockfileImporter>;
 }

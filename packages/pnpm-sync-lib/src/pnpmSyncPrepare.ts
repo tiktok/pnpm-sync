@@ -58,16 +58,22 @@ export async function pnpmSyncPrepareAsync({
     }
   });
 
-  if (!fs.existsSync(lockfilePath)) {
-    throw Error('The input pnpm-lock.yaml path is not correct!');
+  if (!fs.existsSync(lockfilePath) || !fs.existsSync(storePath)) {
+    throw Error('The input pnpm-lock.yaml path or the input .pnpm folder path is not correct!');
   }
 
   const startTime = hrtime.bigint();
 
   // read the pnpm-lock.yaml
-  const pnpmLockfile = await readPnpmLockfile(lockfilePath, {
+  const pnpmLockfile: ILockfile | undefined = await readPnpmLockfile(lockfilePath, {
     ignoreIncompatible: true
   });
+
+  // currently, only support lockfileVersion 6.x, which is pnpm v8
+  const lockfileVersion: string | undefined = pnpmLockfile?.lockfileVersion.toString();
+  if (!lockfileVersion || !lockfileVersion.startsWith('6.')) {
+    throw Error('The input pnpm-lock.yaml version is not supported! Only support lockfile version 6.x');
+  }
 
   // find injected dependency and all its available versions
   const injectedDependencyToVersion: Map<string, Set<string>> = getInjectedDependencyToVersion(pnpmLockfile);
