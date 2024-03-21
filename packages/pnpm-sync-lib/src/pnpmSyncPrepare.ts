@@ -71,7 +71,7 @@ export async function pnpmSyncPrepareAsync({
 
   // currently, only support lockfileVersion 6.x, which is pnpm v8
   const lockfileVersion: string | undefined = pnpmLockfile?.lockfileVersion.toString();
-  if (!lockfileVersion || !lockfileVersion.startsWith('6.')) {
+  if (!lockfileVersion || !lockfileVersion.startsWith('6')) {
     throw Error(`The pnpm-lock.yaml format is not supported; pnpm-sync requires lockfile version 6`);
   }
 
