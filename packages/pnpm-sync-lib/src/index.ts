@@ -11,6 +11,7 @@ export { LogMessageIdentifier, LogMessageKind } from './interfaces';
 export type {
   ILockfile,
   ILockfileImporter,
+  ILockfilePackage,
   IVersionSpecifier,
   IDependencyMeta,
   ILogMessageCallbackOptions

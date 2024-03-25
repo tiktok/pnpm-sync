@@ -16,6 +16,8 @@ export interface ILockfile {
     importers: Record<string, ILockfileImporter>;
     // (undocumented)
     lockfileVersion: number | string;
+    // (undocumented)
+    packages: Record<string, ILockfilePackage>;
 }
 
 // @beta (undocumented)
@@ -27,6 +29,12 @@ export interface ILockfileImporter {
     // (undocumented)
     devDependencies?: Record<string, IVersionSpecifier>;
     // (undocumented)
+    optionalDependencies?: Record<string, IVersionSpecifier>;
+}
+
+// @beta (undocumented)
+export interface ILockfilePackage {
+    dependencies?: Record<string, IVersionSpecifier>;
     optionalDependencies?: Record<string, IVersionSpecifier>;
 }
 
@@ -83,6 +91,8 @@ export interface IPnpmSyncCopyOptions {
 // @beta (undocumented)
 export interface IPnpmSyncPrepareOptions {
     // (undocumented)
+    ensureFolder: (folderPath: string) => Promise<void>;
+    // (undocumented)
     lockfilePath: string;
     // (undocumented)
     logMessageCallback: (options: ILogMessageCallbackOptions) => void;
@@ -131,6 +141,6 @@ export enum LogMessageKind {
 export function pnpmSyncCopyAsync({ pnpmSyncJsonPath, getPackageIncludedFiles, forEachAsyncWithConcurrency, ensureFolder, logMessageCallback }: IPnpmSyncCopyOptions): Promise<void>;
 
 // @beta
-export function pnpmSyncPrepareAsync({ lockfilePath, storePath, readPnpmLockfile, logMessageCallback }: IPnpmSyncPrepareOptions): Promise<void>;
+export function pnpmSyncPrepareAsync({ lockfilePath, storePath, ensureFolder, readPnpmLockfile, logMessageCallback }: IPnpmSyncPrepareOptions): Promise<void>;
 
 ```

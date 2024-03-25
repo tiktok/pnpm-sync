@@ -1,5 +1,11 @@
 import { Command } from 'commander';
-import { pnpmSyncCopyAsync, pnpmSyncPrepareAsync, type ILogMessageCallbackOptions } from 'pnpm-sync-lib';
+import {
+  type ILockfile,
+  type ILockfilePackage,
+  pnpmSyncCopyAsync,
+  pnpmSyncPrepareAsync,
+  type ILogMessageCallbackOptions
+} from 'pnpm-sync-lib';
 import { FileSystem, Async } from '@rushstack/node-core-library';
 import { PackageExtractor } from '@rushstack/package-extractor';
 import { readWantedLockfile, Lockfile } from '@pnpm/lockfile-file';
@@ -45,6 +51,7 @@ program
       await pnpmSyncPrepareAsync({
         lockfilePath: lockfile,
         storePath: store,
+        ensureFolder: FileSystem.ensureFolderAsync,
         readPnpmLockfile: async (
           lockfilePath: string,
           options: {
@@ -58,7 +65,23 @@ program
           if (lockfile === null) {
             return undefined;
           } else {
-            return lockfile;
+            const lockfilePackages: Record<string, ILockfilePackage> = {};
+            for (const packagePath in lockfile.packages) {
+              if (lockfile.packages[packagePath]) {
+                lockfilePackages[packagePath] = {
+                  dependencies: lockfile.packages[packagePath].dependencies,
+                  optionalDependencies: lockfile.packages[packagePath].optionalDependencies
+                };
+              }
+            }
+
+            const result: ILockfile = {
+              lockfileVersion: lockfile.lockfileVersion,
+              importers: lockfile.importers,
+              packages: lockfilePackages
+            };
+
+            return result;
           }
         },
         logMessageCallback: (options: ILogMessageCallbackOptions) => {

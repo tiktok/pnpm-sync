@@ -103,6 +103,16 @@ export interface ILockfileImporter {
 }
 
 /**
+ * @beta
+ */
+export interface ILockfilePackage {
+  /** The list of dependencies and the resolved version */
+  dependencies?: Record<string, IVersionSpecifier>;
+  /** The list of optional dependencies and the resolved version */
+  optionalDependencies?: Record<string, IVersionSpecifier>;
+}
+
+/**
  * An abstraction of the pnpm lockfile
  *
  * @beta
@@ -110,4 +120,5 @@ export interface ILockfileImporter {
 export interface ILockfile {
   lockfileVersion: number | string;
   importers: Record<string, ILockfileImporter>;
+  packages: Record<string, ILockfilePackage>;
 }
