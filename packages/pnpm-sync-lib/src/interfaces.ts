@@ -113,11 +113,16 @@ export interface ILockfilePackage {
 }
 
 /**
- * An abstraction of the pnpm lockfile
+ * This interface represents the data structure that is parsed from `pnpm-lock.yaml`
  *
  * @beta
  */
 export interface ILockfile {
+  /**
+   * The version of the `pnpm-lock.yaml` file format.
+   *
+   * Example: `6.0`
+   */
   lockfileVersion: number | string;
   importers: Record<string, ILockfileImporter>;
   packages: Record<string, ILockfilePackage>;

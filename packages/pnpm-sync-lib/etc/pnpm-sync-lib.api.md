@@ -14,7 +14,6 @@ export interface IDependencyMeta {
 export interface ILockfile {
     // (undocumented)
     importers: Record<string, ILockfileImporter>;
-    // (undocumented)
     lockfileVersion: number | string;
     // (undocumented)
     packages: Record<string, ILockfilePackage>;
