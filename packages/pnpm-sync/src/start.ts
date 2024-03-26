@@ -14,43 +14,66 @@ const program: Command = new Command();
 
 program.version(require('../package.json').version);
 
+let verboseLogging: boolean = false;
+function logMessage(options: ILogMessageCallbackOptions): void {
+  const { message, messageKind } = options;
+
+  switch (messageKind) {
+    case 'error':
+      console.error('ERROR: ' + message);
+      process.exitCode = 1;
+      break;
+    case 'warning':
+      console.error('WARNING: ' + message);
+      process.exitCode = 1;
+      break;
+    case 'verbose':
+      if (verboseLogging) {
+        console.log(message);
+      }
+      break;
+    default:
+      console.log(message);
+      break;
+  }
+}
+
 program
   .command('copy')
   .description('Execute the copy action based on the plan defined under node_modules/.pnpm-sync.json')
-  .action(
-    async () =>
+  .option('-v, --verbose', 'Show verbose messages')
+  .action(async (options) => {
+    try {
+      const { verbose } = options;
+      verboseLogging = verbose;
+
       await pnpmSyncCopyAsync({
+        pnpmSyncJsonPath: process.cwd() + '/node_modules/.pnpm-sync.json',
         getPackageIncludedFiles: PackageExtractor.getPackageIncludedFilesAsync,
         forEachAsyncWithConcurrency: Async.forEachAsync,
         ensureFolder: FileSystem.ensureFolderAsync,
-        logMessageCallback: (options: ILogMessageCallbackOptions) => {
-          const { message, messageKind } = options;
-          switch (messageKind) {
-            case 'error':
-              console.error(message);
-              break;
-            case 'warning':
-              console.warn(message);
-              break;
-            default:
-              console.log(message);
-              break;
-          }
-        }
-      })
-  );
+        logMessageCallback: logMessage
+      });
+    } catch (error) {
+      console.log('UNEXPECTED ERROR: ' + error);
+      process.exitCode = 1;
+    }
+  });
 
 program
   .command('prepare')
-  .description('Generate the pnpm-sync.json based on pnpm-lock.yaml file path and .pnpm folder path')
+  .description('Regenerate the .pnpm-sync.json file for a given pnpm-lock.yaml lockfile')
   .requiredOption('-l, --lockfile <value>', 'The pnpm-lock.yaml file path')
-  .requiredOption('-s, --store <value>', 'The .pnpm folder path')
+  .requiredOption('-s, --store <value>', 'The PNPM virtual store path ("node_modules/.pnpm" folder)')
+  .option('-v, --verbose', 'Show verbose messages')
   .action(async (options) => {
-    const { lockfile, store } = options;
     try {
+      const { lockfile, store, verbose } = options;
+      verboseLogging = verbose;
+
       await pnpmSyncPrepareAsync({
         lockfilePath: lockfile,
-        storePath: store,
+        dotPnpmFolder: store,
         ensureFolder: FileSystem.ensureFolderAsync,
         readPnpmLockfile: async (
           lockfilePath: string,
@@ -77,23 +100,11 @@ program
             return result;
           }
         },
-        logMessageCallback: (options: ILogMessageCallbackOptions) => {
-          const { message, messageKind } = options;
-          switch (messageKind) {
-            case 'error':
-              console.error(message);
-              break;
-            case 'warning':
-              console.warn(message);
-              break;
-            default:
-              console.log(message);
-              break;
-          }
-        }
+        logMessageCallback: logMessage
       });
     } catch (error) {
-      console.log(error);
+      console.log('UNEXPECTED ERROR: ' + error);
+      process.exitCode = 1;
     }
   });
 

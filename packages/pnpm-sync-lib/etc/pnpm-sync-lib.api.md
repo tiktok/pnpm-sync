@@ -39,31 +39,7 @@ export interface ILockfilePackage {
 // @beta (undocumented)
 export interface ILogMessageCallbackOptions {
     // (undocumented)
-    details: {
-        messageIdentifier: LogMessageIdentifier.PREPARE_STARTING;
-        lockfilePath: string;
-        dotPnpmFolderPath: string;
-    } | {
-        messageIdentifier: LogMessageIdentifier.PREPARE_PROCESSING;
-        lockfilePath: string;
-        dotPnpmFolderPath: string;
-    } | {
-        messageIdentifier: LogMessageIdentifier.PREPARE_FINISHING;
-        lockfilePath: string;
-        dotPnpmFolderPath: string;
-        executionTimeInMs: string;
-    } | {
-        messageIdentifier: LogMessageIdentifier.COPY_STARTING;
-        pnpmSyncJsonPath: string;
-    } | {
-        messageIdentifier: LogMessageIdentifier.COPY_PROCESSING;
-        pnpmSyncJsonPath: string;
-    } | {
-        messageIdentifier: LogMessageIdentifier.COPY_FINISHING;
-        pnpmSyncJsonPath: string;
-        fileCount: number;
-        executionTimeInMs: string;
-    };
+    details: LogMessageDetails;
     // (undocumented)
     message: string;
     // (undocumented)
@@ -72,34 +48,24 @@ export interface ILogMessageCallbackOptions {
 
 // @beta (undocumented)
 export interface IPnpmSyncCopyOptions {
-    // (undocumented)
     ensureFolder: (folderPath: string) => Promise<void>;
-    // (undocumented)
     forEachAsyncWithConcurrency: <TItem>(iterable: Iterable<TItem>, callback: (item: TItem) => Promise<void>, options: {
         concurrency: number;
     }) => Promise<void>;
-    // (undocumented)
     getPackageIncludedFiles: (packagePath: string) => Promise<string[]>;
-    // (undocumented)
     logMessageCallback: (options: ILogMessageCallbackOptions) => void;
-    // (undocumented)
-    pnpmSyncJsonPath?: string;
+    pnpmSyncJsonPath: string;
 }
 
 // @beta (undocumented)
 export interface IPnpmSyncPrepareOptions {
-    // (undocumented)
+    dotPnpmFolder: string;
     ensureFolder: (folderPath: string) => Promise<void>;
-    // (undocumented)
     lockfilePath: string;
-    // (undocumented)
     logMessageCallback: (options: ILogMessageCallbackOptions) => void;
-    // (undocumented)
     readPnpmLockfile: (lockfilePath: string, options: {
         ignoreIncompatible: boolean;
     }) => Promise<ILockfile | undefined>;
-    // (undocumented)
-    storePath: string;
 }
 
 // @beta (undocumented)
@@ -109,19 +75,59 @@ export type IVersionSpecifier = string | {
 };
 
 // @beta (undocumented)
+export type LogMessageDetails = {
+    messageIdentifier: LogMessageIdentifier.PREPARE_STARTING;
+    lockfilePath: string;
+    dotPnpmFolder: string;
+} | {
+    messageIdentifier: LogMessageIdentifier.PREPARE_ERROR_UNSUPPORTED_FORMAT;
+    lockfilePath: string;
+    lockfileVersion: string | undefined;
+} | {
+    messageIdentifier: LogMessageIdentifier.PREPARE_PROCESSING;
+    lockfilePath: string;
+    dotPnpmFolderPath: string;
+} | {
+    messageIdentifier: LogMessageIdentifier.PREPARE_WRITING_FILE;
+    pnpmSyncJsonPath: string;
+    projectFolder: string;
+} | {
+    messageIdentifier: LogMessageIdentifier.PREPARE_FINISHING;
+    lockfilePath: string;
+    dotPnpmFolder: string;
+    executionTimeInMs: number;
+} | {
+    messageIdentifier: LogMessageIdentifier.COPY_STARTING;
+    pnpmSyncJsonPath: string;
+} | {
+    messageIdentifier: LogMessageIdentifier.COPY_ERROR_NO_SYNC_FILE;
+    pnpmSyncJsonPath: string;
+} | {
+    messageIdentifier: LogMessageIdentifier.COPY_FINISHING;
+    pnpmSyncJsonPath: string;
+    fileCount: number;
+    sourcePath: string;
+    executionTimeInMs: number;
+};
+
+// @beta (undocumented)
 export enum LogMessageIdentifier {
+    // (undocumented)
+    COPY_ERROR_NO_SYNC_FILE = "copy-error-no-sync-file",
     // (undocumented)
     COPY_FINISHING = "copy-finishing",
     // (undocumented)
-    COPY_PROCESSING = "copy-processing",
-    // (undocumented)
     COPY_STARTING = "copy-starting",
+    // (undocumented)
+    PREPARE_ERROR_UNSUPPORTED_FORMAT = "prepare-error-unsupported-format",
     // (undocumented)
     PREPARE_FINISHING = "prepare-finishing",
     // (undocumented)
     PREPARE_PROCESSING = "prepare-processing",
     // (undocumented)
-    PREPARE_STARTING = "prepare-starting"
+    PREPARE_STARTING = "prepare-starting",
+    // (undocumented)
+    PREPARE_WRITING_FILE = "prepare-writing-file"
 }
 
 // @beta (undocumented)
@@ -137,9 +143,9 @@ export enum LogMessageKind {
 }
 
 // @beta
-export function pnpmSyncCopyAsync({ pnpmSyncJsonPath, getPackageIncludedFiles, forEachAsyncWithConcurrency, ensureFolder, logMessageCallback }: IPnpmSyncCopyOptions): Promise<void>;
+export function pnpmSyncCopyAsync(options: IPnpmSyncCopyOptions): Promise<void>;
 
 // @beta
-export function pnpmSyncPrepareAsync({ lockfilePath, storePath, ensureFolder, readPnpmLockfile, logMessageCallback }: IPnpmSyncPrepareOptions): Promise<void>;
+export function pnpmSyncPrepareAsync(options: IPnpmSyncPrepareOptions): Promise<void>;
 
 ```

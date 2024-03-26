@@ -7,7 +7,7 @@
 
 export { pnpmSyncCopyAsync, type IPnpmSyncCopyOptions } from './pnpmSyncCopy';
 export { pnpmSyncPrepareAsync, type IPnpmSyncPrepareOptions } from './pnpmSyncPrepare';
-export { LogMessageIdentifier, LogMessageKind } from './interfaces';
+export { LogMessageIdentifier, LogMessageKind, LogMessageDetails } from './interfaces';
 export type {
   ILockfile,
   ILockfileImporter,

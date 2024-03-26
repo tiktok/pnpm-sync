@@ -1,6 +1,6 @@
 import path from 'path';
 import fs from 'fs';
-import { cwd, hrtime } from 'process';
+import process from 'node:process';
 
 import {
   ILockfile,
@@ -16,56 +16,75 @@ import {
  * @beta
  */
 export interface IPnpmSyncPrepareOptions {
+  /**
+   * The path to the `pnpm-lock.yaml` file
+   */
   lockfilePath: string;
-  storePath: string;
+
+  /**
+   * The path to the PNPM virtual store ("node_modules/.pnpm" folder)
+   */
+  dotPnpmFolder: string;
+
+  /**
+   * Environment-provided API to avoid an NPM dependency.
+   * The "pnpm-sync" NPM package provides a reference implementation.
+   */
   ensureFolder: (folderPath: string) => Promise<void>;
+
+  /**
+   * Environment-provided API to avoid an NPM dependency.
+   * The "pnpm-sync" NPM package provides a reference implementation.
+   */
   readPnpmLockfile: (
     lockfilePath: string,
     options: { ignoreIncompatible: boolean }
   ) => Promise<ILockfile | undefined>;
+
+  /**
+   * A callback for reporting events during the operation.
+   *
+   * @remarks
+   * `LogMessageKind.ERROR` events do NOT cause the promise to reject,
+   * so they must be handled appropriately.
+   */
   logMessageCallback: (options: ILogMessageCallbackOptions) => void;
 }
 
 /**
  * For each workspace project has injected dependencies in a PNPM workspace, this API
- * should be invoked to prepare its `pnpm-sync.json` file.  While building projects,
+ * should be invoked to prepare its `.pnpm-sync.json` file.  While building projects,
  * that file will be used by {@link pnpmSyncCopyAsync} to recopy the build outputs into
  * injected dependency installation folders under the `node_modules` folder.
  *
- * @param lockfile - the path to the `pnpm-lock.yaml` file
- * @param store - the path to the PNPM store folder
- *
  * @beta
  */
-export async function pnpmSyncPrepareAsync({
-  lockfilePath,
-  storePath,
-  ensureFolder,
-  readPnpmLockfile,
-  logMessageCallback
-}: IPnpmSyncPrepareOptions): Promise<void> {
+export async function pnpmSyncPrepareAsync(options: IPnpmSyncPrepareOptions): Promise<void> {
+  const { ensureFolder, readPnpmLockfile, logMessageCallback } = options;
+  let { lockfilePath, dotPnpmFolder } = options;
+
   // get the pnpm-lock.yaml path
-  lockfilePath = path.resolve(cwd(), lockfilePath);
-  storePath = path.resolve(cwd(), storePath);
+  lockfilePath = path.resolve(process.cwd(), lockfilePath);
+  dotPnpmFolder = path.resolve(process.cwd(), dotPnpmFolder);
 
   logMessageCallback({
     message:
-      `pnpm-sync prepare: Starting operation...\n` +
-      `pnpm-sync prepare: The pnpm-lock.yaml file path => ${lockfilePath}\n` +
-      `pnpm-sync prepare: The .pnpm folder path => ${storePath}`,
+      `Starting operation...\n` +
+      `pnpm-lock.yaml file path: ${lockfilePath}\n` +
+      `.pnpm folder path: ${dotPnpmFolder}`,
     messageKind: LogMessageKind.VERBOSE,
     details: {
       messageIdentifier: LogMessageIdentifier.PREPARE_STARTING,
       lockfilePath,
-      dotPnpmFolderPath: storePath
+      dotPnpmFolder
     }
   });
 
-  if (!fs.existsSync(lockfilePath) || !fs.existsSync(storePath)) {
+  if (!fs.existsSync(lockfilePath) || !fs.existsSync(dotPnpmFolder)) {
     throw Error('The input pnpm-lock.yaml path or the input .pnpm folder path is not correct!');
   }
 
-  const startTime = hrtime.bigint();
+  const startTime = process.hrtime.bigint();
 
   // read the pnpm-lock.yaml
   const pnpmLockfile: ILockfile | undefined = await readPnpmLockfile(lockfilePath, {
@@ -75,7 +94,16 @@ export async function pnpmSyncPrepareAsync({
   // currently, only support lockfileVersion 6.x, which is pnpm v8
   const lockfileVersion: string | undefined = pnpmLockfile?.lockfileVersion.toString();
   if (!lockfileVersion || !lockfileVersion.startsWith('6')) {
-    throw Error(`The pnpm-lock.yaml format is not supported; pnpm-sync requires lockfile version 6`);
+    logMessageCallback({
+      message: `The pnpm-lock.yaml format is not supported; pnpm-sync requires lockfile version 6`,
+      messageKind: LogMessageKind.ERROR,
+      details: {
+        messageIdentifier: LogMessageIdentifier.PREPARE_ERROR_UNSUPPORTED_FORMAT,
+        lockfilePath,
+        lockfileVersion
+      }
+    });
+    return;
   }
 
   // find injected dependency and all its available versions
@@ -85,7 +113,7 @@ export async function pnpmSyncPrepareAsync({
   processTransitiveInjectedDependency(pnpmLockfile, injectedDependencyToVersion);
 
   // get pnpm-lock.yaml folder path
-  const pnpmLockFolder = lockfilePath.slice(0, lockfilePath.length - 'pnpm-lock.yaml'.length);
+  const pnpmLockFolder = path.dirname(lockfilePath);
 
   // generate a map, where key is the absolute path of the injectedDependency, value is all available paths in .pnpm folder
   const injectedDependencyToFilePathSet: Map<string, Set<string>> = new Map();
@@ -102,32 +130,42 @@ export async function pnpmSyncPrepareAsync({
 
       injectedDependencyToFilePathSet
         .get(injectedDependencyPath)
-        ?.add(transferFilePathToPnpmStorePath(injectedDependencyVersion, injectedDependency, storePath));
+        ?.add(transferFilePathToDotPnpmFolder(injectedDependencyVersion, injectedDependency, dotPnpmFolder));
     }
   }
 
-  // now, we have everything we need to generate the the pnpm-sync.json
+  // now, we have everything we need to generate the the .pnpm-sync.json
   // console.log('injectedDependencyToFilePathSet =>', injectedDependencyToFilePathSet);
   for (const [projectFolder, targetFolderSet] of injectedDependencyToFilePathSet) {
     if (targetFolderSet.size === 0) {
       continue;
     }
 
+    const pnpmSyncJsonFolder = `${projectFolder}/node_modules`;
+    const pnpmSyncJsonPath = `${pnpmSyncJsonFolder}/.pnpm-sync.json`;
+
+    logMessageCallback({
+      message: `Writing ${pnpmSyncJsonPath}`,
+      messageKind: LogMessageKind.VERBOSE,
+      details: {
+        messageIdentifier: LogMessageIdentifier.PREPARE_WRITING_FILE,
+        pnpmSyncJsonPath,
+        projectFolder
+      }
+    });
+
     // make sure the node_modules folder exists, if not, create it
     // why?
     // in the transitive injected dependencies case
     // it is possible that node_modules folder for a package is not exist yet
     // but we need to generate .pnpm-sync.json for that package
-    const projectNodeModulesFolderPath = `${projectFolder}/node_modules`;
-    if (!fs.existsSync(projectNodeModulesFolderPath)) {
-      await ensureFolder(projectNodeModulesFolderPath);
+    if (!fs.existsSync(pnpmSyncJsonFolder)) {
+      await ensureFolder(pnpmSyncJsonFolder);
     }
-
-    const pnpmSyncJsonPath = `${projectFolder}/node_modules/.pnpm-sync.json`;
 
     let pnpmSyncJsonFile: IPnpmSyncJson = {
       postbuildInjectedCopy: {
-        sourceFolder: '../..',
+        sourceFolder: '..', // path from pnpmSyncJsonFolder to projectFolder
         targetFolders: []
       }
     };
@@ -144,35 +182,36 @@ export async function pnpmSyncPrepareAsync({
     }
 
     for (const targetFolder of targetFolderSet) {
-      const relativePath = path.relative(pnpmSyncJsonPath, targetFolder);
+      const relativePath = path.relative(pnpmSyncJsonFolder, targetFolder);
       if (!existingTargetFolderSet.has(relativePath)) {
         pnpmSyncJsonFile.postbuildInjectedCopy.targetFolders.push({
           folderPath: relativePath
         });
       }
     }
-    fs.writeFileSync(pnpmSyncJsonPath, JSON.stringify(pnpmSyncJsonFile, null, 2));
+
+    await fs.promises.writeFile(pnpmSyncJsonPath, JSON.stringify(pnpmSyncJsonFile, null, 2));
   }
 
-  const endTime = hrtime.bigint();
-  const prepareExecutionTimeInMs: string = (Number(endTime - startTime) / 1e6).toFixed(3) + 'ms';
+  const endTime = process.hrtime.bigint();
+  const executionTimeInMs: number = Number(endTime - startTime) / 1e6;
 
   logMessageCallback({
-    message: `pnpm-sync prepare: Regenerated pnpm-sync.json in ${prepareExecutionTimeInMs} for ${lockfilePath}`,
+    message: `Regenerated .pnpm-sync.json in ${executionTimeInMs.toFixed(3)} ms for ${lockfilePath}`,
     messageKind: LogMessageKind.INFO,
     details: {
       messageIdentifier: LogMessageIdentifier.PREPARE_FINISHING,
       lockfilePath,
-      dotPnpmFolderPath: storePath,
-      executionTimeInMs: prepareExecutionTimeInMs
+      dotPnpmFolder,
+      executionTimeInMs
     }
   });
 }
 
-function transferFilePathToPnpmStorePath(
+function transferFilePathToDotPnpmFolder(
   rawFilePath: string,
   dependencyName: string,
-  storePath: string
+  dotPnpmFolder: string
 ): string {
   // this logic is heavily depends on pnpm-lock format
   // the current logic is for pnpm v8
@@ -194,7 +233,7 @@ function transferFilePathToPnpmStorePath(
   // 5. add dependencyName
   rawFilePath = rawFilePath + `/node_modules/${dependencyName}`;
 
-  rawFilePath = storePath + '/' + rawFilePath;
+  rawFilePath = dotPnpmFolder + '/' + rawFilePath;
 
   return rawFilePath;
 }
