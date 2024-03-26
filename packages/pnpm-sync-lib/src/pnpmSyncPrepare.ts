@@ -8,7 +8,8 @@ import {
   LogMessageKind,
   LogMessageIdentifier,
   IPnpmSyncJson,
-  IVersionSpecifier
+  IVersionSpecifier,
+  ILockfilePackage
 } from './interfaces';
 
 /**
@@ -17,6 +18,7 @@ import {
 export interface IPnpmSyncPrepareOptions {
   lockfilePath: string;
   storePath: string;
+  ensureFolder: (folderPath: string) => Promise<void>;
   readPnpmLockfile: (
     lockfilePath: string,
     options: { ignoreIncompatible: boolean }
@@ -38,6 +40,7 @@ export interface IPnpmSyncPrepareOptions {
 export async function pnpmSyncPrepareAsync({
   lockfilePath,
   storePath,
+  ensureFolder,
   readPnpmLockfile,
   logMessageCallback
 }: IPnpmSyncPrepareOptions): Promise<void> {
@@ -78,10 +81,13 @@ export async function pnpmSyncPrepareAsync({
   // find injected dependency and all its available versions
   const injectedDependencyToVersion: Map<string, Set<string>> = getInjectedDependencyToVersion(pnpmLockfile);
 
+  // check and process transitive injected dependency
+  processTransitiveInjectedDependency(pnpmLockfile, injectedDependencyToVersion);
+
   // get pnpm-lock.yaml folder path
   const pnpmLockFolder = lockfilePath.slice(0, lockfilePath.length - 'pnpm-lock.yaml'.length);
 
-  // generate a map, where key is the actual path of the injectedDependency, value is all available paths in .pnpm folder
+  // generate a map, where key is the absolute path of the injectedDependency, value is all available paths in .pnpm folder
   const injectedDependencyToFilePathSet: Map<string, Set<string>> = new Map();
   for (const [injectedDependency, injectedDependencyVersionSet] of injectedDependencyToVersion) {
     for (const injectedDependencyVersion of injectedDependencyVersionSet) {
@@ -107,9 +113,14 @@ export async function pnpmSyncPrepareAsync({
       continue;
     }
 
-    // make sure the node_modules folder exists
-    if (!fs.existsSync(`${projectFolder}/node_modules`)) {
-      continue;
+    // make sure the node_modules folder exists, if not, create it
+    // why?
+    // in the transitive injected dependencies case
+    // it is possible that node_modules folder for a package is not exist yet
+    // but we need to generate .pnpm-sync.json for that package
+    const projectNodeModulesFolderPath = `${projectFolder}/node_modules`;
+    if (!fs.existsSync(projectNodeModulesFolderPath)) {
+      await ensureFolder(projectNodeModulesFolderPath);
     }
 
     const pnpmSyncJsonPath = `${projectFolder}/node_modules/.pnpm-sync.json`;
@@ -225,6 +236,58 @@ function processDependencies(
       if (injectedDependencyToVersion.has(dependency)) {
         const specifierToUse: string = typeof specifier === 'string' ? specifier : specifier.version;
         injectedDependencyToVersion.get(dependency)?.add(specifierToUse);
+      }
+    }
+  }
+}
+
+// process all dependencies and devDependencies to find potential transitive injected dependencies
+// and add to injectedDependencyToFilePath map
+function processTransitiveInjectedDependency(
+  pnpmLockfile: ILockfile | undefined,
+  injectedDependencyToVersion: Map<string, Set<string>>
+): void {
+  const potentialTransitiveInjectedDependencyVersionQueue: Array<string> = [];
+  for (const injectedDependencyVersion of [...injectedDependencyToVersion.values()]) {
+    potentialTransitiveInjectedDependencyVersionQueue.push(...injectedDependencyVersion);
+  }
+
+  const lockfilePackages: Record<string, ILockfilePackage> | undefined = pnpmLockfile?.packages;
+
+  if (lockfilePackages) {
+    while (potentialTransitiveInjectedDependencyVersionQueue.length > 0) {
+      const transitiveInjectedDependencyVersion: string | undefined =
+        potentialTransitiveInjectedDependencyVersionQueue.shift();
+      if (transitiveInjectedDependencyVersion) {
+        const { dependencies, optionalDependencies } = lockfilePackages[transitiveInjectedDependencyVersion];
+        processInjectedDependencies(
+          dependencies,
+          injectedDependencyToVersion,
+          potentialTransitiveInjectedDependencyVersionQueue
+        );
+        processInjectedDependencies(
+          optionalDependencies,
+          injectedDependencyToVersion,
+          potentialTransitiveInjectedDependencyVersionQueue
+        );
+      }
+    }
+  }
+}
+function processInjectedDependencies(
+  dependencies: Record<string, string> | undefined,
+  injectedDependencyToVersion: Map<string, Set<string>>,
+  potentialTransitiveInjectedDependencyVersionQueue: Array<string>
+): void {
+  if (dependencies) {
+    for (const [dependency, version] of Object.entries(dependencies)) {
+      // if the version is set with file: protocol, then it is a transitive injected dependency
+      if (version.startsWith('file:')) {
+        if (!injectedDependencyToVersion.has(dependency)) {
+          injectedDependencyToVersion.set(dependency, new Set());
+        }
+        injectedDependencyToVersion.get(dependency)?.add(version);
+        potentialTransitiveInjectedDependencyVersionQueue.push(version);
       }
     }
   }
