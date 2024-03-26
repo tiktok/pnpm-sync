@@ -29,13 +29,64 @@ export enum LogMessageKind {
  * @beta
  */
 export enum LogMessageIdentifier {
+  // pnpmSyncPrepareAsync() messages
   PREPARE_STARTING = 'prepare-starting',
+  PREPARE_ERROR_UNSUPPORTED_FORMAT = 'prepare-error-unsupported-format',
   PREPARE_PROCESSING = 'prepare-processing',
+  PREPARE_WRITING_FILE = 'prepare-writing-file',
   PREPARE_FINISHING = 'prepare-finishing',
+
+  // pnpmSyncCopyAsync() messages
   COPY_STARTING = 'copy-starting',
-  COPY_PROCESSING = 'copy-processing',
+  COPY_ERROR_NO_SYNC_FILE = 'copy-error-no-sync-file',
   COPY_FINISHING = 'copy-finishing'
 }
+
+/**
+ * @beta
+ */
+export type LogMessageDetails =
+  | {
+      messageIdentifier: LogMessageIdentifier.PREPARE_STARTING;
+      lockfilePath: string;
+      dotPnpmFolder: string;
+    }
+  | {
+      messageIdentifier: LogMessageIdentifier.PREPARE_ERROR_UNSUPPORTED_FORMAT;
+      lockfilePath: string;
+      lockfileVersion: string | undefined;
+    }
+  | {
+      messageIdentifier: LogMessageIdentifier.PREPARE_PROCESSING;
+      lockfilePath: string;
+      dotPnpmFolderPath: string;
+    }
+  | {
+      messageIdentifier: LogMessageIdentifier.PREPARE_WRITING_FILE;
+      pnpmSyncJsonPath: string;
+      projectFolder: string;
+    }
+  | {
+      messageIdentifier: LogMessageIdentifier.PREPARE_FINISHING;
+      lockfilePath: string;
+      dotPnpmFolder: string;
+      executionTimeInMs: number;
+    }
+  | {
+      messageIdentifier: LogMessageIdentifier.COPY_STARTING;
+      pnpmSyncJsonPath: string;
+    }
+  | {
+      messageIdentifier: LogMessageIdentifier.COPY_ERROR_NO_SYNC_FILE;
+      pnpmSyncJsonPath: string;
+    }
+  | {
+      messageIdentifier: LogMessageIdentifier.COPY_FINISHING;
+      pnpmSyncJsonPath: string;
+      fileCount: number;
+      sourcePath: string;
+      executionTimeInMs: number;
+    };
 
 /**
  * @beta
@@ -43,37 +94,7 @@ export enum LogMessageIdentifier {
 export interface ILogMessageCallbackOptions {
   message: string;
   messageKind: LogMessageKind;
-  details:
-    | {
-        messageIdentifier: LogMessageIdentifier.PREPARE_STARTING;
-        lockfilePath: string;
-        dotPnpmFolderPath: string;
-      }
-    | {
-        messageIdentifier: LogMessageIdentifier.PREPARE_PROCESSING;
-        lockfilePath: string;
-        dotPnpmFolderPath: string;
-      }
-    | {
-        messageIdentifier: LogMessageIdentifier.PREPARE_FINISHING;
-        lockfilePath: string;
-        dotPnpmFolderPath: string;
-        executionTimeInMs: string;
-      }
-    | {
-        messageIdentifier: LogMessageIdentifier.COPY_STARTING;
-        pnpmSyncJsonPath: string;
-      }
-    | {
-        messageIdentifier: LogMessageIdentifier.COPY_PROCESSING;
-        pnpmSyncJsonPath: string;
-      }
-    | {
-        messageIdentifier: LogMessageIdentifier.COPY_FINISHING;
-        pnpmSyncJsonPath: string;
-        fileCount: number;
-        executionTimeInMs: string;
-      };
+  details: LogMessageDetails;
 }
 
 /**

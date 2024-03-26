@@ -1,20 +1,47 @@
 import path from 'path';
 import fs from 'fs';
-import { hrtime } from 'node:process';
+import process from 'node:process';
 import { ILogMessageCallbackOptions, LogMessageIdentifier, LogMessageKind } from './interfaces';
 
 /**
  * @beta
  */
 export interface IPnpmSyncCopyOptions {
-  pnpmSyncJsonPath?: string;
+  /**
+   * Path to the `<project-folder>/node_modules/.pnpm-sync.json` file to be processed.
+   * This parameter is required because the caller should efficiently test its existence
+   * and can avoid invoking pnpmSync if it is absent.
+   */
+  pnpmSyncJsonPath: string;
+
+  /**
+   * Environment-provided API to avoid an NPM dependency.
+   * The "pnpm-sync" NPM package provides a reference implementation.
+   */
   getPackageIncludedFiles: (packagePath: string) => Promise<string[]>;
+
+  /**
+   * Environment-provided API to avoid an NPM dependency.
+   * The "pnpm-sync" NPM package provides a reference implementation.
+   */
   forEachAsyncWithConcurrency: <TItem>(
     iterable: Iterable<TItem>,
     callback: (item: TItem) => Promise<void>,
     options: { concurrency: number }
   ) => Promise<void>;
+
+  /**
+   * Environment-provided API to avoid an NPM dependency.
+   * The "pnpm-sync" NPM package provides a reference implementation.
+   */
   ensureFolder: (folderPath: string) => Promise<void>;
+  /**
+   * A callback for reporting events during the operation.
+   *
+   * @remarks
+   * `LogMessageKind.ERROR` events do NOT cause the promise to reject,
+   * so they must be handled appropriately.
+   */
   logMessageCallback: (options: ILogMessageCallbackOptions) => void;
 }
 
@@ -27,25 +54,16 @@ export interface IPnpmSyncCopyOptions {
  * This operation reads the `.npm-sync.json` file which should have been prepared after
  * `pnpm install` by calling the {@link pnpmSyncPrepareAsync} function.
  *
- * @param pnpmSyncJsonPath - optionally customizes the location of the `.pnpm-sync.json` file
- *
  * @beta
  */
-export async function pnpmSyncCopyAsync({
-  pnpmSyncJsonPath = '',
-  getPackageIncludedFiles,
-  forEachAsyncWithConcurrency,
-  ensureFolder,
-  logMessageCallback
-}: IPnpmSyncCopyOptions): Promise<void> {
-  if (pnpmSyncJsonPath === '') {
-    // if user does not input .pnpm-sync.json file path
-    // then we assume .pnpm-sync.json is always under node_modules folder
-    pnpmSyncJsonPath = 'node_modules/.pnpm-sync.json';
-  }
+export async function pnpmSyncCopyAsync(options: IPnpmSyncCopyOptions): Promise<void> {
+  const { getPackageIncludedFiles, forEachAsyncWithConcurrency, ensureFolder, logMessageCallback } = options;
+  let pnpmSyncJsonPath = options.pnpmSyncJsonPath;
+
+  pnpmSyncJsonPath = path.resolve(process.cwd(), pnpmSyncJsonPath);
 
   logMessageCallback({
-    message: `pnpm-sync copy: Starting operation...`,
+    message: `Starting operation for ` + pnpmSyncJsonPath,
     messageKind: LogMessageKind.VERBOSE,
     details: {
       messageIdentifier: LogMessageIdentifier.COPY_STARTING,
@@ -60,33 +78,35 @@ export async function pnpmSyncCopyAsync({
     if ((e as NodeJS.ErrnoException).code === 'ENOENT') {
       logMessageCallback({
         message:
-          'You are executing pnpm-sync for a package, but we can not find the .pnpm-sync.json inside node_modules folder',
+          'The .pnpm-sync.json file was not found under the node_modules folder; was this project prepared?',
         messageKind: LogMessageKind.ERROR,
         details: {
-          messageIdentifier: LogMessageIdentifier.COPY_PROCESSING,
+          messageIdentifier: LogMessageIdentifier.COPY_ERROR_NO_SYNC_FILE,
           pnpmSyncJsonPath
         }
       });
-
       return;
     } else {
       throw e;
     }
   }
 
+  const pnpmSyncJsonFolder = path.dirname(pnpmSyncJsonPath);
+
   //read the .pnpm-sync.json
   const pnpmSyncJson = JSON.parse(pnpmSyncJsonContents);
   const { sourceFolder, targetFolders } = pnpmSyncJson.postbuildInjectedCopy;
-  const sourcePath = path.resolve(pnpmSyncJsonPath, sourceFolder);
+  const sourcePath = path.resolve(pnpmSyncJsonFolder, sourceFolder);
 
   //get npmPackFiles
   const npmPackFiles: string[] = await getPackageIncludedFiles(sourcePath);
 
-  const startTime = hrtime.bigint();
+  const startTime = process.hrtime.bigint();
 
   //clear the destination folder first
   for (const targetFolder of targetFolders) {
-    const destinationPath = path.resolve(pnpmSyncJsonPath, targetFolder.folderPath);
+    const destinationPath = path.resolve(pnpmSyncJsonFolder, targetFolder.folderPath);
+    // TODO: optimize this
     await fs.promises.rm(destinationPath, { recursive: true, force: true });
   }
 
@@ -94,7 +114,7 @@ export async function pnpmSyncCopyAsync({
     npmPackFiles,
     async (npmPackFile: string) => {
       for (const targetFolder of targetFolders) {
-        const destinationPath = path.resolve(pnpmSyncJsonPath, targetFolder.folderPath);
+        const destinationPath = path.resolve(pnpmSyncJsonFolder, targetFolder.folderPath);
 
         const copySourcePath: string = path.join(sourcePath, npmPackFile);
         const copyDestinationPath: string = path.join(destinationPath, npmPackFile);
@@ -110,9 +130,13 @@ export async function pnpmSyncCopyAsync({
     }
   );
 
-  const endTime = hrtime.bigint();
-  const copyExecutionTimeInMs: string = (Number(endTime - startTime) / 1e6).toFixed(3) + 'ms';
-  const infoMessage = `pnpm-sync copy: Copied ${npmPackFiles.length} files in ${copyExecutionTimeInMs} from ${sourcePath}`;
+  const endTime = process.hrtime.bigint();
+  const executionTimeInMs: number = Number(endTime - startTime) / 1e6;
+
+  const infoMessage =
+    `Synced ${npmPackFiles.length} ` +
+    (npmPackFiles.length === 1 ? 'file' : 'files') +
+    ` in ${executionTimeInMs.toFixed(3)} ms from ${sourcePath}`;
 
   logMessageCallback({
     message: infoMessage,
@@ -121,7 +145,8 @@ export async function pnpmSyncCopyAsync({
       messageIdentifier: LogMessageIdentifier.COPY_FINISHING,
       pnpmSyncJsonPath,
       fileCount: npmPackFiles.length,
-      executionTimeInMs: copyExecutionTimeInMs
+      sourcePath,
+      executionTimeInMs
     }
   });
 }
