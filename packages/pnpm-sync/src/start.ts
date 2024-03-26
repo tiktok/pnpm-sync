@@ -65,22 +65,15 @@ program
           if (lockfile === null) {
             return undefined;
           } else {
-            const lockfilePackages: Record<string, ILockfilePackage> = {};
-            for (const packagePath in lockfile.packages) {
-              if (lockfile.packages[packagePath]) {
-                lockfilePackages[packagePath] = {
-                  dependencies: lockfile.packages[packagePath].dependencies,
-                  optionalDependencies: lockfile.packages[packagePath].optionalDependencies
-                };
-              }
-            }
-
+            const lockfilePackages: Record<string, ILockfilePackage> = lockfile.packages as Record<
+              string,
+              ILockfilePackage
+            >;
             const result: ILockfile = {
               lockfileVersion: lockfile.lockfileVersion,
               importers: lockfile.importers,
               packages: lockfilePackages
             };
-
             return result;
           }
         },

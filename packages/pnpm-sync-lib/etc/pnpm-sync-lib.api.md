@@ -15,11 +15,10 @@ export interface ILockfile {
     // (undocumented)
     importers: Record<string, ILockfileImporter>;
     lockfileVersion: number | string;
-    // (undocumented)
     packages: Record<string, ILockfilePackage>;
 }
 
-// @beta (undocumented)
+// @beta
 export interface ILockfileImporter {
     // (undocumented)
     dependencies?: Record<string, IVersionSpecifier>;
@@ -33,8 +32,8 @@ export interface ILockfileImporter {
 
 // @beta (undocumented)
 export interface ILockfilePackage {
-    dependencies?: Record<string, IVersionSpecifier>;
-    optionalDependencies?: Record<string, IVersionSpecifier>;
+    dependencies?: Record<string, string>;
+    optionalDependencies?: Record<string, string>;
 }
 
 // @beta (undocumented)
@@ -105,6 +104,7 @@ export interface IPnpmSyncPrepareOptions {
 
 // @beta (undocumented)
 export type IVersionSpecifier = string | {
+    specifier: string;
     version: string;
 };
 
