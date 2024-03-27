@@ -8,7 +8,7 @@ import {
 import { FileSystem } from '@rushstack/node-core-library';
 import { readWantedLockfile, Lockfile } from '@pnpm/lockfile-file';
 
-describe('Example Test', () => {
+describe('pnpm-sync-api test', () => {
   it('pnpmSyncPrepareAsync should generate .pnpm-sync.json under pnpm-sync-cli-demo/lib1/node_modules', async () => {
     const lockfilePath = '../pnpm-lock.yaml';
     const dotPnpmFolder = '../node_modules/.pnpm';
@@ -19,6 +19,8 @@ describe('Example Test', () => {
     if (fs.existsSync(expectedDotPnpmSyncJsonPath)) {
       fs.unlinkSync(expectedDotPnpmSyncJsonPath);
     }
+
+    expect(fs.existsSync(expectedDotPnpmSyncJsonPath)).toBe(false);
 
     await pnpmSyncPrepareAsync({
       lockfilePath: lockfilePath,
@@ -55,6 +57,9 @@ describe('Example Test', () => {
     });
 
     // now, read .pnpm-sync.json and check the fields
+
+    expect(fs.existsSync(expectedDotPnpmSyncJsonPath)).toBe(true);
+
     const pnpmSyncJsonFile: {
       postbuildInjectedCopy: {
         sourceFolder: string;
