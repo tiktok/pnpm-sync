@@ -1,0 +1,30 @@
+{
+  "name": "api-demo-sample-lib1",
+  "version": "1.0.0",
+  "description": "",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "scripts": {
+    "build": "tsc",
+    "start": "tsc -w"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "MIT",
+  "peerDependencies": {
+    "react": "17 || 18"
+  },
+  "dependencies": {
+    "api-demo-sample-lib2": "workspace: *"
+  },
+  "dependenciesMeta": {
+    "api-demo-sample-lib2": {
+      "injected": true
+    }
+  },
+  "devDependencies": {
+    "@types/node": "^20.8.10",
+    "typescript": "^5.2.2",
+    "react": "~17.0.2"
+  }
+}

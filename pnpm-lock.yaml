@@ -131,6 +131,56 @@ importers:
         specifier: ~5.3.3
         version: 5.3.3
 
+  pnpm-sync-api-demo/test-fixtures/sample-app1:
+    dependencies:
+      api-demo-sample-lib1:
+        specifier: workspace:*
+        version: file:pnpm-sync-api-demo/test-fixtures/sample-lib1(react@17.0.2)
+      react:
+        specifier: ~17.0.0
+        version: 17.0.2
+    devDependencies:
+      '@types/node':
+        specifier: ^20.8.10
+        version: 20.11.7
+      typescript:
+        specifier: ^5.2.2
+        version: 5.3.3
+    dependenciesMeta:
+      api-demo-sample-lib1:
+        injected: true
+
+  pnpm-sync-api-demo/test-fixtures/sample-lib1:
+    dependencies:
+      api-demo-sample-lib2:
+        specifier: 'workspace: *'
+        version: file:pnpm-sync-api-demo/test-fixtures/sample-lib2(react@17.0.2)
+    devDependencies:
+      '@types/node':
+        specifier: ^20.8.10
+        version: 20.11.7
+      react:
+        specifier: ~17.0.2
+        version: 17.0.2
+      typescript:
+        specifier: ^5.2.2
+        version: 5.3.3
+    dependenciesMeta:
+      api-demo-sample-lib2:
+        injected: true
+
+  pnpm-sync-api-demo/test-fixtures/sample-lib2:
+    devDependencies:
+      '@types/node':
+        specifier: ^20.8.10
+        version: 20.11.7
+      react:
+        specifier: ~18.2.0
+        version: 18.2.0
+      typescript:
+        specifier: ^5.2.2
+        version: 5.3.3
+
   pnpm-sync-cli-demo/app1:
     dependencies:
       lib1:
@@ -4181,6 +4231,13 @@ packages:
       loose-envify: 1.4.0
     dev: false
 
+  /react@18.2.0:
+    resolution: {integrity: sha512-/3IjMdb2L9QbBdWiW5e3P2/npwMBaU9mHCSCUzNln0ZCYbcfTsGbTJrU/kGemdH2IWmB2ioZ+zkxtmq6g09fGQ==}
+    engines: {node: '>=0.10.0'}
+    dependencies:
+      loose-envify: 1.4.0
+    dev: true
+
   /read-yaml-file@2.1.0:
     resolution: {integrity: sha512-UkRNRIwnhG+y7hpqnycCL/xbTk7+ia9VuVTC0S+zVbwd65DI9eUpRMfsWIGrCWxTU/mi+JW8cHQCrv+zfCbEPQ==}
     engines: {node: '>=10.13'}
@@ -4895,6 +4952,27 @@ packages:
       validator: 13.11.0
     optionalDependencies:
       commander: 9.5.0
+
+  file:pnpm-sync-api-demo/test-fixtures/sample-lib1(react@17.0.2):
+    resolution: {directory: pnpm-sync-api-demo/test-fixtures/sample-lib1, type: directory}
+    id: file:pnpm-sync-api-demo/test-fixtures/sample-lib1
+    name: api-demo-sample-lib1
+    peerDependencies:
+      react: 17 || 18
+    dependencies:
+      api-demo-sample-lib2: file:pnpm-sync-api-demo/test-fixtures/sample-lib2(react@17.0.2)
+      react: 17.0.2
+    dev: false
+
+  file:pnpm-sync-api-demo/test-fixtures/sample-lib2(react@17.0.2):
+    resolution: {directory: pnpm-sync-api-demo/test-fixtures/sample-lib2, type: directory}
+    id: file:pnpm-sync-api-demo/test-fixtures/sample-lib2
+    name: api-demo-sample-lib2
+    peerDependencies:
+      react: 17 || 18
+    dependencies:
+      react: 17.0.2
+    dev: false
 
   file:pnpm-sync-cli-demo/lib1(react@17.0.2):
     resolution: {directory: pnpm-sync-cli-demo/lib1, type: directory}
