@@ -23,3 +23,5 @@ jobs:
         run: pnpm --filter pnpm-sync-lib run build && pnpm --filter pnpm-sync-lib run test
       - name: Build and run tests for pnpm-sync
         run: pnpm --filter pnpm-sync run build && pnpm --filter pnpm-sync run test
+      - name: Build and run tests for pnpm-sync-api-demo
+        run: pnpm --filter pnpm-sync-api-demo run build && pnpm --filter pnpm-sync-api-demo run test

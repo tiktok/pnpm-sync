@@ -90,6 +90,18 @@ importers:
 
   pnpm-sync-api-demo:
     dependencies:
+      '@pnpm/lockfile-file':
+        specifier: ~8.1.4
+        version: 8.1.7(@pnpm/logger@5.0.0)
+      '@pnpm/logger':
+        specifier: ~5.0.0
+        version: 5.0.0
+      '@rushstack/node-core-library':
+        specifier: ^3.61.0
+        version: 3.66.0(@types/node@18.17.15)
+      '@rushstack/package-extractor':
+        specifier: ^0.6.12
+        version: 0.6.26(@types/node@18.17.15)
       pnpm-sync-lib:
         specifier: workspace:*
         version: link:../packages/pnpm-sync-lib
