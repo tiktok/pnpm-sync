@@ -1,12 +1,13 @@
 import fs from 'fs';
+import path from 'path';
+import { FileSystem } from '@rushstack/node-core-library';
+import { readWantedLockfile, Lockfile } from '@pnpm/lockfile-file';
 import {
   type ILockfile,
   type ILockfilePackage,
   pnpmSyncPrepareAsync,
   ILogMessageCallbackOptions
 } from 'pnpm-sync-lib';
-import { FileSystem } from '@rushstack/node-core-library';
-import { readWantedLockfile, Lockfile } from '@pnpm/lockfile-file';
 
 describe('pnpm-sync-api test', () => {
   it('pnpmSyncPrepareAsync should generate .pnpm-sync.json under node_modules folder', async () => {
@@ -37,8 +38,7 @@ describe('pnpm-sync-api test', () => {
           ignoreIncompatible: boolean;
         }
       ) => {
-        const pnpmLockFolder = lockfilePath.slice(0, lockfilePath.length - 'pnpm-lock.yaml'.length);
-
+        const pnpmLockFolder = path.dirname(lockfilePath);
         const lockfile: Lockfile | null = await readWantedLockfile(pnpmLockFolder, options);
 
         if (lockfile === null) {
