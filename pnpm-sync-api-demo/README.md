@@ -4,7 +4,7 @@ Here, we will show examples on how to use pnpm-sync APIs. The APIs mainly used w
 
 ## Folder structure
 
-We will use some test cases to demonstrate who to consume the APIs from `pnpm-sync-lib`.
+We will use some test cases to demonstrate how to consume the APIs from `pnpm-sync-lib`.
 
 The main app to drive the test cases is under `pnpm-sync-api-demo` folder. All test cases are under `pnpm-sync-api-demo/src/test` folder.
 
