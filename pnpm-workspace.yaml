@@ -1,4 +1,4 @@
 packages:
   - 'packages/*'
-  - 'pnpm-sync-api-demo/*'
-  - 'pnpm-sync-cli-demo/*'
+  - 'pnpm-sync-api-demo/**'
+  - 'pnpm-sync-cli-demo/**'
