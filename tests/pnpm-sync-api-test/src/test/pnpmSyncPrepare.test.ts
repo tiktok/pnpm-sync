@@ -95,7 +95,7 @@ describe('pnpm-sync-api test', () => {
       logMessageCallback: (options: ILogMessageCallbackOptions): void => {
         if (
           options.details.messageIdentifier !== 'prepare-writing-file' ||
-          options.details.projectFolder.includes('tests/test-fixtures')
+          options.details.projectFolder.split(path.sep).join(path.posix.sep).includes('tests/test-fixtures')
         ) {
           logs.push(options);
         }
