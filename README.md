@@ -24,7 +24,7 @@ The `pnpm-sync` command provides a way to resync injected dependencies when usin
 | Folder | Description |
 | --- | --- |
 | [./pnpm-sync-cli-demo](./pnpm-sync-cli-demo/) | Demonstrates usage of the `pnpm-sync` CLI in a workspace project. |
-| [./pnpm-sync-api-demo](./pnpm-sync-api-demo/) | Demonstrates usage of the `pnpm-sync` APIs. |
+| [./tests](./tests/) | Tests for `pnpm-sync` project. |
 
 ## How to build this monorepo
 
@@ -46,6 +46,12 @@ The `pnpm-sync` command provides a way to resync injected dependencies when usin
 
    ```bash
    pnpm --recursive run build
+   ```
+
+4. Run tests if needed:
+
+   ```bash
+   pnpm --recursive run test
    ```
 
 ## 💬 Tell us what you think

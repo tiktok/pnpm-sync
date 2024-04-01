@@ -1,7 +1,7 @@
 {
-  "name": "pnpm-sync-api-demo",
-  "version": "0.1.4",
-  "description": "Examples on how to use pnpm-sync-lib",
+  "name": "pnpm-sync-api-tests",
+  "version": "0.2.0",
+  "description": "Test cases for pnpm-sync-lib",
   "license": "MIT",
   "scripts": {
     "build": "heft build --clean",

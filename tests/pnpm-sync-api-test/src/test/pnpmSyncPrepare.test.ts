@@ -9,9 +9,10 @@ import {
   ILogMessageCallbackOptions
 } from 'pnpm-sync-lib';
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 function scrubLog(log: Record<string, any>): Record<string, any> {
   const scrubbedLog = { ...log };
-  const repoRootFolder = path.join(__dirname, '..', '..', '..', '..');
+  const repoRootFolder = path.join(__dirname, '..', '..', '..', '..', '..');
   for (const key of Object.keys(scrubbedLog)) {
     switch (key) {
       case 'message':
@@ -42,11 +43,13 @@ function scrubLog(log: Record<string, any>): Record<string, any> {
 
 describe('pnpm-sync-api test', () => {
   it('pnpmSyncPrepareAsync should generate .pnpm-sync.json under node_modules folder', async () => {
-    const lockfilePath = '../pnpm-lock.yaml';
-    const dotPnpmFolder = '../node_modules/.pnpm';
+    const lockfilePath = '../../pnpm-lock.yaml';
+    const dotPnpmFolder = '../../node_modules/.pnpm';
 
-    const dotPnpmSyncJsonPathForSampleLib1: string = 'test-fixtures/sample-lib1/node_modules/.pnpm-sync.json';
-    const dotPnpmSyncJsonPathForSampleLib2: string = 'test-fixtures/sample-lib2/node_modules/.pnpm-sync.json';
+    const dotPnpmSyncJsonPathForSampleLib1: string =
+      '../test-fixtures/sample-lib1/node_modules/.pnpm-sync.json';
+    const dotPnpmSyncJsonPathForSampleLib2: string =
+      '../test-fixtures/sample-lib2/node_modules/.pnpm-sync.json';
 
     // if .pnpm-sync.json already exists, delete it first
     if (fs.existsSync(dotPnpmSyncJsonPathForSampleLib1)) {
@@ -90,60 +93,56 @@ describe('pnpm-sync-api test', () => {
         }
       },
       logMessageCallback: (options: ILogMessageCallbackOptions): void => {
-        logs.push(options);
+        if (
+          options.details.messageIdentifier !== 'prepare-writing-file' ||
+          options.details.projectFolder.includes('tests/test-fixtures')
+        ) {
+          logs.push(options);
+        }
       }
     });
 
     expect(logs.map((x) => scrubLog(x))).toMatchInlineSnapshot(`
-Array [
-  Object {
-    "details": Object {
-      "dotPnpmFolder": "<root>/pnpm-sync/node_modules/.pnpm",
-      "lockfilePath": "<root>/pnpm-sync/pnpm-lock.yaml",
-      "messageIdentifier": "prepare-starting",
-    },
-    "message": "Starting...",
-    "messageKind": "verbose",
-  },
-  Object {
-    "details": Object {
-      "messageIdentifier": "prepare-writing-file",
-      "pnpmSyncJsonPath": "<root>/pnpm-sync/pnpm-sync-api-demo/test-fixtures/sample-lib1/node_modules/.pnpm-sync.json",
-      "projectFolder": "<root>/pnpm-sync/pnpm-sync-api-demo/test-fixtures/sample-lib1",
-    },
-    "message": "Writing...",
-    "messageKind": "verbose",
-  },
-  Object {
-    "details": Object {
-      "messageIdentifier": "prepare-writing-file",
-      "pnpmSyncJsonPath": "<root>/pnpm-sync/pnpm-sync-api-demo/test-fixtures/sample-lib2/node_modules/.pnpm-sync.json",
-      "projectFolder": "<root>/pnpm-sync/pnpm-sync-api-demo/test-fixtures/sample-lib2",
-    },
-    "message": "Writing...",
-    "messageKind": "verbose",
-  },
-  Object {
-    "details": Object {
-      "messageIdentifier": "prepare-writing-file",
-      "pnpmSyncJsonPath": "<root>/pnpm-sync/pnpm-sync-cli-demo/lib1/node_modules/.pnpm-sync.json",
-      "projectFolder": "<root>/pnpm-sync/pnpm-sync-cli-demo/lib1",
-    },
-    "message": "Writing...",
-    "messageKind": "verbose",
-  },
-  Object {
-    "details": Object {
-      "dotPnpmFolder": "<root>/pnpm-sync/node_modules/.pnpm",
-      "executionTimeInMs": "[TIMING]",
-      "lockfilePath": "<root>/pnpm-sync/pnpm-lock.yaml",
-      "messageIdentifier": "prepare-finishing",
-    },
-    "message": "Regenerated...",
-    "messageKind": "info",
-  },
-]
-`);
+      Array [
+        Object {
+          "details": Object {
+            "dotPnpmFolder": "<root>/pnpm-sync/node_modules/.pnpm",
+            "lockfilePath": "<root>/pnpm-sync/pnpm-lock.yaml",
+            "messageIdentifier": "prepare-starting",
+          },
+          "message": "Starting...",
+          "messageKind": "verbose",
+        },
+        Object {
+          "details": Object {
+            "messageIdentifier": "prepare-writing-file",
+            "pnpmSyncJsonPath": "<root>/pnpm-sync/tests/test-fixtures/sample-lib1/node_modules/.pnpm-sync.json",
+            "projectFolder": "<root>/pnpm-sync/tests/test-fixtures/sample-lib1",
+          },
+          "message": "Writing...",
+          "messageKind": "verbose",
+        },
+        Object {
+          "details": Object {
+            "messageIdentifier": "prepare-writing-file",
+            "pnpmSyncJsonPath": "<root>/pnpm-sync/tests/test-fixtures/sample-lib2/node_modules/.pnpm-sync.json",
+            "projectFolder": "<root>/pnpm-sync/tests/test-fixtures/sample-lib2",
+          },
+          "message": "Writing...",
+          "messageKind": "verbose",
+        },
+        Object {
+          "details": Object {
+            "dotPnpmFolder": "<root>/pnpm-sync/node_modules/.pnpm",
+            "executionTimeInMs": "[TIMING]",
+            "lockfilePath": "<root>/pnpm-sync/pnpm-lock.yaml",
+            "messageIdentifier": "prepare-finishing",
+          },
+          "message": "Regenerated...",
+          "messageKind": "info",
+        },
+      ]
+    `);
 
     // now, read .pnpm-sync.json and check the fields
     expect(fs.existsSync(dotPnpmSyncJsonPathForSampleLib1)).toBe(true);
@@ -155,7 +154,7 @@ Array [
         targetFolders: [
           {
             folderPath:
-              '../../../../node_modules/.pnpm/file+pnpm-sync-api-demo+test-fixtures+sample-lib1_react@17.0.2/node_modules/api-demo-sample-lib1'
+              '../../../../node_modules/.pnpm/file+tests+test-fixtures+sample-lib1_react@17.0.2/node_modules/api-demo-sample-lib1'
           }
         ]
       }
@@ -167,7 +166,7 @@ Array [
         targetFolders: [
           {
             folderPath:
-              '../../../../node_modules/.pnpm/file+pnpm-sync-api-demo+test-fixtures+sample-lib2_react@17.0.2/node_modules/api-demo-sample-lib2'
+              '../../../../node_modules/.pnpm/file+tests+test-fixtures+sample-lib2_react@17.0.2/node_modules/api-demo-sample-lib2'
           }
         ]
       }

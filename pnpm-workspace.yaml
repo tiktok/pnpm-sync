@@ -1,4 +1,7 @@
 packages:
-  - 'packages/*'
-  - 'pnpm-sync-api-demo/**'
-  - 'pnpm-sync-cli-demo/**'
+  - 'packages/pnpm-sync'
+  - 'packages/pnpm-sync-lib'
+  - 'packages/repo-tools'
+  - 'pnpm-sync-cli-demo/*'
+  - 'tests/pnpm-sync-api-test'
+  - 'tests/test-fixtures/*'
