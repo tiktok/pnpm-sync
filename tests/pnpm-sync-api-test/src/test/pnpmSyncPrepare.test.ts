@@ -6,7 +6,8 @@ import {
   type ILockfile,
   type ILockfilePackage,
   pnpmSyncPrepareAsync,
-  ILogMessageCallbackOptions
+  ILogMessageCallbackOptions,
+  LogMessageIdentifier
 } from 'pnpm-sync-lib';
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -93,8 +94,9 @@ describe('pnpm-sync-api test', () => {
         }
       },
       logMessageCallback: (options: ILogMessageCallbackOptions): void => {
+        // in this test case, we only care projects under tests/test-fixtures folder
         if (
-          options.details.messageIdentifier !== 'prepare-writing-file' ||
+          options.details.messageIdentifier !== LogMessageIdentifier.PREPARE_WRITING_FILE ||
           options.details.projectFolder.split(path.sep).join(path.posix.sep).includes('tests/test-fixtures')
         ) {
           logs.push(options);
