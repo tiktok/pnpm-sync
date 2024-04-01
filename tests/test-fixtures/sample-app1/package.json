@@ -1,5 +1,5 @@
 {
-  "name": "app2",
+  "name": "api-demo-sample-app1",
   "version": "1.0.0",
   "description": "",
   "main": "index.js",
@@ -10,12 +10,16 @@
   "author": "",
   "license": "MIT",
   "dependencies": {
-    "lib1": "workspace:*",
-    "react": "~18.0.0"
+    "api-demo-sample-lib1": "workspace:*",
+    "react": "~17.0.0"
+  },
+  "dependenciesMeta": {
+    "api-demo-sample-lib1": {
+      "injected": true
+    }
   },
   "devDependencies": {
     "@types/node": "^20.8.10",
-    "typescript": "^5.2.2",
-    "repo-tools": "workspace:*"
+    "typescript": "^5.2.2"
   }
 }

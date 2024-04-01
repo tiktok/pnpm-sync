@@ -182,7 +182,11 @@ export async function pnpmSyncPrepareAsync(options: IPnpmSyncPrepareOptions): Pr
     }
 
     for (const targetFolder of targetFolderSet) {
-      const relativePath = path.relative(pnpmSyncJsonFolder, targetFolder);
+      let relativePath: string = path.relative(pnpmSyncJsonFolder, targetFolder);
+
+      // the final path in .pnpm-sync.json will always in posix style
+      relativePath = relativePath.split(path.sep).join(path.posix.sep);
+
       if (!existingTargetFolderSet.has(relativePath)) {
         pnpmSyncJsonFile.postbuildInjectedCopy.targetFolders.push({
           folderPath: relativePath

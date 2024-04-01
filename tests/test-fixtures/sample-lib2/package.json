@@ -1,21 +1,22 @@
 {
-  "name": "app2",
+  "name": "api-demo-sample-lib2",
   "version": "1.0.0",
   "description": "",
-  "main": "index.js",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
   "scripts": {
-    "build": "tsc"
+    "build": "tsc",
+    "start": "tsc -w"
   },
   "keywords": [],
   "author": "",
   "license": "MIT",
-  "dependencies": {
-    "lib1": "workspace:*",
-    "react": "~18.0.0"
+  "peerDependencies": {
+    "react": "17 || 18"
   },
   "devDependencies": {
     "@types/node": "^20.8.10",
     "typescript": "^5.2.2",
-    "repo-tools": "workspace:*"
+    "react": "~18.2.0"
   }
 }

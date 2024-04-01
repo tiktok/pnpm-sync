@@ -144,6 +144,99 @@ importers:
         specifier: ^5.2.2
         version: 5.3.3
 
+  tests/pnpm-sync-api-test:
+    dependencies:
+      '@pnpm/lockfile-file':
+        specifier: ~8.1.4
+        version: 8.1.7(@pnpm/logger@5.0.0)
+      '@pnpm/logger':
+        specifier: ~5.0.0
+        version: 5.0.0
+      '@rushstack/node-core-library':
+        specifier: ^3.61.0
+        version: 3.66.0(@types/node@18.17.15)
+      '@rushstack/package-extractor':
+        specifier: ^0.6.12
+        version: 0.6.26(@types/node@18.17.15)
+      pnpm-sync-lib:
+        specifier: workspace:*
+        version: link:../../packages/pnpm-sync-lib
+    devDependencies:
+      '@rushstack/eslint-config':
+        specifier: ^3.6.2
+        version: 3.6.2(eslint@8.7.0)(typescript@5.3.3)
+      '@rushstack/eslint-patch':
+        specifier: ^1.7.2
+        version: 1.7.2
+      '@rushstack/heft':
+        specifier: ^0.64.3
+        version: 0.64.3(@types/node@18.17.15)
+      '@rushstack/heft-node-rig':
+        specifier: ^2.4.5
+        version: 2.4.5(@rushstack/heft@0.64.3)(@types/node@18.17.15)
+      '@types/heft-jest':
+        specifier: 1.0.6
+        version: 1.0.6
+      '@types/node':
+        specifier: 18.17.15
+        version: 18.17.15
+      eslint:
+        specifier: ~8.7.0
+        version: 8.7.0
+      typescript:
+        specifier: ~5.3.3
+        version: 5.3.3
+
+  tests/test-fixtures/sample-app1:
+    dependencies:
+      api-demo-sample-lib1:
+        specifier: workspace:*
+        version: file:tests/test-fixtures/sample-lib1(react@17.0.2)
+      react:
+        specifier: ~17.0.0
+        version: 17.0.2
+    devDependencies:
+      '@types/node':
+        specifier: ^20.8.10
+        version: 20.11.7
+      typescript:
+        specifier: ^5.2.2
+        version: 5.3.3
+    dependenciesMeta:
+      api-demo-sample-lib1:
+        injected: true
+
+  tests/test-fixtures/sample-lib1:
+    dependencies:
+      api-demo-sample-lib2:
+        specifier: 'workspace: *'
+        version: file:tests/test-fixtures/sample-lib2(react@17.0.2)
+    devDependencies:
+      '@types/node':
+        specifier: ^20.8.10
+        version: 20.11.7
+      react:
+        specifier: ~17.0.2
+        version: 17.0.2
+      typescript:
+        specifier: ^5.2.2
+        version: 5.3.3
+    dependenciesMeta:
+      api-demo-sample-lib2:
+        injected: true
+
+  tests/test-fixtures/sample-lib2:
+    devDependencies:
+      '@types/node':
+        specifier: ^20.8.10
+        version: 20.11.7
+      react:
+        specifier: ~18.2.0
+        version: 18.2.0
+      typescript:
+        specifier: ^5.2.2
+        version: 5.3.3
+
 packages:
 
   /@aashutoshrathi/word-wrap@1.2.6:
@@ -4138,6 +4231,13 @@ packages:
       loose-envify: 1.4.0
     dev: false
 
+  /react@18.2.0:
+    resolution: {integrity: sha512-/3IjMdb2L9QbBdWiW5e3P2/npwMBaU9mHCSCUzNln0ZCYbcfTsGbTJrU/kGemdH2IWmB2ioZ+zkxtmq6g09fGQ==}
+    engines: {node: '>=0.10.0'}
+    dependencies:
+      loose-envify: 1.4.0
+    dev: true
+
   /read-yaml-file@2.1.0:
     resolution: {integrity: sha512-UkRNRIwnhG+y7hpqnycCL/xbTk7+ia9VuVTC0S+zVbwd65DI9eUpRMfsWIGrCWxTU/mi+JW8cHQCrv+zfCbEPQ==}
     engines: {node: '>=10.13'}
@@ -4857,6 +4957,27 @@ packages:
     resolution: {directory: pnpm-sync-cli-demo/lib1, type: directory}
     id: file:pnpm-sync-cli-demo/lib1
     name: lib1
+    peerDependencies:
+      react: 17 || 18
+    dependencies:
+      react: 17.0.2
+    dev: false
+
+  file:tests/test-fixtures/sample-lib1(react@17.0.2):
+    resolution: {directory: tests/test-fixtures/sample-lib1, type: directory}
+    id: file:tests/test-fixtures/sample-lib1
+    name: api-demo-sample-lib1
+    peerDependencies:
+      react: 17 || 18
+    dependencies:
+      api-demo-sample-lib2: file:tests/test-fixtures/sample-lib2(react@17.0.2)
+      react: 17.0.2
+    dev: false
+
+  file:tests/test-fixtures/sample-lib2(react@17.0.2):
+    resolution: {directory: tests/test-fixtures/sample-lib2, type: directory}
+    id: file:tests/test-fixtures/sample-lib2
+    name: api-demo-sample-lib2
     peerDependencies:
       react: 17 || 18
     dependencies:
