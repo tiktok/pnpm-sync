@@ -102,7 +102,7 @@ describe('pnpm-sync-api copy test', () => {
         Object {
           "details": Object {
             "executionTimeInMs": "[TIMING]",
-            "fileCount": 3,
+            "fileCount": 6,
             "messageIdentifier": "copy-finishing",
             "pnpmSyncJsonPath": "<root>/pnpm-sync/tests/test-fixtures/sample-lib1/node_modules/.pnpm-sync.json",
             "sourcePath": "<root>/pnpm-sync/tests/test-fixtures/sample-lib1",
