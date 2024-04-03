@@ -4,6 +4,9 @@
 
 ```ts
 
+// @beta
+export function getPnpmSyncJsonVersion(): string;
+
 // @beta (undocumented)
 export interface IDependencyMeta {
     // (undocumented)
@@ -86,7 +89,7 @@ export type LogMessageDetails = {
 } | {
     messageIdentifier: LogMessageIdentifier.PREPARE_PROCESSING;
     lockfilePath: string;
-    dotPnpmFolderPath: string;
+    dotPnpmFolder: string;
 } | {
     messageIdentifier: LogMessageIdentifier.PREPARE_WRITING_FILE;
     pnpmSyncJsonPath: string;
