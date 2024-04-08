@@ -34,12 +34,14 @@ export enum LogMessageIdentifier {
   PREPARE_STARTING = 'prepare-starting',
   PREPARE_ERROR_UNSUPPORTED_FORMAT = 'prepare-error-unsupported-format',
   PREPARE_PROCESSING = 'prepare-processing',
+  PREPARE_REPLACING_FILE = 'prepare-replacing-file',
   PREPARE_WRITING_FILE = 'prepare-writing-file',
   PREPARE_FINISHING = 'prepare-finishing',
 
   // pnpmSyncCopyAsync() messages
   COPY_STARTING = 'copy-starting',
   COPY_ERROR_NO_SYNC_FILE = 'copy-error-no-sync-file',
+  COPY_ERROR_INCOMPATIBLE_SYNC_FILE = 'copy-error-incompatible-sync-file',
   COPY_FINISHING = 'copy-finishing'
 }
 
@@ -63,6 +65,13 @@ export type LogMessageDetails =
       dotPnpmFolder: string;
     }
   | {
+      messageIdentifier: LogMessageIdentifier.PREPARE_REPLACING_FILE;
+      pnpmSyncJsonPath: string;
+      projectFolder: string;
+      actualVersion: string;
+      expectedVersion: string;
+    }
+  | {
       messageIdentifier: LogMessageIdentifier.PREPARE_WRITING_FILE;
       pnpmSyncJsonPath: string;
       projectFolder: string;
@@ -80,6 +89,12 @@ export type LogMessageDetails =
   | {
       messageIdentifier: LogMessageIdentifier.COPY_ERROR_NO_SYNC_FILE;
       pnpmSyncJsonPath: string;
+    }
+  | {
+      messageIdentifier: LogMessageIdentifier.COPY_ERROR_INCOMPATIBLE_SYNC_FILE;
+      pnpmSyncJsonPath: string;
+      actualVersion: string;
+      expectedVersion: string;
     }
   | {
       messageIdentifier: LogMessageIdentifier.COPY_FINISHING;

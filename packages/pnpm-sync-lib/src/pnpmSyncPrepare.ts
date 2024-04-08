@@ -11,7 +11,7 @@ import {
   IVersionSpecifier,
   ILockfilePackage
 } from './interfaces';
-import { getPnpmSyncJsonVersion } from './utilities';
+import { pnpmSyncGetJsonVersion } from './utilities';
 
 /**
  * @beta
@@ -164,10 +164,10 @@ export async function pnpmSyncPrepareAsync(options: IPnpmSyncPrepareOptions): Pr
       await ensureFolder(pnpmSyncJsonFolder);
     }
 
-    const pnpmSyncJsonVersion: string = getPnpmSyncJsonVersion();
+    const expectedPnpmSyncJsonVersion: string = pnpmSyncGetJsonVersion();
 
     let pnpmSyncJsonFile: IPnpmSyncJson = {
-      version: pnpmSyncJsonVersion,
+      version: expectedPnpmSyncJsonVersion,
       postbuildInjectedCopy: {
         sourceFolder: '..', // path from pnpmSyncJsonFolder to projectFolder
         targetFolders: []
@@ -179,16 +179,20 @@ export async function pnpmSyncPrepareAsync(options: IPnpmSyncPrepareOptions): Pr
       const existingPnpmSyncJsonFile: IPnpmSyncJson = JSON.parse(
         fs.readFileSync(pnpmSyncJsonPath).toString()
       );
-      if (existingPnpmSyncJsonFile?.version === pnpmSyncJsonVersion) {
+
+      const actualPnpmSyncJsonVersion: string = existingPnpmSyncJsonFile?.version;
+      if (actualPnpmSyncJsonVersion === expectedPnpmSyncJsonVersion) {
         pnpmSyncJsonFile = existingPnpmSyncJsonFile;
       } else {
         logMessageCallback({
-          message: `The .pnpm-sync.json in ${pnpmSyncJsonFolder} is out of date; pnpm-sync will regenerate it.`,
+          message: `The .pnpm-sync.json file in ${pnpmSyncJsonFolder} has an incompatible version; pnpm-sync will regenerate it.`,
           messageKind: LogMessageKind.VERBOSE,
           details: {
-            messageIdentifier: LogMessageIdentifier.PREPARE_WRITING_FILE,
+            messageIdentifier: LogMessageIdentifier.PREPARE_REPLACING_FILE,
             pnpmSyncJsonPath,
-            projectFolder
+            projectFolder,
+            actualVersion: actualPnpmSyncJsonVersion,
+            expectedVersion: expectedPnpmSyncJsonVersion
           }
         });
       }

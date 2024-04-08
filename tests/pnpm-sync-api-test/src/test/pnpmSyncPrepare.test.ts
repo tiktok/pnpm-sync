@@ -5,11 +5,11 @@ import {
   pnpmSyncPrepareAsync,
   ILogMessageCallbackOptions,
   LogMessageIdentifier,
-  getPnpmSyncJsonVersion
+  pnpmSyncGetJsonVersion
 } from 'pnpm-sync-lib';
 import { readPnpmLockfile, scrubLog } from './testUtilities';
 
-const pnpmSyncLibVersion: string = getPnpmSyncJsonVersion();
+const pnpmSyncLibVersion: string = pnpmSyncGetJsonVersion();
 
 describe('pnpm-sync-api prepare test', () => {
   it('pnpmSyncPrepareAsync should generate .pnpm-sync.json under node_modules folder', async () => {
@@ -134,9 +134,9 @@ describe('pnpm-sync-api prepare test', () => {
       await FileSystem.ensureFolderAsync(pnpmSyncJsonFolder);
     }
 
-    // fake a .pnpm-sync.json for testing
+    // create an incompatible .pnpm-sync.json for testing
     const fakePnpmSyncJsonFile = {
-      version: 'fake-version',
+      version: 'incompatible-version',
       postbuildInjectedCopy: {
         sourceFolder: '..',
         targetFolders: ['../../../../node_modules/.pnpm/fake+folder']
@@ -157,7 +157,7 @@ describe('pnpm-sync-api prepare test', () => {
         // in this test case, we only care projects under tests/test-fixtures/sample-lib1 folder
         // and the logs related to write files
         if (
-          options.details.messageIdentifier === LogMessageIdentifier.PREPARE_WRITING_FILE &&
+          options.details.messageIdentifier === LogMessageIdentifier.PREPARE_REPLACING_FILE &&
           options.details.projectFolder
             .split(path.sep)
             .join(path.posix.sep)
@@ -172,16 +172,9 @@ describe('pnpm-sync-api prepare test', () => {
       Array [
         Object {
           "details": Object {
-            "messageIdentifier": "prepare-writing-file",
-            "pnpmSyncJsonPath": "<root>/pnpm-sync/tests/test-fixtures/sample-lib1/node_modules/.pnpm-sync.json",
-            "projectFolder": "<root>/pnpm-sync/tests/test-fixtures/sample-lib1",
-          },
-          "message": "Writing...",
-          "messageKind": "verbose",
-        },
-        Object {
-          "details": Object {
-            "messageIdentifier": "prepare-writing-file",
+            "actualVersion": "incompatible-version",
+            "expectedVersion": "0.2.1",
+            "messageIdentifier": "prepare-replacing-file",
             "pnpmSyncJsonPath": "<root>/pnpm-sync/tests/test-fixtures/sample-lib1/node_modules/.pnpm-sync.json",
             "projectFolder": "<root>/pnpm-sync/tests/test-fixtures/sample-lib1",
           },

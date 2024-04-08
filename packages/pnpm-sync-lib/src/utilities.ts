@@ -3,6 +3,6 @@
  *
  * @beta
  */
-export function getPnpmSyncJsonVersion(): string {
+export function pnpmSyncGetJsonVersion(): string {
   return require('../package.json').version;
 }

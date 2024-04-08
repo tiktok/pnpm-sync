@@ -4,9 +4,6 @@
 
 ```ts
 
-// @beta
-export function getPnpmSyncJsonVersion(): string;
-
 // @beta (undocumented)
 export interface IDependencyMeta {
     // (undocumented)
@@ -91,6 +88,12 @@ export type LogMessageDetails = {
     lockfilePath: string;
     dotPnpmFolder: string;
 } | {
+    messageIdentifier: LogMessageIdentifier.PREPARE_REPLACING_FILE;
+    pnpmSyncJsonPath: string;
+    projectFolder: string;
+    actualVersion: string;
+    expectedVersion: string;
+} | {
     messageIdentifier: LogMessageIdentifier.PREPARE_WRITING_FILE;
     pnpmSyncJsonPath: string;
     projectFolder: string;
@@ -106,6 +109,11 @@ export type LogMessageDetails = {
     messageIdentifier: LogMessageIdentifier.COPY_ERROR_NO_SYNC_FILE;
     pnpmSyncJsonPath: string;
 } | {
+    messageIdentifier: LogMessageIdentifier.COPY_ERROR_INCOMPATIBLE_SYNC_FILE;
+    pnpmSyncJsonPath: string;
+    actualVersion: string;
+    expectedVersion: string;
+} | {
     messageIdentifier: LogMessageIdentifier.COPY_FINISHING;
     pnpmSyncJsonPath: string;
     fileCount: number;
@@ -115,6 +123,8 @@ export type LogMessageDetails = {
 
 // @beta (undocumented)
 export enum LogMessageIdentifier {
+    // (undocumented)
+    COPY_ERROR_INCOMPATIBLE_SYNC_FILE = "copy-error-incompatible-sync-file",
     // (undocumented)
     COPY_ERROR_NO_SYNC_FILE = "copy-error-no-sync-file",
     // (undocumented)
@@ -127,6 +137,8 @@ export enum LogMessageIdentifier {
     PREPARE_FINISHING = "prepare-finishing",
     // (undocumented)
     PREPARE_PROCESSING = "prepare-processing",
+    // (undocumented)
+    PREPARE_REPLACING_FILE = "prepare-replacing-file",
     // (undocumented)
     PREPARE_STARTING = "prepare-starting",
     // (undocumented)
@@ -147,6 +159,9 @@ export enum LogMessageKind {
 
 // @beta
 export function pnpmSyncCopyAsync(options: IPnpmSyncCopyOptions): Promise<void>;
+
+// @beta
+export function pnpmSyncGetJsonVersion(): string;
 
 // @beta
 export function pnpmSyncPrepareAsync(options: IPnpmSyncPrepareOptions): Promise<void>;

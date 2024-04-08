@@ -7,7 +7,7 @@ import {
   LogMessageIdentifier,
   LogMessageKind
 } from './interfaces';
-import { getPnpmSyncJsonVersion } from './utilities';
+import { pnpmSyncGetJsonVersion } from './utilities';
 
 /**
  * @beta
@@ -102,17 +102,19 @@ export async function pnpmSyncCopyAsync(options: IPnpmSyncCopyOptions): Promise<
   // read the .pnpm-sync.json
   const pnpmSyncJson: IPnpmSyncJson = JSON.parse(pnpmSyncJsonContents);
 
-  // verify if the version is outdated
-  const pnpmSyncJsonVersion: string = getPnpmSyncJsonVersion();
-
-  if (pnpmSyncJsonVersion !== pnpmSyncJson.version) {
-    const errorMessage = `The .pnpm-sync.json file in ${pnpmSyncJsonFolder} is outdated; regenerate it and try again.`;
+  // verify if the version is incompatible
+  const expectedPnpmSyncJsonVersion: string = pnpmSyncGetJsonVersion();
+  const actualPnpmSyncJsonVersion: string = pnpmSyncJson.version;
+  if (expectedPnpmSyncJsonVersion !== actualPnpmSyncJsonVersion) {
+    const errorMessage = `The .pnpm-sync.json file in ${pnpmSyncJsonFolder} has an incompatible version; regenerate it and try again.`;
     logMessageCallback({
       message: errorMessage,
       messageKind: LogMessageKind.ERROR,
       details: {
-        messageIdentifier: LogMessageIdentifier.COPY_ERROR_NO_SYNC_FILE,
-        pnpmSyncJsonPath
+        messageIdentifier: LogMessageIdentifier.COPY_ERROR_INCOMPATIBLE_SYNC_FILE,
+        pnpmSyncJsonPath,
+        actualVersion: actualPnpmSyncJsonVersion,
+        expectedVersion: expectedPnpmSyncJsonVersion
       }
     });
     throw Error(errorMessage);

@@ -5,12 +5,12 @@ import { PackageExtractor } from '@rushstack/package-extractor';
 import { readPnpmLockfile, scrubLog } from './testUtilities';
 import {
   ILogMessageCallbackOptions,
-  getPnpmSyncJsonVersion,
+  pnpmSyncGetJsonVersion,
   pnpmSyncCopyAsync,
   pnpmSyncPrepareAsync
 } from 'pnpm-sync-lib';
 
-const pnpmSyncLibVersion: string = getPnpmSyncJsonVersion();
+const pnpmSyncLibVersion: string = pnpmSyncGetJsonVersion();
 
 describe('pnpm-sync-api copy test', () => {
   it('pnpmSyncCopyAsync should copy files based on .pnpm-sync.json under node_modules folder', async () => {
@@ -47,10 +47,10 @@ describe('pnpm-sync-api copy test', () => {
     });
 
     // set a outdated version
-    pnpmSyncJsonFile.version = 'outdated-version';
+    pnpmSyncJsonFile.version = 'incompatible-version';
     await fs.promises.writeFile(pnpmSyncJsonPath, JSON.stringify(pnpmSyncJsonFile, null, 2));
 
-    // if pnpmSyncCopyAsync detects a outdated version, should throw errors
+    // if pnpmSyncCopyAsync detects a incompatible version, should throw errors
     try {
       await pnpmSyncCopyAsync({
         pnpmSyncJsonPath,
@@ -60,7 +60,7 @@ describe('pnpm-sync-api copy test', () => {
         logMessageCallback: () => {}
       });
     } catch (error) {
-      expect(error.message).toContain('is outdated; regenerate it and try again');
+      expect(error.message).toContain('has an incompatible version; regenerate it and try again');
     }
 
     // set the correct version
