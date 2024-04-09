@@ -59,7 +59,6 @@ export interface IPnpmSyncCopyOptions {
 
 // @beta (undocumented)
 export interface IPnpmSyncPrepareOptions {
-    depPathToFilename: (depPath: string) => string;
     dotPnpmFolder: string;
     ensureFolder: (folderPath: string) => Promise<void>;
     lockfilePath: string;
@@ -81,9 +80,9 @@ export type LogMessageDetails = {
     lockfilePath: string;
     dotPnpmFolder: string;
 } | {
-    messageIdentifier: LogMessageIdentifier.PREPARE_ERROR_UNSUPPORTED_FORMAT;
+    messageIdentifier: LogMessageIdentifier.PREPARE_ERROR_UNSUPPORTED_PNPM_VERSION;
     lockfilePath: string;
-    lockfileVersion: string | undefined;
+    pnpmVersion: string | undefined;
 } | {
     messageIdentifier: LogMessageIdentifier.PREPARE_PROCESSING;
     lockfilePath: string;
@@ -133,7 +132,7 @@ export enum LogMessageIdentifier {
     // (undocumented)
     COPY_STARTING = "copy-starting",
     // (undocumented)
-    PREPARE_ERROR_UNSUPPORTED_FORMAT = "prepare-error-unsupported-format",
+    PREPARE_ERROR_UNSUPPORTED_PNPM_VERSION = "prepare-error-unsupported-pnpm-version",
     // (undocumented)
     PREPARE_FINISHING = "prepare-finishing",
     // (undocumented)

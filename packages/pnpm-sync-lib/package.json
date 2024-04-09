@@ -16,6 +16,10 @@
     "lint": "eslint src/**",
     "prepublishOnly": "heft build --clean"
   },
+  "dependencies": {
+    "@pnpm/dependency-path": "2.1.8",
+    "yaml": "2.4.1"
+  },
   "devDependencies": {
     "@rushstack/eslint-config": "^3.6.2",
     "@rushstack/eslint-patch": "^1.7.2",

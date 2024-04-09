@@ -8,9 +8,6 @@ importers:
 
   packages/pnpm-sync:
     dependencies:
-      '@pnpm/dependency-path':
-        specifier: ~2.1.8
-        version: 2.1.8
       '@pnpm/lockfile-file':
         specifier: ~8.1.4
         version: 8.1.7(@pnpm/logger@5.0.0)
@@ -56,6 +53,13 @@ importers:
         version: 5.3.3
 
   packages/pnpm-sync-lib:
+    dependencies:
+      '@pnpm/dependency-path':
+        specifier: 2.1.8
+        version: 2.1.8
+      yaml:
+        specifier: 2.4.1
+        version: 2.4.1
     devDependencies:
       '@rushstack/eslint-config':
         specifier: ^3.6.2
@@ -149,9 +153,6 @@ importers:
 
   tests/pnpm-sync-api-test:
     dependencies:
-      '@pnpm/dependency-path':
-        specifier: ~2.1.8
-        version: 2.1.8
       '@pnpm/lockfile-file':
         specifier: ~8.1.4
         version: 8.1.7(@pnpm/logger@5.0.0)
@@ -4943,6 +4944,12 @@ packages:
 
   /yallist@4.0.0:
     resolution: {integrity: sha512-3wdGidZyq5PB084XLES5TpOSRA3wjXAlIWMhum2kRcv/41Sn2emQ0dycQW4uZXLejwKvg6EsvbdlVL+FYEct7A==}
+
+  /yaml@2.4.1:
+    resolution: {integrity: sha512-pIXzoImaqmfOrL7teGUBt/T7ZDnyeGBWyXQBvOVhLkWLN37GXv8NMLK406UY6dS51JfcQHsmcW5cJ441bHg6Lg==}
+    engines: {node: '>= 14'}
+    hasBin: true
+    dev: false
 
   /yocto-queue@0.1.0:
     resolution: {integrity: sha512-rVksvsnNCdJ/ohGc6xgPwyN8eheCxsiLM8mxuE/t/mOVqJewPuO1miLpTHQiRgTKCLexL4MeAFVagts7HmNZ2Q==}
