@@ -1,48 +1,17 @@
 import fs from 'fs';
 import path from 'path';
-import { FileSystem, Path } from '@rushstack/node-core-library';
-import { readWantedLockfile, Lockfile } from '@pnpm/lockfile-file';
+import { FileSystem } from '@rushstack/node-core-library';
 import {
-  type ILockfile,
-  type ILockfilePackage,
   pnpmSyncPrepareAsync,
   ILogMessageCallbackOptions,
-  LogMessageIdentifier
+  LogMessageIdentifier,
+  pnpmSyncGetJsonVersion
 } from 'pnpm-sync-lib';
+import { readPnpmLockfile, scrubLog } from './testUtilities';
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-function scrubLog(log: Record<string, any>): Record<string, any> {
-  const scrubbedLog = { ...log };
-  const repoRootFolder = path.join(__dirname, '..', '..', '..', '..', '..');
-  for (const key of Object.keys(scrubbedLog)) {
-    switch (key) {
-      case 'message':
-        scrubbedLog[key] = scrubbedLog[key].split(' ')[0] + '...';
-        break;
-      case 'details':
-        scrubbedLog[key] = scrubLog(scrubbedLog[key]);
-        break;
-      case 'executionTimeInMs':
-        scrubbedLog[key] = '[TIMING]';
-        break;
+const pnpmSyncLibVersion: string = pnpmSyncGetJsonVersion();
 
-      case 'dotPnpmFolder':
-      case 'dotPnpmFolderPath':
-      case 'lockfilePath':
-      case 'pnpmSyncJsonPath':
-      case 'projectFolder':
-      case 'sourcePath':
-        let scrubbedPath = scrubbedLog[key];
-        scrubbedPath = scrubbedPath.replace(repoRootFolder, '<root>');
-        scrubbedPath = Path.convertToSlashes(scrubbedPath);
-        scrubbedLog[key] = scrubbedPath;
-        break;
-    }
-  }
-  return scrubbedLog;
-}
-
-describe('pnpm-sync-api test', () => {
+describe('pnpm-sync-api prepare test', () => {
   it('pnpmSyncPrepareAsync should generate .pnpm-sync.json under node_modules folder', async () => {
     const lockfilePath = '../../pnpm-lock.yaml';
     const dotPnpmFolder = '../../node_modules/.pnpm';
@@ -69,30 +38,7 @@ describe('pnpm-sync-api test', () => {
       lockfilePath: lockfilePath,
       dotPnpmFolder: dotPnpmFolder,
       ensureFolder: FileSystem.ensureFolderAsync,
-      readPnpmLockfile: async (
-        lockfilePath: string,
-        options: {
-          ignoreIncompatible: boolean;
-        }
-      ) => {
-        const pnpmLockFolder = path.dirname(lockfilePath);
-        const lockfile: Lockfile | null = await readWantedLockfile(pnpmLockFolder, options);
-
-        if (lockfile === null) {
-          return undefined;
-        } else {
-          const lockfilePackages: Record<string, ILockfilePackage> = lockfile.packages as Record<
-            string,
-            ILockfilePackage
-          >;
-          const result: ILockfile = {
-            lockfileVersion: lockfile.lockfileVersion,
-            importers: lockfile.importers,
-            packages: lockfilePackages
-          };
-          return result;
-        }
-      },
+      readPnpmLockfile,
       logMessageCallback: (options: ILogMessageCallbackOptions): void => {
         // in this test case, we only care projects under tests/test-fixtures folder
         if (
@@ -151,6 +97,7 @@ describe('pnpm-sync-api test', () => {
     expect(fs.existsSync(dotPnpmSyncJsonPathForSampleLib2)).toBe(true);
 
     expect(JSON.parse(fs.readFileSync(dotPnpmSyncJsonPathForSampleLib1).toString())).toEqual({
+      version: pnpmSyncLibVersion,
       postbuildInjectedCopy: {
         sourceFolder: '..',
         targetFolders: [
@@ -163,12 +110,92 @@ describe('pnpm-sync-api test', () => {
     });
 
     expect(JSON.parse(fs.readFileSync(dotPnpmSyncJsonPathForSampleLib2).toString())).toEqual({
+      version: pnpmSyncLibVersion,
       postbuildInjectedCopy: {
         sourceFolder: '..',
         targetFolders: [
           {
             folderPath:
               '../../../../node_modules/.pnpm/file+tests+test-fixtures+sample-lib2_react@17.0.2/node_modules/api-demo-sample-lib2'
+          }
+        ]
+      }
+    });
+  });
+
+  it('pnpmSyncPrepareAsync should detect outdated .pnpm-sync.json version', async () => {
+    const lockfilePath = '../../pnpm-lock.yaml';
+    const dotPnpmFolder = '../../node_modules/.pnpm';
+
+    const pnpmSyncJsonFolder = `../test-fixtures/sample-lib1/node_modules`;
+    const pnpmSyncJsonPath = `${pnpmSyncJsonFolder}/.pnpm-sync.json`;
+
+    if (!fs.existsSync(pnpmSyncJsonFolder)) {
+      await FileSystem.ensureFolderAsync(pnpmSyncJsonFolder);
+    }
+
+    // create an incompatible .pnpm-sync.json for testing
+    const fakePnpmSyncJsonFile = {
+      version: 'incompatible-version',
+      postbuildInjectedCopy: {
+        sourceFolder: '..',
+        targetFolders: ['../../../../node_modules/.pnpm/fake+folder']
+      }
+    };
+
+    // write a fake .pnpm-sync.json
+    await fs.promises.writeFile(pnpmSyncJsonPath, JSON.stringify(fakePnpmSyncJsonFile, null, 2));
+
+    const logs: ILogMessageCallbackOptions[] = [];
+
+    await pnpmSyncPrepareAsync({
+      lockfilePath: lockfilePath,
+      dotPnpmFolder: dotPnpmFolder,
+      ensureFolder: FileSystem.ensureFolderAsync,
+      readPnpmLockfile,
+      logMessageCallback: (options: ILogMessageCallbackOptions): void => {
+        // in this test case, we only care projects under tests/test-fixtures/sample-lib1 folder
+        // and the logs related to write files
+        if (
+          options.details.messageIdentifier === LogMessageIdentifier.PREPARE_REPLACING_FILE &&
+          options.details.projectFolder
+            .split(path.sep)
+            .join(path.posix.sep)
+            .includes('tests/test-fixtures/sample-lib1')
+        ) {
+          logs.push(options);
+        }
+      }
+    });
+
+    expect(logs.map((x) => scrubLog(x))).toMatchInlineSnapshot(`
+      Array [
+        Object {
+          "details": Object {
+            "actualVersion": "incompatible-version",
+            "expectedVersion": "0.2.1",
+            "messageIdentifier": "prepare-replacing-file",
+            "pnpmSyncJsonPath": "<root>/pnpm-sync/tests/test-fixtures/sample-lib1/node_modules/.pnpm-sync.json",
+            "projectFolder": "<root>/pnpm-sync/tests/test-fixtures/sample-lib1",
+          },
+          "message": "The...",
+          "messageKind": "verbose",
+        },
+      ]
+    `);
+
+    // now, read .pnpm-sync.json and check the fields
+    expect(fs.existsSync(pnpmSyncJsonPath)).toBe(true);
+
+    // the fake a .pnpm-sync.json should be replaced with the correct one
+    expect(JSON.parse(fs.readFileSync(pnpmSyncJsonPath).toString())).toEqual({
+      version: pnpmSyncLibVersion,
+      postbuildInjectedCopy: {
+        sourceFolder: '..',
+        targetFolders: [
+          {
+            folderPath:
+              '../../../../node_modules/.pnpm/file+tests+test-fixtures+sample-lib1_react@17.0.2/node_modules/api-demo-sample-lib1'
           }
         ]
       }

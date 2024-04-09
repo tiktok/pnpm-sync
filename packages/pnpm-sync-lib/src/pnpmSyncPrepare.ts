@@ -11,6 +11,7 @@ import {
   IVersionSpecifier,
   ILockfilePackage
 } from './interfaces';
+import { pnpmSyncGetJsonVersion } from './utilities';
 
 /**
  * @beta
@@ -163,7 +164,10 @@ export async function pnpmSyncPrepareAsync(options: IPnpmSyncPrepareOptions): Pr
       await ensureFolder(pnpmSyncJsonFolder);
     }
 
+    const expectedPnpmSyncJsonVersion: string = pnpmSyncGetJsonVersion();
+
     let pnpmSyncJsonFile: IPnpmSyncJson = {
+      version: expectedPnpmSyncJsonVersion,
       postbuildInjectedCopy: {
         sourceFolder: '..', // path from pnpmSyncJsonFolder to projectFolder
         targetFolders: []
@@ -172,7 +176,26 @@ export async function pnpmSyncPrepareAsync(options: IPnpmSyncPrepareOptions): Pr
 
     // if .pnpm-sync.json already exists, read it first
     if (fs.existsSync(pnpmSyncJsonPath)) {
-      pnpmSyncJsonFile = JSON.parse(fs.readFileSync(pnpmSyncJsonPath).toString());
+      const existingPnpmSyncJsonFile: IPnpmSyncJson = JSON.parse(
+        fs.readFileSync(pnpmSyncJsonPath).toString()
+      );
+
+      const actualPnpmSyncJsonVersion: string = existingPnpmSyncJsonFile?.version;
+      if (actualPnpmSyncJsonVersion === expectedPnpmSyncJsonVersion) {
+        pnpmSyncJsonFile = existingPnpmSyncJsonFile;
+      } else {
+        logMessageCallback({
+          message: `The .pnpm-sync.json file in ${pnpmSyncJsonFolder} has an incompatible version; pnpm-sync will regenerate it.`,
+          messageKind: LogMessageKind.VERBOSE,
+          details: {
+            messageIdentifier: LogMessageIdentifier.PREPARE_REPLACING_FILE,
+            pnpmSyncJsonPath,
+            projectFolder,
+            actualVersion: actualPnpmSyncJsonVersion,
+            expectedVersion: expectedPnpmSyncJsonVersion
+          }
+        });
+      }
     }
 
     const existingTargetFolderSet: Set<string> = new Set();

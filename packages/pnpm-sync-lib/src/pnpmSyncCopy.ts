@@ -1,7 +1,13 @@
 import path from 'path';
 import fs from 'fs';
 import process from 'node:process';
-import { ILogMessageCallbackOptions, LogMessageIdentifier, LogMessageKind } from './interfaces';
+import {
+  ILogMessageCallbackOptions,
+  IPnpmSyncJson,
+  LogMessageIdentifier,
+  LogMessageKind
+} from './interfaces';
+import { pnpmSyncGetJsonVersion } from './utilities';
 
 /**
  * @beta
@@ -93,17 +99,36 @@ export async function pnpmSyncCopyAsync(options: IPnpmSyncCopyOptions): Promise<
 
   const pnpmSyncJsonFolder = path.dirname(pnpmSyncJsonPath);
 
-  //read the .pnpm-sync.json
-  const pnpmSyncJson = JSON.parse(pnpmSyncJsonContents);
+  // read the .pnpm-sync.json
+  const pnpmSyncJson: IPnpmSyncJson = JSON.parse(pnpmSyncJsonContents);
+
+  // verify if the version is incompatible
+  const expectedPnpmSyncJsonVersion: string = pnpmSyncGetJsonVersion();
+  const actualPnpmSyncJsonVersion: string = pnpmSyncJson.version;
+  if (expectedPnpmSyncJsonVersion !== actualPnpmSyncJsonVersion) {
+    const errorMessage = `The .pnpm-sync.json file in ${pnpmSyncJsonFolder} has an incompatible version; regenerate it and try again.`;
+    logMessageCallback({
+      message: errorMessage,
+      messageKind: LogMessageKind.ERROR,
+      details: {
+        messageIdentifier: LogMessageIdentifier.COPY_ERROR_INCOMPATIBLE_SYNC_FILE,
+        pnpmSyncJsonPath,
+        actualVersion: actualPnpmSyncJsonVersion,
+        expectedVersion: expectedPnpmSyncJsonVersion
+      }
+    });
+    throw Error(errorMessage);
+  }
+
   const { sourceFolder, targetFolders } = pnpmSyncJson.postbuildInjectedCopy;
   const sourcePath = path.resolve(pnpmSyncJsonFolder, sourceFolder);
 
-  //get npmPackFiles
+  // get npmPackFiles
   const npmPackFiles: string[] = await getPackageIncludedFiles(sourcePath);
 
   const startTime = process.hrtime.bigint();
 
-  //clear the destination folder first
+  // clear the destination folder first
   for (const targetFolder of targetFolders) {
     const destinationPath = path.resolve(pnpmSyncJsonFolder, targetFolder.folderPath);
     // TODO: optimize this
