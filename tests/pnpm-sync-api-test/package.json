@@ -11,6 +11,7 @@
   "main": "lib/index.js",
   "dependencies": {
     "@pnpm/lockfile-file": "~8.1.4",
+    "@pnpm/dependency-path": "~2.1.8",
     "@pnpm/logger": "~5.0.0",
     "@rushstack/node-core-library": "^3.61.0",
     "@rushstack/package-extractor": "^0.6.12",

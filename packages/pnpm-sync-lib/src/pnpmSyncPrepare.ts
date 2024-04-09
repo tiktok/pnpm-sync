@@ -31,6 +31,12 @@ export interface IPnpmSyncPrepareOptions {
    * Environment-provided API to avoid an NPM dependency.
    * The "pnpm-sync" NPM package provides a reference implementation.
    */
+  depPathToFilename: (depPath: string) => string;
+
+  /**
+   * Environment-provided API to avoid an NPM dependency.
+   * The "pnpm-sync" NPM package provides a reference implementation.
+   */
   ensureFolder: (folderPath: string) => Promise<void>;
 
   /**
@@ -61,7 +67,7 @@ export interface IPnpmSyncPrepareOptions {
  * @beta
  */
 export async function pnpmSyncPrepareAsync(options: IPnpmSyncPrepareOptions): Promise<void> {
-  const { ensureFolder, readPnpmLockfile, logMessageCallback } = options;
+  const { ensureFolder, readPnpmLockfile, logMessageCallback, depPathToFilename } = options;
   let { lockfilePath, dotPnpmFolder } = options;
 
   // get the pnpm-lock.yaml path
@@ -129,9 +135,14 @@ export async function pnpmSyncPrepareAsync(options: IPnpmSyncPrepareOptions): Pr
         injectedDependencyToFilePathSet.set(injectedDependencyPath, new Set());
       }
 
-      injectedDependencyToFilePathSet
-        .get(injectedDependencyPath)
-        ?.add(transferFilePathToDotPnpmFolder(injectedDependencyVersion, injectedDependency, dotPnpmFolder));
+      const fullPackagePath = path.join(
+        dotPnpmFolder,
+        depPathToFilename(injectedDependencyVersion),
+        'node_modules',
+        injectedDependency
+      );
+
+      injectedDependencyToFilePathSet.get(injectedDependencyPath)?.add(fullPackagePath);
     }
   }
 
@@ -233,36 +244,6 @@ export async function pnpmSyncPrepareAsync(options: IPnpmSyncPrepareOptions): Pr
       executionTimeInMs
     }
   });
-}
-
-function transferFilePathToDotPnpmFolder(
-  rawFilePath: string,
-  dependencyName: string,
-  dotPnpmFolder: string
-): string {
-  // this logic is heavily depends on pnpm-lock format
-  // the current logic is for pnpm v8
-
-  // an example, file:../../libraries/lib1(react@16.0.0) -> file+..+..+libraries+lib1_react@16.9.0
-
-  // 1. replace ':' with '+'
-  rawFilePath = rawFilePath.replaceAll(':', '+');
-
-  // 2. replace '/' with '+'
-  rawFilePath = rawFilePath.replaceAll('/', '+');
-
-  // 3. replace '(' with '_'
-  rawFilePath = rawFilePath.replaceAll('(', '_');
-
-  // 4. remove ')'
-  rawFilePath = rawFilePath.replaceAll(')', '');
-
-  // 5. add dependencyName
-  rawFilePath = rawFilePath + `/node_modules/${dependencyName}`;
-
-  rawFilePath = dotPnpmFolder + '/' + rawFilePath;
-
-  return rawFilePath;
 }
 
 // process dependencies and devDependencies to generate injectedDependencyToFilePath

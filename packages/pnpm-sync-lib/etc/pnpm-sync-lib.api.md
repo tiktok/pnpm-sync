@@ -59,6 +59,7 @@ export interface IPnpmSyncCopyOptions {
 
 // @beta (undocumented)
 export interface IPnpmSyncPrepareOptions {
+    depPathToFilename: (depPath: string) => string;
     dotPnpmFolder: string;
     ensureFolder: (folderPath: string) => Promise<void>;
     lockfilePath: string;

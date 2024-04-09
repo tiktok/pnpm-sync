@@ -9,6 +9,7 @@ import {
 import { FileSystem, Async } from '@rushstack/node-core-library';
 import { PackageExtractor } from '@rushstack/package-extractor';
 import { readWantedLockfile, Lockfile } from '@pnpm/lockfile-file';
+import { depPathToFilename } from '@pnpm/dependency-path';
 
 const program: Command = new Command();
 
@@ -74,6 +75,7 @@ program
       await pnpmSyncPrepareAsync({
         lockfilePath: lockfile,
         dotPnpmFolder: store,
+        depPathToFilename,
         ensureFolder: FileSystem.ensureFolderAsync,
         readPnpmLockfile: async (
           lockfilePath: string,

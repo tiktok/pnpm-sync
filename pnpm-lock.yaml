@@ -8,6 +8,9 @@ importers:
 
   packages/pnpm-sync:
     dependencies:
+      '@pnpm/dependency-path':
+        specifier: ~2.1.8
+        version: 2.1.8
       '@pnpm/lockfile-file':
         specifier: ~8.1.4
         version: 8.1.7(@pnpm/logger@5.0.0)
@@ -146,6 +149,9 @@ importers:
 
   tests/pnpm-sync-api-test:
     dependencies:
+      '@pnpm/dependency-path':
+        specifier: ~2.1.8
+        version: 2.1.8
       '@pnpm/lockfile-file':
         specifier: ~8.1.4
         version: 8.1.7(@pnpm/logger@5.0.0)
