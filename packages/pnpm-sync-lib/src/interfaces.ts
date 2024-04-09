@@ -32,6 +32,7 @@ export enum LogMessageKind {
 export enum LogMessageIdentifier {
   // pnpmSyncPrepareAsync() messages
   PREPARE_STARTING = 'prepare-starting',
+  PREPARE_ERROR_UNSUPPORTED_FORMAT = 'prepare-error-unsupported-format',
   PREPARE_ERROR_UNSUPPORTED_PNPM_VERSION = 'prepare-error-unsupported-pnpm-version',
   PREPARE_PROCESSING = 'prepare-processing',
   PREPARE_REPLACING_FILE = 'prepare-replacing-file',
@@ -53,6 +54,11 @@ export type LogMessageDetails =
       messageIdentifier: LogMessageIdentifier.PREPARE_STARTING;
       lockfilePath: string;
       dotPnpmFolder: string;
+    }
+  | {
+      messageIdentifier: LogMessageIdentifier.PREPARE_ERROR_UNSUPPORTED_FORMAT;
+      lockfilePath: string;
+      lockfileVersion: string | undefined;
     }
   | {
       messageIdentifier: LogMessageIdentifier.PREPARE_ERROR_UNSUPPORTED_PNPM_VERSION;
