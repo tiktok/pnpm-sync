@@ -1,6 +1,8 @@
 import path from 'path';
 import fs from 'fs';
+import YAML from 'yaml';
 import process from 'node:process';
+import { depPathToFilename } from '@pnpm/dependency-path';
 
 import {
   ILockfile,
@@ -87,6 +89,24 @@ export async function pnpmSyncPrepareAsync(options: IPnpmSyncPrepareOptions): Pr
 
   const startTime = process.hrtime.bigint();
 
+  const pnpmModulesYamlPath: string = path.resolve(dotPnpmFolder, '..');
+  const pnpmModulesYaml = YAML.parse(fs.readFileSync(`${pnpmModulesYamlPath}/.modules.yaml`, 'utf8'));
+  const pnpmVersion: string | undefined = pnpmModulesYaml?.packageManager?.split('@')[1];
+
+  // currently, only support pnpm v8
+  if (!pnpmVersion || !pnpmVersion.startsWith('8')) {
+    logMessageCallback({
+      message: `The pnpm version is not supported; pnpm-sync requires pnpm version 8.x`,
+      messageKind: LogMessageKind.ERROR,
+      details: {
+        messageIdentifier: LogMessageIdentifier.PREPARE_ERROR_UNSUPPORTED_PNPM_VERSION,
+        lockfilePath,
+        pnpmVersion: pnpmVersion
+      }
+    });
+    return;
+  }
+
   // read the pnpm-lock.yaml
   const pnpmLockfile: ILockfile | undefined = await readPnpmLockfile(lockfilePath, {
     ignoreIncompatible: true
@@ -129,9 +149,14 @@ export async function pnpmSyncPrepareAsync(options: IPnpmSyncPrepareOptions): Pr
         injectedDependencyToFilePathSet.set(injectedDependencyPath, new Set());
       }
 
-      injectedDependencyToFilePathSet
-        .get(injectedDependencyPath)
-        ?.add(transferFilePathToDotPnpmFolder(injectedDependencyVersion, injectedDependency, dotPnpmFolder));
+      const fullPackagePath = path.join(
+        dotPnpmFolder,
+        depPathToFilename(injectedDependencyVersion),
+        'node_modules',
+        injectedDependency
+      );
+
+      injectedDependencyToFilePathSet.get(injectedDependencyPath)?.add(fullPackagePath);
     }
   }
 
@@ -233,36 +258,6 @@ export async function pnpmSyncPrepareAsync(options: IPnpmSyncPrepareOptions): Pr
       executionTimeInMs
     }
   });
-}
-
-function transferFilePathToDotPnpmFolder(
-  rawFilePath: string,
-  dependencyName: string,
-  dotPnpmFolder: string
-): string {
-  // this logic is heavily depends on pnpm-lock format
-  // the current logic is for pnpm v8
-
-  // an example, file:../../libraries/lib1(react@16.0.0) -> file+..+..+libraries+lib1_react@16.9.0
-
-  // 1. replace ':' with '+'
-  rawFilePath = rawFilePath.replaceAll(':', '+');
-
-  // 2. replace '/' with '+'
-  rawFilePath = rawFilePath.replaceAll('/', '+');
-
-  // 3. replace '(' with '_'
-  rawFilePath = rawFilePath.replaceAll('(', '_');
-
-  // 4. remove ')'
-  rawFilePath = rawFilePath.replaceAll(')', '');
-
-  // 5. add dependencyName
-  rawFilePath = rawFilePath + `/node_modules/${dependencyName}`;
-
-  rawFilePath = dotPnpmFolder + '/' + rawFilePath;
-
-  return rawFilePath;
 }
 
 // process dependencies and devDependencies to generate injectedDependencyToFilePath

@@ -1,6 +1,6 @@
 {
   "name": "pnpm-sync-lib",
-  "version": "0.2.1",
+  "version": "0.2.2",
   "description": "API library for integrating \"pnpm-sync\" with your toolchain",
   "repository": {
     "type": "git",
@@ -15,6 +15,10 @@
     "test": "heft test --clean",
     "lint": "eslint src/**",
     "prepublishOnly": "heft build --clean"
+  },
+  "dependencies": {
+    "@pnpm/dependency-path": "2.1.8",
+    "yaml": "2.4.1"
   },
   "devDependencies": {
     "@rushstack/eslint-config": "^3.6.2",

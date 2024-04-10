@@ -33,6 +33,7 @@ export enum LogMessageIdentifier {
   // pnpmSyncPrepareAsync() messages
   PREPARE_STARTING = 'prepare-starting',
   PREPARE_ERROR_UNSUPPORTED_FORMAT = 'prepare-error-unsupported-format',
+  PREPARE_ERROR_UNSUPPORTED_PNPM_VERSION = 'prepare-error-unsupported-pnpm-version',
   PREPARE_PROCESSING = 'prepare-processing',
   PREPARE_REPLACING_FILE = 'prepare-replacing-file',
   PREPARE_WRITING_FILE = 'prepare-writing-file',
@@ -58,6 +59,11 @@ export type LogMessageDetails =
       messageIdentifier: LogMessageIdentifier.PREPARE_ERROR_UNSUPPORTED_FORMAT;
       lockfilePath: string;
       lockfileVersion: string | undefined;
+    }
+  | {
+      messageIdentifier: LogMessageIdentifier.PREPARE_ERROR_UNSUPPORTED_PNPM_VERSION;
+      lockfilePath: string;
+      pnpmVersion: string | undefined;
     }
   | {
       messageIdentifier: LogMessageIdentifier.PREPARE_PROCESSING;

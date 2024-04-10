@@ -84,6 +84,10 @@ export type LogMessageDetails = {
     lockfilePath: string;
     lockfileVersion: string | undefined;
 } | {
+    messageIdentifier: LogMessageIdentifier.PREPARE_ERROR_UNSUPPORTED_PNPM_VERSION;
+    lockfilePath: string;
+    pnpmVersion: string | undefined;
+} | {
     messageIdentifier: LogMessageIdentifier.PREPARE_PROCESSING;
     lockfilePath: string;
     dotPnpmFolder: string;
@@ -133,6 +137,8 @@ export enum LogMessageIdentifier {
     COPY_STARTING = "copy-starting",
     // (undocumented)
     PREPARE_ERROR_UNSUPPORTED_FORMAT = "prepare-error-unsupported-format",
+    // (undocumented)
+    PREPARE_ERROR_UNSUPPORTED_PNPM_VERSION = "prepare-error-unsupported-pnpm-version",
     // (undocumented)
     PREPARE_FINISHING = "prepare-finishing",
     // (undocumented)

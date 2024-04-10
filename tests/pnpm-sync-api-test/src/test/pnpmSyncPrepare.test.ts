@@ -173,7 +173,7 @@ describe('pnpm-sync-api prepare test', () => {
         Object {
           "details": Object {
             "actualVersion": "incompatible-version",
-            "expectedVersion": "0.2.1",
+            "expectedVersion": "${pnpmSyncLibVersion}",
             "messageIdentifier": "prepare-replacing-file",
             "pnpmSyncJsonPath": "<root>/pnpm-sync/tests/test-fixtures/sample-lib1/node_modules/.pnpm-sync.json",
             "projectFolder": "<root>/pnpm-sync/tests/test-fixtures/sample-lib1",
