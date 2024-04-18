@@ -73,6 +73,18 @@ describe('pnpm-sync-api copy test', () => {
     await fs.promises.rm(destinationPath, { recursive: true, force: true });
     expect(fs.existsSync(destinationPath)).toBe(false);
 
+    // now let put some random files and directories in the destination folder
+    // this is to test the incremental copy, the pnpmSyncCopyAsync needs be able to delete them correctly
+    await FileSystem.ensureFolderAsync(destinationPath);
+    const testTempFolder: string = path.join(destinationPath, 'tempFolder');
+    const testTempFile: string = path.join(destinationPath, 'tempFile.js');
+    fs.mkdirSync(testTempFolder);
+    fs.writeFileSync(testTempFile, 'console.log("Hello World!")');
+
+    // make sure we created these temp files successfully
+    expect(fs.existsSync(testTempFolder)).toBe(true);
+    expect(fs.existsSync(testTempFile)).toBe(true);
+
     const logs: ILogMessageCallbackOptions[] = [];
 
     await pnpmSyncCopyAsync({
@@ -87,6 +99,14 @@ describe('pnpm-sync-api copy test', () => {
 
     // after copy action, the destination folder should exists
     expect(fs.existsSync(destinationPath)).toBe(true);
+
+    // and temp folder and file should be deleted
+    expect(fs.existsSync(testTempFolder)).toBe(false);
+    expect(fs.existsSync(testTempFile)).toBe(false);
+
+    // and the real files should be there
+    expect(fs.existsSync(path.join(destinationPath, 'src/index.ts'))).toBe(true);
+    expect(fs.existsSync(path.join(destinationPath, 'dist/index.js'))).toBe(true);
 
     // check the log message
     expect(logs.map((x) => scrubLog(x))).toMatchInlineSnapshot(`
@@ -112,5 +132,5 @@ describe('pnpm-sync-api copy test', () => {
         },
       ]
     `);
-  });
+  }, 200000);
 });

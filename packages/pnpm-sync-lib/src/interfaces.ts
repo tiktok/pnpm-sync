@@ -16,6 +16,13 @@ export interface ITargetFolder {
   folderPath: string;
 }
 
+export interface IFileStat {
+  file: string;
+  ino: number;
+  isDirectory: boolean;
+  isFile: boolean;
+}
+
 /**
  * @beta
  */

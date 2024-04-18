@@ -2,12 +2,13 @@ import path from 'path';
 import fs from 'fs';
 import process from 'node:process';
 import {
+  IFileStat,
   ILogMessageCallbackOptions,
   IPnpmSyncJson,
   LogMessageIdentifier,
   LogMessageKind
 } from './interfaces';
-import { pnpmSyncGetJsonVersion } from './utilities';
+import { getFilesInDirectory, pnpmSyncGetJsonVersion } from './utilities';
 
 /**
  * @beta
@@ -128,11 +129,19 @@ export async function pnpmSyncCopyAsync(options: IPnpmSyncCopyOptions): Promise<
 
   const startTime = process.hrtime.bigint();
 
-  // clear the destination folder first
+  // init the map to track files that already processed
+  const targetFolderFileToIsProcessed: Map<string, IFileStat> = new Map();
+
   for (const targetFolder of targetFolders) {
     const destinationPath = path.resolve(pnpmSyncJsonFolder, targetFolder.folderPath);
-    // TODO: optimize this
-    await fs.promises.rm(destinationPath, { recursive: true, force: true });
+    if (!fs.existsSync(destinationPath)) {
+      continue;
+    }
+    const existFileStatInoInTargetFolder: Array<IFileStat> = getFilesInDirectory(destinationPath, true);
+    // all files are not processed in the beginning
+    for (const fileStat of existFileStatInoInTargetFolder) {
+      targetFolderFileToIsProcessed.set(fileStat.file, fileStat);
+    }
   }
 
   await forEachAsyncWithConcurrency(
@@ -144,16 +153,44 @@ export async function pnpmSyncCopyAsync(options: IPnpmSyncCopyOptions): Promise<
         const copySourcePath: string = path.join(sourcePath, npmPackFile);
         const copyDestinationPath: string = path.join(destinationPath, npmPackFile);
 
-        await ensureFolder(path.dirname(copyDestinationPath));
+        if (!fs.existsSync(copyDestinationPath)) {
+          // if not exist in target folder, we just copy it
+          await ensureFolder(path.dirname(copyDestinationPath));
+          await fs.promises.link(copySourcePath, copyDestinationPath);
+        } else {
+          // if exist in target folder, check if it still point to the source Inode number
+          if (
+            targetFolderFileToIsProcessed.get(copyDestinationPath)?.ino !== fs.statSync(copySourcePath).ino
+          ) {
+            await fs.promises.unlink(copyDestinationPath);
+            await fs.promises.link(copySourcePath, copyDestinationPath);
+          }
 
-        // create a hard link to the destination path
-        await fs.promises.link(copySourcePath, copyDestinationPath);
+          // to keep track which file already processed
+          targetFolderFileToIsProcessed.delete(copyDestinationPath);
+        }
       }
     },
     {
       concurrency: 10
     }
   );
+
+  // delete unprocessed files in target folders
+  for (const fileStat of targetFolderFileToIsProcessed.values()) {
+    const { file, isFile } = fileStat;
+    if (isFile) {
+      await fs.promises.unlink(file);
+    }
+  }
+
+  // delete empty folders in target folders as well
+  for (const fileStat of targetFolderFileToIsProcessed.values()) {
+    const { file, isDirectory } = fileStat;
+    if (isDirectory && fs.readdirSync(file).length === 0) {
+      await fs.promises.rmdir(file);
+    }
+  }
 
   const endTime = process.hrtime.bigint();
   const executionTimeInMs: number = Number(endTime - startTime) / 1e6;
