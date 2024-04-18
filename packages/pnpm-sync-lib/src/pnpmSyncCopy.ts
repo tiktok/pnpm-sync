@@ -159,6 +159,8 @@ export async function pnpmSyncCopyAsync(options: IPnpmSyncCopyOptions): Promise<
           await fs.promises.link(copySourcePath, copyDestinationPath);
         } else {
           // if exist in target folder, check if it still point to the source Inode number
+          // in our copy implementation, we use hard link to copy files
+          // so that, we can utilize the file inode info to determine the equality of two files
           if (
             targetFolderFileToIsProcessed.get(copyDestinationPath)?.ino !== fs.statSync(copySourcePath).ino
           ) {
