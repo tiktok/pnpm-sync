@@ -132,5 +132,5 @@ describe('pnpm-sync-api copy test', () => {
         },
       ]
     `);
-  }, 200000);
+  });
 });
