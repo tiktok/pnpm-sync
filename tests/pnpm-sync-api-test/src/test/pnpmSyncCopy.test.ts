@@ -13,38 +13,65 @@ import {
 const pnpmSyncLibVersion: string = pnpmSyncGetJsonVersion();
 
 describe('pnpm-sync-api copy test', () => {
-  it('pnpmSyncCopyAsync should copy files based on .pnpm-sync.json under node_modules folder', async () => {
+  beforeAll(async () => {
     const lockfilePath = '../../pnpm-lock.yaml';
     const dotPnpmFolder = '../../node_modules/.pnpm';
 
-    const pnpmSyncJsonFolder = `../test-fixtures/sample-lib1/node_modules`;
-    const pnpmSyncJsonPath = `${pnpmSyncJsonFolder}/.pnpm-sync.json`;
-    const targetFolderPath =
-      '../../../../node_modules/.pnpm/file+tests+test-fixtures+sample-lib1_react@17.0.2/node_modules/api-demo-sample-lib1';
     // generate .pnpm-sync.json file first.
     await pnpmSyncPrepareAsync({
       lockfilePath: lockfilePath,
       dotPnpmFolder: dotPnpmFolder,
-      ensureFolder: FileSystem.ensureFolderAsync,
+      ensureFolderAsync: FileSystem.ensureFolderAsync,
       readPnpmLockfile,
       logMessageCallback: (): void => {}
     });
 
-    // make sure .pnpm-sync.json exists
-    expect(fs.existsSync(pnpmSyncJsonPath)).toBe(true);
+    const pnpmSyncJsonFolder1 = `../test-fixtures/sample-lib1/node_modules`;
+    const pnpmSyncJsonFolder2 = `../test-fixtures/sample-lib2/node_modules`;
 
-    const pnpmSyncJsonFile = JSON.parse(fs.readFileSync(pnpmSyncJsonPath).toString());
-    expect(pnpmSyncJsonFile).toEqual({
+    const pnpmSyncJsonPath1 = `${pnpmSyncJsonFolder1}/.pnpm-sync.json`;
+    const pnpmSyncJsonPath2 = `${pnpmSyncJsonFolder2}/.pnpm-sync.json`;
+
+    const targetFolderPath1 =
+      '../../../../node_modules/.pnpm/file+tests+test-fixtures+sample-lib1_react@17.0.2/node_modules/api-demo-sample-lib1';
+    const targetFolderPath2 =
+      '../../../../node_modules/.pnpm/file+tests+test-fixtures+sample-lib2_react@17.0.2/node_modules/api-demo-sample-lib2';
+
+    // make sure .pnpm-sync.json exists
+    expect(fs.existsSync(pnpmSyncJsonPath1)).toBe(true);
+    expect(fs.existsSync(pnpmSyncJsonPath2)).toBe(true);
+
+    expect(JSON.parse(fs.readFileSync(pnpmSyncJsonPath1).toString())).toEqual({
       version: pnpmSyncLibVersion,
       postbuildInjectedCopy: {
         sourceFolder: '..',
         targetFolders: [
           {
-            folderPath: targetFolderPath
+            folderPath: targetFolderPath1
           }
         ]
       }
     });
+    expect(JSON.parse(fs.readFileSync(pnpmSyncJsonPath2).toString())).toEqual({
+      version: pnpmSyncLibVersion,
+      postbuildInjectedCopy: {
+        sourceFolder: '..',
+        targetFolders: [
+          {
+            folderPath: targetFolderPath2
+          }
+        ]
+      }
+    });
+  });
+
+  it('pnpmSyncCopyAsync should copy files based on .pnpm-sync.json under node_modules folder', async () => {
+    const pnpmSyncJsonFolder = `../test-fixtures/sample-lib1/node_modules`;
+    const pnpmSyncJsonPath = `${pnpmSyncJsonFolder}/.pnpm-sync.json`;
+
+    const targetFolderPath =
+      '../../../../node_modules/.pnpm/file+tests+test-fixtures+sample-lib1_react@17.0.2/node_modules/api-demo-sample-lib1';
+    const pnpmSyncJsonFile = JSON.parse(fs.readFileSync(pnpmSyncJsonPath).toString());
 
     // set a outdated version
     pnpmSyncJsonFile.version = 'incompatible-version';
@@ -56,7 +83,7 @@ describe('pnpm-sync-api copy test', () => {
         pnpmSyncJsonPath,
         getPackageIncludedFiles: PackageExtractor.getPackageIncludedFilesAsync,
         forEachAsyncWithConcurrency: Async.forEachAsync,
-        ensureFolder: FileSystem.ensureFolderAsync,
+        ensureFolderAsync: FileSystem.ensureFolderAsync,
         logMessageCallback: () => {}
       });
     } catch (error) {
@@ -73,25 +100,13 @@ describe('pnpm-sync-api copy test', () => {
     await fs.promises.rm(destinationPath, { recursive: true, force: true });
     expect(fs.existsSync(destinationPath)).toBe(false);
 
-    // now let put some random files and directories in the destination folder
-    // this is to test the incremental copy, the pnpmSyncCopyAsync needs be able to delete them correctly
-    await FileSystem.ensureFolderAsync(destinationPath);
-    const testTempFolder: string = path.join(destinationPath, 'tempFolder');
-    const testTempFile: string = path.join(destinationPath, 'tempFile.js');
-    fs.mkdirSync(testTempFolder);
-    fs.writeFileSync(testTempFile, 'console.log("Hello World!")');
-
-    // make sure we created these temp files successfully
-    expect(fs.existsSync(testTempFolder)).toBe(true);
-    expect(fs.existsSync(testTempFile)).toBe(true);
-
     const logs: ILogMessageCallbackOptions[] = [];
 
     await pnpmSyncCopyAsync({
       pnpmSyncJsonPath,
       getPackageIncludedFiles: PackageExtractor.getPackageIncludedFilesAsync,
       forEachAsyncWithConcurrency: Async.forEachAsync,
-      ensureFolder: FileSystem.ensureFolderAsync,
+      ensureFolderAsync: FileSystem.ensureFolderAsync,
       logMessageCallback: (options: ILogMessageCallbackOptions): void => {
         logs.push(options);
       }
@@ -99,10 +114,6 @@ describe('pnpm-sync-api copy test', () => {
 
     // after copy action, the destination folder should exists
     expect(fs.existsSync(destinationPath)).toBe(true);
-
-    // and temp folder and file should be deleted
-    expect(fs.existsSync(testTempFolder)).toBe(false);
-    expect(fs.existsSync(testTempFile)).toBe(false);
 
     // and the real files should be there
     expect(fs.existsSync(path.join(destinationPath, 'src/index.ts'))).toBe(true);
@@ -132,5 +143,81 @@ describe('pnpm-sync-api copy test', () => {
         },
       ]
     `);
+  });
+
+  it('pnpmSyncCopyAsync should handle incremental copy', async () => {
+    const pnpmSyncJsonFolder = `../test-fixtures/sample-lib2/node_modules`;
+    const pnpmSyncJsonPath = `${pnpmSyncJsonFolder}/.pnpm-sync.json`;
+
+    const targetFolderPath =
+      '../../../../node_modules/.pnpm/file+tests+test-fixtures+sample-lib2_react@17.0.2/node_modules/api-demo-sample-lib2';
+
+    const destinationPath = path.resolve(pnpmSyncJsonFolder, targetFolderPath);
+    const sourcePath = '../test-fixtures/sample-lib2';
+
+    // let's do copy action first
+    await pnpmSyncCopyAsync({
+      pnpmSyncJsonPath,
+      getPackageIncludedFiles: PackageExtractor.getPackageIncludedFilesAsync,
+      forEachAsyncWithConcurrency: Async.forEachAsync,
+      ensureFolderAsync: FileSystem.ensureFolderAsync,
+      logMessageCallback: (): void => {}
+    });
+
+    // after copy action, the destination folder should exists
+    expect(fs.existsSync(destinationPath)).toBe(true);
+
+    const destinationPackageJsonPath = path.join(destinationPath, 'package.json');
+    const destinationIndexFilePath = path.join(destinationPath, 'dist/index.js');
+
+    // and the files should be there
+    expect(fs.existsSync(destinationPackageJsonPath)).toBe(true);
+    expect(fs.existsSync(destinationIndexFilePath)).toBe(true);
+
+    // let get the file info of package.json in destination folder
+    const oldDestinationPackageJsonStat = fs.statSync(destinationPackageJsonPath);
+
+    // now let do some file operations in source folder
+    // create a new file
+    fs.writeFileSync(path.join(sourcePath, 'dist/index.new.js'), 'console.log("Hello World!")');
+    // delete a old file
+    fs.rmSync(path.join(sourcePath, 'dist/index.js'));
+    // modify a old file
+    const sourcePackageJsonPath = path.join(sourcePath, 'package.json');
+    const packageJson = JSON.parse(fs.readFileSync(sourcePackageJsonPath).toString());
+    const newPackageJsonDescription = 'Test description value';
+    packageJson.description = newPackageJsonDescription;
+
+    // let get the file info of package.json in source folder
+    const sourcePackageJsonStat = fs.statSync(sourcePackageJsonPath);
+
+    fs.writeFileSync(sourcePackageJsonPath, JSON.stringify(packageJson, null, 2), 'utf8');
+
+    // now let run pnpmSyncCopyAsync again
+    await pnpmSyncCopyAsync({
+      pnpmSyncJsonPath,
+      getPackageIncludedFiles: PackageExtractor.getPackageIncludedFilesAsync,
+      forEachAsyncWithConcurrency: Async.forEachAsync,
+      ensureFolderAsync: FileSystem.ensureFolderAsync,
+      logMessageCallback: (): void => {}
+    });
+
+    // ok, now, let's do some verification
+    // 1. for file edit operation
+    // let's read the file info of package.json in destination folder again
+    const newDestinationPackageJsonStat = fs.statSync(destinationPackageJsonPath);
+    // the file ino number should not be changed!
+    expect(sourcePackageJsonStat.ino).toBe(newDestinationPackageJsonStat.ino);
+    expect(sourcePackageJsonStat.ino).toBe(oldDestinationPackageJsonStat.ino);
+    // the actual content should be the new value
+    expect(JSON.parse(fs.readFileSync(destinationPackageJsonPath).toString()).description).toBe(
+      newPackageJsonDescription
+    );
+
+    // 2. the deleted file should not exist
+    expect(fs.existsSync(destinationIndexFilePath)).toBe(false);
+
+    // 3. then new added file should be there
+    expect(fs.existsSync(path.join(destinationPath, 'dist/index.new.js'))).toBe(true);
   });
 });

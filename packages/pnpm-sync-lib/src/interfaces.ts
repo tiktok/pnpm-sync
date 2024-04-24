@@ -16,9 +16,8 @@ export interface ITargetFolder {
   folderPath: string;
 }
 
-export interface IFileStat {
-  file: string;
-  ino: number;
+export interface ISyncItem {
+  absolutePath: string;
   isDirectory: boolean;
   isFile: boolean;
 }

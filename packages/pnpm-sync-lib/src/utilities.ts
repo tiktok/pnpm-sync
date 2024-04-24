@@ -1,6 +1,6 @@
-import fs from 'fs';
+import fs, { type Dirent } from 'fs';
 import path from 'path';
-import { IFileStat } from './interfaces';
+import { ISyncItem } from './interfaces';
 
 /**
  * Get .pnpm-sync.json version
@@ -11,39 +11,26 @@ export function pnpmSyncGetJsonVersion(): string {
   return require('../package.json').version;
 }
 
-export function getFilesInDirectory(directory: string, includeDirectory: boolean): Array<IFileStat> {
-  const returnFileList: Array<IFileStat> = [];
-  getFilesInDirectoryHelper(directory, includeDirectory, returnFileList);
+export async function getFilesInDirectory(directory: string): Promise<ISyncItem[]> {
+  const returnFileList: ISyncItem[] = [];
+  await getFilesInDirectoryHelper(directory, returnFileList);
   return returnFileList;
 }
 
-function getFilesInDirectoryHelper(
-  directory: string,
-  includeDirectory: boolean,
-  returnFileList: Array<IFileStat>
-): void {
-  const fileList = fs.readdirSync(directory);
+async function getFilesInDirectoryHelper(directory: string, returnFileList: ISyncItem[]): Promise<void> {
+  const itemList: Array<Dirent> = await fs.promises.readdir(directory, { withFileTypes: true });
 
-  for (const fileName of fileList) {
-    const absoluteFileName: string = path.join(directory, fileName);
-    const fileStat = fs.statSync(absoluteFileName);
-    if (fileStat.isDirectory()) {
-      if (includeDirectory) {
-        returnFileList.push({
-          file: absoluteFileName,
-          ino: fileStat.ino,
-          isDirectory: true,
-          isFile: false
-        });
-      }
-      getFilesInDirectoryHelper(absoluteFileName, includeDirectory, returnFileList);
-    } else {
-      returnFileList.push({
-        file: absoluteFileName,
-        ino: fileStat.ino,
-        isDirectory: false,
-        isFile: true
-      });
+  for (const item of itemList) {
+    const absolutePath: string = path.join(directory, item.name);
+    if (item.isDirectory()) {
+      await getFilesInDirectoryHelper(absolutePath, returnFileList);
     }
+
+    // the list should include both files and directories
+    returnFileList.push({
+      absolutePath,
+      isDirectory: item.isDirectory(),
+      isFile: item.isFile()
+    });
   }
 }

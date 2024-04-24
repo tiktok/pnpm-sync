@@ -51,7 +51,7 @@ program
         pnpmSyncJsonPath: process.cwd() + '/node_modules/.pnpm-sync.json',
         getPackageIncludedFiles: PackageExtractor.getPackageIncludedFilesAsync,
         forEachAsyncWithConcurrency: Async.forEachAsync,
-        ensureFolder: FileSystem.ensureFolderAsync,
+        ensureFolderAsync: FileSystem.ensureFolderAsync,
         logMessageCallback: logMessage
       });
     } catch (error) {
@@ -74,7 +74,7 @@ program
       await pnpmSyncPrepareAsync({
         lockfilePath: lockfile,
         dotPnpmFolder: store,
-        ensureFolder: FileSystem.ensureFolderAsync,
+        ensureFolderAsync: FileSystem.ensureFolderAsync,
         readPnpmLockfile: async (
           lockfilePath: string,
           options: {

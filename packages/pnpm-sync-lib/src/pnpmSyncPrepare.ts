@@ -33,7 +33,7 @@ export interface IPnpmSyncPrepareOptions {
    * Environment-provided API to avoid an NPM dependency.
    * The "pnpm-sync" NPM package provides a reference implementation.
    */
-  ensureFolder: (folderPath: string) => Promise<void>;
+  ensureFolderAsync: (folderPath: string) => Promise<void>;
 
   /**
    * Environment-provided API to avoid an NPM dependency.
@@ -63,7 +63,7 @@ export interface IPnpmSyncPrepareOptions {
  * @beta
  */
 export async function pnpmSyncPrepareAsync(options: IPnpmSyncPrepareOptions): Promise<void> {
-  const { ensureFolder, readPnpmLockfile, logMessageCallback } = options;
+  const { ensureFolderAsync, readPnpmLockfile, logMessageCallback } = options;
   let { lockfilePath, dotPnpmFolder } = options;
 
   // get the pnpm-lock.yaml path
@@ -186,7 +186,7 @@ export async function pnpmSyncPrepareAsync(options: IPnpmSyncPrepareOptions): Pr
     // it is possible that node_modules folder for a package is not exist yet
     // but we need to generate .pnpm-sync.json for that package
     if (!fs.existsSync(pnpmSyncJsonFolder)) {
-      await ensureFolder(pnpmSyncJsonFolder);
+      await ensureFolderAsync(pnpmSyncJsonFolder);
     }
 
     const expectedPnpmSyncJsonVersion: string = pnpmSyncGetJsonVersion();

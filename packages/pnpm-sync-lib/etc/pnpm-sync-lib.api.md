@@ -48,7 +48,7 @@ export interface ILogMessageCallbackOptions {
 
 // @beta (undocumented)
 export interface IPnpmSyncCopyOptions {
-    ensureFolder: (folderPath: string) => Promise<void>;
+    ensureFolderAsync: (folderPath: string) => Promise<void>;
     forEachAsyncWithConcurrency: <TItem>(iterable: Iterable<TItem>, callback: (item: TItem) => Promise<void>, options: {
         concurrency: number;
     }) => Promise<void>;
@@ -60,7 +60,7 @@ export interface IPnpmSyncCopyOptions {
 // @beta (undocumented)
 export interface IPnpmSyncPrepareOptions {
     dotPnpmFolder: string;
-    ensureFolder: (folderPath: string) => Promise<void>;
+    ensureFolderAsync: (folderPath: string) => Promise<void>;
     lockfilePath: string;
     logMessageCallback: (options: ILogMessageCallbackOptions) => void;
     readPnpmLockfile: (lockfilePath: string, options: {
