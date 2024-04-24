@@ -177,23 +177,22 @@ describe('pnpm-sync-api copy test', () => {
     // let get the file info of package.json in destination folder
     const oldDestinationPackageJsonStat = fs.statSync(destinationPackageJsonPath);
 
-    // now let do some file operations in source folder
+    // now let's do some file operations in source folder
     // create a new file
     fs.writeFileSync(path.join(sourcePath, 'dist/index.new.js'), 'console.log("Hello World!")');
     // delete a old file
     fs.rmSync(path.join(sourcePath, 'dist/index.js'));
-    // modify a old file
+    // modify an existing file
     const sourcePackageJsonPath = path.join(sourcePath, 'package.json');
     const packageJson = JSON.parse(fs.readFileSync(sourcePackageJsonPath).toString());
     const newPackageJsonDescription = 'Test description value';
     packageJson.description = newPackageJsonDescription;
-
-    // let get the file info of package.json in source folder
-    const sourcePackageJsonStat = fs.statSync(sourcePackageJsonPath);
-
     fs.writeFileSync(sourcePackageJsonPath, JSON.stringify(packageJson, null, 2), 'utf8');
 
-    // now let run pnpmSyncCopyAsync again
+    // let get the file info of modified package.json in source folder
+    const sourcePackageJsonStat = fs.statSync(sourcePackageJsonPath);
+
+    // now let's run pnpmSyncCopyAsync again
     await pnpmSyncCopyAsync({
       pnpmSyncJsonPath,
       getPackageIncludedFiles: PackageExtractor.getPackageIncludedFilesAsync,
@@ -206,10 +205,10 @@ describe('pnpm-sync-api copy test', () => {
     // 1. for file edit operation
     // let's read the file info of package.json in destination folder again
     const newDestinationPackageJsonStat = fs.statSync(destinationPackageJsonPath);
-    // the file ino number should not be changed!
+    // Since it is a hard link, the file inode number should not be changed, still the original inode number!
     expect(sourcePackageJsonStat.ino).toBe(newDestinationPackageJsonStat.ino);
     expect(sourcePackageJsonStat.ino).toBe(oldDestinationPackageJsonStat.ino);
-    // the actual content should be the new value
+    // and, the actual content in destination folder should be the new value
     expect(JSON.parse(fs.readFileSync(destinationPackageJsonPath).toString()).description).toBe(
       newPackageJsonDescription
     );
