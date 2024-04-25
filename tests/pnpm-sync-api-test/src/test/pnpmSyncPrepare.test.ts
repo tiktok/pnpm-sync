@@ -37,7 +37,7 @@ describe('pnpm-sync-api prepare test', () => {
     await pnpmSyncPrepareAsync({
       lockfilePath: lockfilePath,
       dotPnpmFolder: dotPnpmFolder,
-      ensureFolder: FileSystem.ensureFolderAsync,
+      ensureFolderAsync: FileSystem.ensureFolderAsync,
       readPnpmLockfile,
       logMessageCallback: (options: ILogMessageCallbackOptions): void => {
         // in this test case, we only care projects under tests/test-fixtures folder
@@ -151,7 +151,7 @@ describe('pnpm-sync-api prepare test', () => {
     await pnpmSyncPrepareAsync({
       lockfilePath: lockfilePath,
       dotPnpmFolder: dotPnpmFolder,
-      ensureFolder: FileSystem.ensureFolderAsync,
+      ensureFolderAsync: FileSystem.ensureFolderAsync,
       readPnpmLockfile,
       logMessageCallback: (options: ILogMessageCallbackOptions): void => {
         // in this test case, we only care projects under tests/test-fixtures/sample-lib1 folder

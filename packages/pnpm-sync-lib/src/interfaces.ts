@@ -16,6 +16,12 @@ export interface ITargetFolder {
   folderPath: string;
 }
 
+export interface ISyncItem {
+  absolutePath: string;
+  isDirectory: boolean;
+  isFile: boolean;
+}
+
 /**
  * @beta
  */
