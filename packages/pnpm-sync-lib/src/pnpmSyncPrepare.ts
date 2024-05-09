@@ -296,7 +296,11 @@ function processDependencies(
     for (const [dependency, specifier] of Object.entries(dependencies)) {
       if (injectedDependencyToVersion.has(dependency)) {
         const specifierToUse: string = typeof specifier === 'string' ? specifier : specifier.version;
-        injectedDependencyToVersion.get(dependency)?.add(specifierToUse);
+
+        // the injected dependency should always start with file protocol
+        if (specifierToUse.startsWith('file:')) {
+          injectedDependencyToVersion.get(dependency)?.add(specifierToUse);
+        }
       }
     }
   }
