@@ -276,6 +276,7 @@ function getInjectedDependencyToVersion(
       const specifierToUse: string = typeof specifier === 'string' ? specifier : specifier.version;
       // the injected dependency should always start with file protocol
       // and exclude tarball installation
+      // what is the tarball installation, learn more: https://pnpm.io/cli/add#install-from-local-file-system
 
       const tarballSuffix = ['.tar', '.tar.gz', '.tgz'];
       if (
