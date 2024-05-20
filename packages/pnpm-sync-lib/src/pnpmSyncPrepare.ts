@@ -128,7 +128,14 @@ export async function pnpmSyncPrepareAsync(options: IPnpmSyncPrepareOptions): Pr
   }
 
   // find injected dependency and all its available versions
-  const injectedDependencyToVersion: Map<string, Set<string>> = getInjectedDependencyToVersion(pnpmLockfile);
+  const injectedDependencyToVersion: Map<string, Set<string>> = new Map();
+  for (const importerItem of Object.values(pnpmLockfile?.importers || {})) {
+    // based on https://pnpm.io/package_json#dependenciesmeta
+    // the injected dependencies could available inside dependencies, optionalDependencies, and devDependencies.
+    getInjectedDependencyToVersion(importerItem?.dependencies, injectedDependencyToVersion);
+    getInjectedDependencyToVersion(importerItem?.devDependencies, injectedDependencyToVersion);
+    getInjectedDependencyToVersion(importerItem?.optionalDependencies, injectedDependencyToVersion);
+  }
 
   // check and process transitive injected dependency
   processTransitiveInjectedDependency(pnpmLockfile, injectedDependencyToVersion);
@@ -260,47 +267,26 @@ export async function pnpmSyncPrepareAsync(options: IPnpmSyncPrepareOptions): Pr
   });
 }
 
-// process dependencies and devDependencies to generate injectedDependencyToFilePath
-function getInjectedDependencyToVersion(pnpmLockfile: ILockfile | undefined): Map<string, Set<string>> {
-  const injectedDependencyToVersion: Map<string, Set<string>> = new Map();
-  for (const importerKey in pnpmLockfile?.importers) {
-    if (!pnpmLockfile?.importers[importerKey]?.dependenciesMeta) {
-      continue;
-    }
-    const dependenciesMeta = pnpmLockfile?.importers[importerKey]?.dependenciesMeta;
-
-    for (const dependency in dependenciesMeta) {
-      if (dependenciesMeta[dependency]?.injected) {
-        if (!injectedDependencyToVersion.has(dependency)) {
-          injectedDependencyToVersion.set(dependency, new Set());
-        }
-      }
-    }
-
-    // based on https://pnpm.io/package_json#dependenciesmeta
-    // the injected dependencies could available inside dependencies, optionalDependencies, and devDependencies.
-    processDependencies(pnpmLockfile?.importers[importerKey]?.dependencies, injectedDependencyToVersion);
-    processDependencies(pnpmLockfile?.importers[importerKey]?.devDependencies, injectedDependencyToVersion);
-    processDependencies(
-      pnpmLockfile?.importers[importerKey]?.optionalDependencies,
-      injectedDependencyToVersion
-    );
-  }
-  return injectedDependencyToVersion;
-}
-function processDependencies(
+function getInjectedDependencyToVersion(
   dependencies: Record<string, IVersionSpecifier> | undefined,
   injectedDependencyToVersion: Map<string, Set<string>>
 ): void {
   if (dependencies) {
     for (const [dependency, specifier] of Object.entries(dependencies)) {
-      if (injectedDependencyToVersion.has(dependency)) {
-        const specifierToUse: string = typeof specifier === 'string' ? specifier : specifier.version;
+      const specifierToUse: string = typeof specifier === 'string' ? specifier : specifier.version;
+      // the injected dependency should always start with file protocol
+      // and exclude tarball installation
+      // what is the tarball installation, learn more: https://pnpm.io/cli/add#install-from-local-file-system
 
-        // the injected dependency should always start with file protocol
-        if (specifierToUse.startsWith('file:')) {
-          injectedDependencyToVersion.get(dependency)?.add(specifierToUse);
+      const tarballSuffix = ['.tar', '.tar.gz', '.tgz'];
+      if (
+        specifierToUse.startsWith('file:') &&
+        !tarballSuffix.some((suffix) => specifierToUse.endsWith(suffix))
+      ) {
+        if (!injectedDependencyToVersion.has(dependency)) {
+          injectedDependencyToVersion.set(dependency, new Set());
         }
+        injectedDependencyToVersion.get(dependency)?.add(specifierToUse);
       }
     }
   }
