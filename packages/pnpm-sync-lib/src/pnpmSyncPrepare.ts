@@ -275,7 +275,13 @@ function getInjectedDependencyToVersion(
     for (const [dependency, specifier] of Object.entries(dependencies)) {
       const specifierToUse: string = typeof specifier === 'string' ? specifier : specifier.version;
       // the injected dependency should always start with file protocol
-      if (specifierToUse.startsWith('file:')) {
+      // and exclude tarball installation
+
+      const tarballSuffix = ['.tar', '.tar.gz', '.tgz'];
+      if (
+        specifierToUse.startsWith('file:') &&
+        !tarballSuffix.some((suffix) => specifierToUse.endsWith(suffix))
+      ) {
         if (!injectedDependencyToVersion.has(dependency)) {
           injectedDependencyToVersion.set(dependency, new Set());
         }
