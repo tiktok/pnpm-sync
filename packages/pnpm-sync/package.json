@@ -1,6 +1,6 @@
 {
   "name": "pnpm-sync",
-  "version": "0.2.6",
+  "version": "0.2.7",
   "description": "Recopy injected dependencies whenever a project is rebuilt in your PNPM workspace",
   "keywords": [
     "rush",

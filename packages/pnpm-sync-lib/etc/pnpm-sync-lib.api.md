@@ -61,6 +61,7 @@ export interface IPnpmSyncCopyOptions {
 export interface IPnpmSyncPrepareOptions {
     dotPnpmFolder: string;
     ensureFolderAsync: (folderPath: string) => Promise<void>;
+    identifier?: string;
     lockfilePath: string;
     logMessageCallback: (options: ILogMessageCallbackOptions) => void;
     readPnpmLockfile: (lockfilePath: string, options: {
