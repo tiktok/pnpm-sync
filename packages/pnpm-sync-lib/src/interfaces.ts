@@ -14,7 +14,7 @@ export interface IPnpmSyncJson {
 
 export interface ITargetFolder {
   folderPath: string;
-  identifier?: string;
+  lockfileId?: string;
 }
 
 export interface ISyncItem {

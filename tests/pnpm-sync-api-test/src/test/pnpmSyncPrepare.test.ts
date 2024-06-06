@@ -222,17 +222,17 @@ describe('pnpm-sync-api prepare test', () => {
           {
             folderPath:
               '../../../../node_modules/.pnpm/file+tests+test-fixtures+sample-lib1_react@17.0.2/node_modules/api-demo-sample-lib1',
-            identifier: 'identifier1'
+            lockfileId: 'identifier1'
           },
           {
             folderPath:
               '../../../../node_modules/.pnpm/file+tests+test-fixtures+sample-lib1_react@17.0.2/node_modules/api-demo-sample-lib2',
-            identifier: 'identifier1'
+            lockfileId: 'identifier1'
           },
           {
             folderPath:
               '../../../../node_modules/.pnpm/file+tests+test-fixtures+sample-lib1_react@17.0.2/node_modules/api-demo-sample-lib3',
-            identifier: 'identifier2'
+            lockfileId: 'identifier2'
           }
         ]
       }
@@ -244,7 +244,7 @@ describe('pnpm-sync-api prepare test', () => {
     await pnpmSyncPrepareAsync({
       lockfilePath: lockfilePath,
       dotPnpmFolder: dotPnpmFolder,
-      identifier: 'identifier1',
+      lockfileId: 'identifier1',
       ensureFolderAsync: FileSystem.ensureFolderAsync,
       readPnpmLockfile,
       logMessageCallback: (): void => {}
@@ -263,12 +263,12 @@ describe('pnpm-sync-api prepare test', () => {
           {
             folderPath:
               '../../../../node_modules/.pnpm/file+tests+test-fixtures+sample-lib1_react@17.0.2/node_modules/api-demo-sample-lib3',
-            identifier: 'identifier2'
+            lockfileId: 'identifier2'
           },
           {
             folderPath:
               '../../../../node_modules/.pnpm/file+tests+test-fixtures+sample-lib1_react@17.0.2/node_modules/api-demo-sample-lib1',
-            identifier: 'identifier1'
+            lockfileId: 'identifier1'
           }
         ]
       }
