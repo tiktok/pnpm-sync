@@ -9,5 +9,8 @@
   "coverageReporters": ["cobertura", "html"],
 
   // Use v8 coverage provider to avoid Babel
-  "coverageProvider": "v8"
+  "coverageProvider": "v8",
+
+  // Let jest test files run one by one
+  "maxWorkers": 1
 }

@@ -201,4 +201,77 @@ describe('pnpm-sync-api prepare test', () => {
       }
     });
   });
+
+  it('pnpmSyncPrepareAsync should handle identifier (if provided)', async () => {
+    const lockfilePath = '../../pnpm-lock.yaml';
+    const dotPnpmFolder = '../../node_modules/.pnpm';
+
+    const pnpmSyncJsonFolder = `../test-fixtures/sample-lib1/node_modules`;
+    const pnpmSyncJsonPath = `${pnpmSyncJsonFolder}/.pnpm-sync.json`;
+
+    if (!fs.existsSync(pnpmSyncJsonFolder)) {
+      await FileSystem.ensureFolderAsync(pnpmSyncJsonFolder);
+    }
+
+    // create an .pnpm-sync.json with some identifiers
+    const pnpmSyncJsonFile = {
+      version: pnpmSyncLibVersion,
+      postbuildInjectedCopy: {
+        sourceFolder: '..',
+        targetFolders: [
+          {
+            folderPath:
+              '../../../../node_modules/.pnpm/file+tests+test-fixtures+sample-lib1_react@17.0.2/node_modules/api-demo-sample-lib1',
+            lockfileId: 'identifier1'
+          },
+          {
+            folderPath:
+              '../../../../node_modules/.pnpm/file+tests+test-fixtures+sample-lib1_react@17.0.2/node_modules/api-demo-sample-lib2',
+            lockfileId: 'identifier1'
+          },
+          {
+            folderPath:
+              '../../../../node_modules/.pnpm/file+tests+test-fixtures+sample-lib1_react@17.0.2/node_modules/api-demo-sample-lib3',
+            lockfileId: 'identifier2'
+          }
+        ]
+      }
+    };
+
+    // write .pnpm-sync.json
+    await fs.promises.writeFile(pnpmSyncJsonPath, JSON.stringify(pnpmSyncJsonFile, null, 2));
+
+    await pnpmSyncPrepareAsync({
+      lockfilePath: lockfilePath,
+      dotPnpmFolder: dotPnpmFolder,
+      lockfileId: 'identifier1',
+      ensureFolderAsync: FileSystem.ensureFolderAsync,
+      readPnpmLockfile,
+      logMessageCallback: (): void => {}
+    });
+
+    // now, read .pnpm-sync.json and check the fields
+    expect(fs.existsSync(pnpmSyncJsonPath)).toBe(true);
+
+    // the folderPath with identifier1 should be regenerated
+    // the folderPath with identifier2 should keep as it is
+    expect(JSON.parse(fs.readFileSync(pnpmSyncJsonPath).toString())).toEqual({
+      version: pnpmSyncLibVersion,
+      postbuildInjectedCopy: {
+        sourceFolder: '..',
+        targetFolders: [
+          {
+            folderPath:
+              '../../../../node_modules/.pnpm/file+tests+test-fixtures+sample-lib1_react@17.0.2/node_modules/api-demo-sample-lib3',
+            lockfileId: 'identifier2'
+          },
+          {
+            folderPath:
+              '../../../../node_modules/.pnpm/file+tests+test-fixtures+sample-lib1_react@17.0.2/node_modules/api-demo-sample-lib1',
+            lockfileId: 'identifier1'
+          }
+        ]
+      }
+    });
+  });
 });

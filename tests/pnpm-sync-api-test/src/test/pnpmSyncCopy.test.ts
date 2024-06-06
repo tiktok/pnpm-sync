@@ -17,6 +17,21 @@ describe('pnpm-sync-api copy test', () => {
     const lockfilePath = '../../pnpm-lock.yaml';
     const dotPnpmFolder = '../../node_modules/.pnpm';
 
+    const pnpmSyncJsonFolder1 = `../test-fixtures/sample-lib1/node_modules`;
+    const pnpmSyncJsonFolder2 = `../test-fixtures/sample-lib2/node_modules`;
+
+    const pnpmSyncJsonPath1 = `${pnpmSyncJsonFolder1}/.pnpm-sync.json`;
+    const pnpmSyncJsonPath2 = `${pnpmSyncJsonFolder2}/.pnpm-sync.json`;
+
+    // if .pnpm-sync.json already exists, delete it first
+    if (fs.existsSync(pnpmSyncJsonPath1)) {
+      fs.unlinkSync(pnpmSyncJsonPath1);
+    }
+
+    if (fs.existsSync(pnpmSyncJsonPath2)) {
+      fs.unlinkSync(pnpmSyncJsonPath2);
+    }
+
     // generate .pnpm-sync.json file first.
     await pnpmSyncPrepareAsync({
       lockfilePath: lockfilePath,
@@ -25,12 +40,6 @@ describe('pnpm-sync-api copy test', () => {
       readPnpmLockfile,
       logMessageCallback: (): void => {}
     });
-
-    const pnpmSyncJsonFolder1 = `../test-fixtures/sample-lib1/node_modules`;
-    const pnpmSyncJsonFolder2 = `../test-fixtures/sample-lib2/node_modules`;
-
-    const pnpmSyncJsonPath1 = `${pnpmSyncJsonFolder1}/.pnpm-sync.json`;
-    const pnpmSyncJsonPath2 = `${pnpmSyncJsonFolder2}/.pnpm-sync.json`;
 
     const targetFolderPath1 =
       '../../../../node_modules/.pnpm/file+tests+test-fixtures+sample-lib1_react@17.0.2/node_modules/api-demo-sample-lib1';

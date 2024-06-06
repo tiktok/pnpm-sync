@@ -11,7 +11,8 @@ import {
   LogMessageIdentifier,
   IPnpmSyncJson,
   IVersionSpecifier,
-  ILockfilePackage
+  ILockfilePackage,
+  ITargetFolder
 } from './interfaces';
 import { pnpmSyncGetJsonVersion } from './utilities';
 
@@ -28,6 +29,11 @@ export interface IPnpmSyncPrepareOptions {
    * The path to the PNPM virtual store ("node_modules/.pnpm" folder)
    */
   dotPnpmFolder: string;
+
+  /**
+   * A lockfileId that can be used to recognize the `pnpm-lock.yaml`
+   */
+  lockfileId?: string;
 
   /**
    * Environment-provided API to avoid an NPM dependency.
@@ -63,7 +69,7 @@ export interface IPnpmSyncPrepareOptions {
  * @beta
  */
 export async function pnpmSyncPrepareAsync(options: IPnpmSyncPrepareOptions): Promise<void> {
-  const { ensureFolderAsync, readPnpmLockfile, logMessageCallback } = options;
+  const { lockfileId, ensureFolderAsync, readPnpmLockfile, logMessageCallback } = options;
   let { lockfilePath, dotPnpmFolder } = options;
 
   // get the pnpm-lock.yaml path
@@ -214,6 +220,15 @@ export async function pnpmSyncPrepareAsync(options: IPnpmSyncPrepareOptions): Pr
 
       const actualPnpmSyncJsonVersion: string = existingPnpmSyncJsonFile?.version;
       if (actualPnpmSyncJsonVersion === expectedPnpmSyncJsonVersion) {
+        // If a lockfileId is provided
+        // then all entries with this lockfileId should be deleted
+        // they will be regenerated later
+        if (lockfileId) {
+          const filteredTargetFolders = existingPnpmSyncJsonFile.postbuildInjectedCopy.targetFolders.filter(
+            (targetFolder) => targetFolder?.lockfileId !== lockfileId
+          );
+          existingPnpmSyncJsonFile.postbuildInjectedCopy.targetFolders = filteredTargetFolders;
+        }
         pnpmSyncJsonFile = existingPnpmSyncJsonFile;
       } else {
         logMessageCallback({
@@ -243,9 +258,15 @@ export async function pnpmSyncPrepareAsync(options: IPnpmSyncPrepareOptions): Pr
       relativePath = relativePath.split(path.sep).join(path.posix.sep);
 
       if (!existingTargetFolderSet.has(relativePath)) {
-        pnpmSyncJsonFile.postbuildInjectedCopy.targetFolders.push({
+        const targetFolderItem: ITargetFolder = {
           folderPath: relativePath
-        });
+        };
+
+        if (lockfileId) {
+          targetFolderItem.lockfileId = lockfileId;
+        }
+
+        pnpmSyncJsonFile.postbuildInjectedCopy.targetFolders.push(targetFolderItem);
       }
     }
 
