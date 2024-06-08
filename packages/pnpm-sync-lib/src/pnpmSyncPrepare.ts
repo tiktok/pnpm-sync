@@ -214,34 +214,40 @@ export async function pnpmSyncPrepareAsync(options: IPnpmSyncPrepareOptions): Pr
 
     // if .pnpm-sync.json already exists, read it first
     if (fs.existsSync(pnpmSyncJsonPath)) {
-      const existingPnpmSyncJsonFile: IPnpmSyncJson = JSON.parse(
-        fs.readFileSync(pnpmSyncJsonPath).toString()
-      );
+      let existingPnpmSyncJsonFile: IPnpmSyncJson | undefined;
+      try {
+        existingPnpmSyncJsonFile = JSON.parse(fs.readFileSync(pnpmSyncJsonPath).toString());
+      } catch (e) {
+        // no-catch
+        // Regenerate .pnpm-sync.json when failed to load the current one
+      }
 
-      const actualPnpmSyncJsonVersion: string = existingPnpmSyncJsonFile?.version;
-      if (actualPnpmSyncJsonVersion === expectedPnpmSyncJsonVersion) {
-        // If a lockfileId is provided
-        // then all entries with this lockfileId should be deleted
-        // they will be regenerated later
-        if (lockfileId) {
-          const filteredTargetFolders = existingPnpmSyncJsonFile.postbuildInjectedCopy.targetFolders.filter(
-            (targetFolder) => targetFolder?.lockfileId !== lockfileId
-          );
-          existingPnpmSyncJsonFile.postbuildInjectedCopy.targetFolders = filteredTargetFolders;
-        }
-        pnpmSyncJsonFile = existingPnpmSyncJsonFile;
-      } else {
-        logMessageCallback({
-          message: `The .pnpm-sync.json file in ${pnpmSyncJsonFolder} has an incompatible version; pnpm-sync will regenerate it.`,
-          messageKind: LogMessageKind.VERBOSE,
-          details: {
-            messageIdentifier: LogMessageIdentifier.PREPARE_REPLACING_FILE,
-            pnpmSyncJsonPath,
-            projectFolder,
-            actualVersion: actualPnpmSyncJsonVersion,
-            expectedVersion: expectedPnpmSyncJsonVersion
+      if (existingPnpmSyncJsonFile) {
+        const actualPnpmSyncJsonVersion: string = existingPnpmSyncJsonFile.version;
+        if (actualPnpmSyncJsonVersion === expectedPnpmSyncJsonVersion) {
+          // If a lockfileId is provided
+          // then all entries with this lockfileId should be deleted
+          // they will be regenerated later
+          if (lockfileId) {
+            const filteredTargetFolders = existingPnpmSyncJsonFile.postbuildInjectedCopy.targetFolders.filter(
+              (targetFolder) => targetFolder?.lockfileId !== lockfileId
+            );
+            existingPnpmSyncJsonFile.postbuildInjectedCopy.targetFolders = filteredTargetFolders;
           }
-        });
+          pnpmSyncJsonFile = existingPnpmSyncJsonFile;
+        } else {
+          logMessageCallback({
+            message: `The .pnpm-sync.json file in ${pnpmSyncJsonFolder} has an incompatible version; pnpm-sync will regenerate it.`,
+            messageKind: LogMessageKind.VERBOSE,
+            details: {
+              messageIdentifier: LogMessageIdentifier.PREPARE_REPLACING_FILE,
+              pnpmSyncJsonPath,
+              projectFolder,
+              actualVersion: actualPnpmSyncJsonVersion,
+              expectedVersion: expectedPnpmSyncJsonVersion
+            }
+          });
+        }
       }
     }
 
