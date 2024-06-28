@@ -22,7 +22,8 @@ async function getFilesInDirectoryHelper(directory: string, returnFileList: ISyn
 
   for (const item of itemList) {
     const absolutePath: string = path.join(directory, item.name);
-    if (item.isDirectory()) {
+    // ignore node_modules folder in the pnpm-store location
+    if (item.isDirectory() && item.name !== 'node_modules') {
       await getFilesInDirectoryHelper(absolutePath, returnFileList);
     }
 
