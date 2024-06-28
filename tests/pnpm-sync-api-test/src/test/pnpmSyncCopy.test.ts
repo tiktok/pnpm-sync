@@ -228,4 +228,38 @@ describe('pnpm-sync-api copy test', () => {
     // 3. then new added file should be there
     expect(fs.existsSync(path.join(destinationPath, 'dist/index.new.js'))).toBe(true);
   });
+
+  it('pnpmSyncCopyAsync should not delete node_modules folder in .pnpm folder', async () => {
+    const pnpmSyncJsonFolder = `../test-fixtures/sample-lib2/node_modules`;
+    const pnpmSyncJsonPath = `${pnpmSyncJsonFolder}/.pnpm-sync.json`;
+
+    const targetFolderPath =
+      '../../../../node_modules/.pnpm/file+tests+test-fixtures+sample-lib2_react@17.0.2/node_modules/api-demo-sample-lib2';
+
+    const destinationPath = path.resolve(pnpmSyncJsonFolder, targetFolderPath);
+
+    // let fake a node_modules and add some files
+    // create node_modules folder
+    fs.mkdirSync(path.join(destinationPath, 'node_modules'));
+    // create .bin folder
+    fs.mkdirSync(path.join(destinationPath, 'node_modules/.bin'));
+    // create a test file
+    const testBinFileInDestinationPath: string = path.join(destinationPath, 'node_modules/.bin/test.js');
+    fs.writeFileSync(testBinFileInDestinationPath, 'console.log("Hello World in .bin!")');
+
+    // let's do copy action first
+    await pnpmSyncCopyAsync({
+      pnpmSyncJsonPath,
+      getPackageIncludedFiles: PackageExtractor.getPackageIncludedFilesAsync,
+      forEachAsyncWithConcurrency: Async.forEachAsync,
+      ensureFolderAsync: FileSystem.ensureFolderAsync,
+      logMessageCallback: (): void => {}
+    });
+
+    // after copy action, the destination folder should exists
+    expect(fs.existsSync(destinationPath)).toBe(true);
+
+    // and the test file should be there
+    expect(fs.existsSync(testBinFileInDestinationPath)).toBe(true);
+  });
 });
