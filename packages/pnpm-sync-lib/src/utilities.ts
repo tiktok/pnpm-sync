@@ -22,7 +22,9 @@ async function getFilesInDirectoryHelper(directory: string, returnFileList: ISyn
 
   for (const item of itemList) {
     const absolutePath: string = path.join(directory, item.name);
-    // ignore node_modules folder in the pnpm-store location
+    // when PNPM install injected dependencies
+    // it will create necessary node_modules/.bin folder in PNPM store
+    // so we need to ignore node_modules folder in the pnpm-store location
     if (item.isDirectory() && item.name !== 'node_modules') {
       await getFilesInDirectoryHelper(absolutePath, returnFileList);
     }
