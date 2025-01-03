@@ -1,5 +1,5 @@
 {
-  "name": "@tiktok-arch/api-demo-sample-lib1",
+  "name": "@tiktok-frontend/api-demo-sample-lib1",
   "version": "1.0.0",
   "description": "",
   "main": "dist/index.js",
@@ -15,10 +15,10 @@
     "react": "17 || 18"
   },
   "dependencies": {
-    "@tiktok-arch/api-demo-sample-lib2": "workspace: *"
+    "@tiktok-frontend/api-demo-sample-lib2": "workspace: *"
   },
   "dependenciesMeta": {
-    "@tiktok-arch/api-demo-sample-lib2": {
+    "@tiktok-frontend/api-demo-sample-lib2": {
       "injected": true
     }
   },
