@@ -42,9 +42,9 @@ describe('pnpm-sync-api copy test', () => {
     });
 
     const targetFolderPath1 =
-      '../../../../node_modules/.pnpm/file+tests+test-fixtures+sample-lib1_react@17.0.2/node_modules/@tiktok-frontend/api-demo-sample-lib1';
+      '../../../../node_modules/.pnpm/file+tests+test-fixtures+sample-lib1_react@17.0.2/node_modules/@tiktok-service/api-demo-sample-lib1';
     const targetFolderPath2 =
-      '../../../../node_modules/.pnpm/file+tests+test-fixtures+sample-lib2_react@17.0.2/node_modules/@tiktok-frontend/api-demo-sample-lib2';
+      '../../../../node_modules/.pnpm/file+tests+test-fixtures+sample-lib2_react@17.0.2/node_modules/@tiktok-service/api-demo-sample-lib2';
 
     // make sure .pnpm-sync.json exists
     expect(fs.existsSync(pnpmSyncJsonPath1)).toBe(true);
@@ -79,7 +79,7 @@ describe('pnpm-sync-api copy test', () => {
     const pnpmSyncJsonPath = `${pnpmSyncJsonFolder}/.pnpm-sync.json`;
 
     const targetFolderPath =
-      '../../../../node_modules/.pnpm/file+tests+test-fixtures+sample-lib1_react@17.0.2/node_modules/@tiktok-frontend/api-demo-sample-lib1';
+      '../../../../node_modules/.pnpm/file+tests+test-fixtures+sample-lib1_react@17.0.2/node_modules/@tiktok-service/api-demo-sample-lib1';
     const pnpmSyncJsonFile = JSON.parse(fs.readFileSync(pnpmSyncJsonPath).toString());
 
     // set a outdated version
@@ -159,7 +159,7 @@ describe('pnpm-sync-api copy test', () => {
     const pnpmSyncJsonPath = `${pnpmSyncJsonFolder}/.pnpm-sync.json`;
 
     const targetFolderPath =
-      '../../../../node_modules/.pnpm/file+tests+test-fixtures+sample-lib2_react@17.0.2/node_modules/@tiktok-frontend/api-demo-sample-lib2';
+      '../../../../node_modules/.pnpm/file+tests+test-fixtures+sample-lib2_react@17.0.2/node_modules/@tiktok-service/api-demo-sample-lib2';
 
     const destinationPath = path.resolve(pnpmSyncJsonFolder, targetFolderPath);
     const sourcePath = '../test-fixtures/sample-lib2';
@@ -234,7 +234,7 @@ describe('pnpm-sync-api copy test', () => {
     const pnpmSyncJsonPath = `${pnpmSyncJsonFolder}/.pnpm-sync.json`;
 
     const targetFolderPath =
-      '../../../../node_modules/.pnpm/file+tests+test-fixtures+sample-lib2_react@17.0.2/node_modules/@tiktok-frontend/api-demo-sample-lib2';
+      '../../../../node_modules/.pnpm/file+tests+test-fixtures+sample-lib2_react@17.0.2/node_modules/@tiktok-service/api-demo-sample-lib2';
 
     const destinationPath = path.resolve(pnpmSyncJsonFolder, targetFolderPath);
 
