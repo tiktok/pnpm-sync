@@ -117,8 +117,6 @@ A complete tutorial example can be found in this folder: [pnpm-sync/pnpm-sync-cl
 
 It would be cumbersome for each project's **package.json** to perform this recopying, and easy for mistakes to occur.  It would be better for this copying to be managed automatically by your monorepo toolchain.  To support that, we've provided an API package [pnpm-sync-lib](https://www.npmjs.com/package/pnpm-sync-lib) that exposes the same basic operations.
 
-A complete tutorial example can be found in this folder: [pnpm-sync/pnpm-sync-api-demo/](https://github.com/tiktok/pnpm-sync/tree/main/pnpm-sync-api-demo)
-
 ## 💬 Tell us what you think
 
 GitHub issues and pull requests are welcome in the [pnpm-sync repository](https://github.com/tiktok/pnpm-sync/).  For general discussions about the feature idea, please comment on the upstream GitHub issue:
@@ -128,4 +126,5 @@ GitHub issues and pull requests are welcome in the [pnpm-sync repository](https:
 ## See also
 
 - [pnpm-sync-lib](https://www.npmjs.com/package/pnpm-sync-lib) API package
-- [Rush Subspaces RFC #4230](https://github.com/microsoft/rushstack/blob/main/common/docs/rfcs/rfc-4230-rush-subspaces.md)
+- [Rush Subspaces](https://rushjs.io/pages/advanced/subspaces/)
+- [Injected dependencies](https://rushjs.io/pages/advanced/injected_deps/)
