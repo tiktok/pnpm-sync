@@ -103,7 +103,7 @@ describe('pnpm-sync-api prepare test', () => {
         targetFolders: [
           {
             folderPath:
-              '../../../../node_modules/.pnpm/file+tests+test-fixtures+sample-lib1_react@17.0.2/node_modules/api-demo-sample-lib1'
+              '../../../../node_modules/.pnpm/file+tests+test-fixtures+sample-lib1_react@17.0.2/node_modules/@tiktok-service/api-demo-sample-lib1'
           }
         ]
       }
@@ -116,7 +116,7 @@ describe('pnpm-sync-api prepare test', () => {
         targetFolders: [
           {
             folderPath:
-              '../../../../node_modules/.pnpm/file+tests+test-fixtures+sample-lib2_react@17.0.2/node_modules/api-demo-sample-lib2'
+              '../../../../node_modules/.pnpm/file+tests+test-fixtures+sample-lib2_react@17.0.2/node_modules/@tiktok-service/api-demo-sample-lib2'
           }
         ]
       }
@@ -195,7 +195,7 @@ describe('pnpm-sync-api prepare test', () => {
         targetFolders: [
           {
             folderPath:
-              '../../../../node_modules/.pnpm/file+tests+test-fixtures+sample-lib1_react@17.0.2/node_modules/api-demo-sample-lib1'
+              '../../../../node_modules/.pnpm/file+tests+test-fixtures+sample-lib1_react@17.0.2/node_modules/@tiktok-service/api-demo-sample-lib1'
           }
         ]
       }
@@ -221,17 +221,17 @@ describe('pnpm-sync-api prepare test', () => {
         targetFolders: [
           {
             folderPath:
-              '../../../../node_modules/.pnpm/file+tests+test-fixtures+sample-lib1_react@17.0.2/node_modules/api-demo-sample-lib1',
+              '../../../../node_modules/.pnpm/file+tests+test-fixtures+sample-lib1_react@17.0.2/node_modules/@tiktok-service/api-demo-sample-lib1',
             lockfileId: 'identifier1'
           },
           {
             folderPath:
-              '../../../../node_modules/.pnpm/file+tests+test-fixtures+sample-lib1_react@17.0.2/node_modules/api-demo-sample-lib2',
+              '../../../../node_modules/.pnpm/file+tests+test-fixtures+sample-lib1_react@17.0.2/node_modules/@tiktok-service/api-demo-sample-lib2',
             lockfileId: 'identifier1'
           },
           {
             folderPath:
-              '../../../../node_modules/.pnpm/file+tests+test-fixtures+sample-lib1_react@17.0.2/node_modules/api-demo-sample-lib3',
+              '../../../../node_modules/.pnpm/file+tests+test-fixtures+sample-lib1_react@17.0.2/node_modules/@tiktok-service/api-demo-sample-lib3',
             lockfileId: 'identifier2'
           }
         ]
@@ -262,12 +262,12 @@ describe('pnpm-sync-api prepare test', () => {
         targetFolders: [
           {
             folderPath:
-              '../../../../node_modules/.pnpm/file+tests+test-fixtures+sample-lib1_react@17.0.2/node_modules/api-demo-sample-lib3',
+              '../../../../node_modules/.pnpm/file+tests+test-fixtures+sample-lib1_react@17.0.2/node_modules/@tiktok-service/api-demo-sample-lib3',
             lockfileId: 'identifier2'
           },
           {
             folderPath:
-              '../../../../node_modules/.pnpm/file+tests+test-fixtures+sample-lib1_react@17.0.2/node_modules/api-demo-sample-lib1',
+              '../../../../node_modules/.pnpm/file+tests+test-fixtures+sample-lib1_react@17.0.2/node_modules/@tiktok-service/api-demo-sample-lib1',
             lockfileId: 'identifier1'
           }
         ]

@@ -1,5 +1,5 @@
 {
-  "name": "api-demo-sample-lib1",
+  "name": "@tiktok-service/api-demo-sample-lib1",
   "version": "1.0.0",
   "description": "",
   "main": "dist/index.js",
@@ -15,10 +15,10 @@
     "react": "17 || 18"
   },
   "dependencies": {
-    "api-demo-sample-lib2": "workspace: *"
+    "@tiktok-service/api-demo-sample-lib2": "workspace: *"
   },
   "dependenciesMeta": {
-    "api-demo-sample-lib2": {
+    "@tiktok-service/api-demo-sample-lib2": {
       "injected": true
     }
   },

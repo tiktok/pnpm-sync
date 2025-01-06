@@ -1,5 +1,5 @@
 {
-  "name": "api-demo-sample-lib2",
+  "name": "@tiktok-service/api-demo-sample-lib2",
   "version": "1.0.0",
   "description": "Test description value",
   "main": "dist/index.js",

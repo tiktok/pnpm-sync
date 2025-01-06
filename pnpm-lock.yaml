@@ -196,7 +196,7 @@ importers:
 
   tests/test-fixtures/sample-app1:
     dependencies:
-      api-demo-sample-lib1:
+      '@tiktok-service/api-demo-sample-lib1':
         specifier: workspace:*
         version: file:tests/test-fixtures/sample-lib1(react@17.0.2)
       react:
@@ -210,12 +210,12 @@ importers:
         specifier: ^5.2.2
         version: 5.3.3
     dependenciesMeta:
-      api-demo-sample-lib1:
+      '@tiktok-service/api-demo-sample-lib1':
         injected: true
 
   tests/test-fixtures/sample-lib1:
     dependencies:
-      api-demo-sample-lib2:
+      '@tiktok-service/api-demo-sample-lib2':
         specifier: 'workspace: *'
         version: file:tests/test-fixtures/sample-lib2(react@17.0.2)
     devDependencies:
@@ -229,7 +229,7 @@ importers:
         specifier: ^5.2.2
         version: 5.3.3
     dependenciesMeta:
-      api-demo-sample-lib2:
+      '@tiktok-service/api-demo-sample-lib2':
         injected: true
 
   tests/test-fixtures/sample-lib2:
@@ -4979,18 +4979,18 @@ packages:
   file:tests/test-fixtures/sample-lib1(react@17.0.2):
     resolution: {directory: tests/test-fixtures/sample-lib1, type: directory}
     id: file:tests/test-fixtures/sample-lib1
-    name: api-demo-sample-lib1
+    name: '@tiktok-service/api-demo-sample-lib1'
     peerDependencies:
       react: 17 || 18
     dependencies:
-      api-demo-sample-lib2: file:tests/test-fixtures/sample-lib2(react@17.0.2)
+      '@tiktok-service/api-demo-sample-lib2': file:tests/test-fixtures/sample-lib2(react@17.0.2)
       react: 17.0.2
     dev: false
 
   file:tests/test-fixtures/sample-lib2(react@17.0.2):
     resolution: {directory: tests/test-fixtures/sample-lib2, type: directory}
     id: file:tests/test-fixtures/sample-lib2
-    name: api-demo-sample-lib2
+    name: '@tiktok-service/api-demo-sample-lib2'
     peerDependencies:
       react: 17 || 18
     dependencies:
