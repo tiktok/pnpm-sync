@@ -57,13 +57,13 @@ export interface IPnpmSyncCopyOptions {
     pnpmSyncJsonPath: string;
 }
 
+// Warning: (ae-forgotten-export) The symbol "IPnpmSyncPrepareBaseOptions" needs to be exported by the entry point index.d.ts
+//
 // @beta (undocumented)
-export interface IPnpmSyncPrepareOptions {
+export interface IPnpmSyncPrepareOptions extends IPnpmSyncPrepareBaseOptions {
     dotPnpmFolder: string;
     ensureFolderAsync: (folderPath: string) => Promise<void>;
-    lockfileId?: string;
     lockfilePath: string;
-    logMessageCallback: (options: ILogMessageCallbackOptions) => void;
     readPnpmLockfile: (lockfilePath: string, options: {
         ignoreIncompatible: boolean;
     }) => Promise<ILockfile | undefined>;
@@ -172,5 +172,10 @@ export function pnpmSyncGetJsonVersion(): string;
 
 // @beta
 export function pnpmSyncPrepareAsync(options: IPnpmSyncPrepareOptions): Promise<void>;
+
+// Warning: (ae-forgotten-export) The symbol "ICreatePnpmSyncOptions" needs to be exported by the entry point index.d.ts
+//
+// @beta (undocumented)
+export function writePnpmSyncFileAsync(options: ICreatePnpmSyncOptions): Promise<void>;
 
 ```

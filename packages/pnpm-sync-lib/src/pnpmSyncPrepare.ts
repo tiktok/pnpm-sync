@@ -310,7 +310,8 @@ export async function pnpmSyncPrepareAsync(options: IPnpmSyncPrepareOptions): Pr
     await writePnpmSyncFileAsync({
       projectFolder,
       targetFolderSet,
-      logMessageCallback
+      logMessageCallback,
+      lockfileId
     });
   }
 
