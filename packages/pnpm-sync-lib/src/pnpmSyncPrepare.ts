@@ -19,7 +19,26 @@ import { pnpmSyncGetJsonVersion } from './utilities';
 /**
  * @beta
  */
-export interface IPnpmSyncPrepareOptions {
+export interface IPnpmSyncPrepareBaseOptions {
+  /**
+   * A lockfileId that can be used to recognize the `pnpm-lock.yaml`
+   */
+  lockfileId?: string;
+
+  /**
+   * A callback for reporting events during the operation.
+   *
+   * @remarks
+   * `LogMessageKind.ERROR` events do NOT cause the promise to reject,
+   * so they must be handled appropriately.
+   */
+  logMessageCallback: (options: ILogMessageCallbackOptions) => void;
+}
+
+/**
+ * @beta
+ */
+export interface IPnpmSyncPrepareOptions extends IPnpmSyncPrepareBaseOptions {
   /**
    * The path to the `pnpm-lock.yaml` file
    */
@@ -29,11 +48,6 @@ export interface IPnpmSyncPrepareOptions {
    * The path to the PNPM virtual store ("node_modules/.pnpm" folder)
    */
   dotPnpmFolder: string;
-
-  /**
-   * A lockfileId that can be used to recognize the `pnpm-lock.yaml`
-   */
-  lockfileId?: string;
 
   /**
    * Environment-provided API to avoid an NPM dependency.
@@ -49,15 +63,106 @@ export interface IPnpmSyncPrepareOptions {
     lockfilePath: string,
     options: { ignoreIncompatible: boolean }
   ) => Promise<ILockfile | undefined>;
+}
+
+/**
+ * @beta
+ */
+export interface ICreatePnpmSyncOptions extends IPnpmSyncPrepareBaseOptions {
+  /**
+   * The root folder path of the project.
+   */
+  projectFolder: string;
 
   /**
-   * A callback for reporting events during the operation.
-   *
-   * @remarks
-   * `LogMessageKind.ERROR` events do NOT cause the promise to reject,
-   * so they must be handled appropriately.
+   * A set of target folders that need to be synchronized.
    */
-  logMessageCallback: (options: ILogMessageCallbackOptions) => void;
+  targetFolderSet: Set<string>;
+}
+
+/**
+ * @beta
+ */
+export async function writePnpmSyncFileAsync(options: ICreatePnpmSyncOptions): Promise<void> {
+  const { lockfileId, logMessageCallback, projectFolder, targetFolderSet } = options;
+
+  const pnpmSyncJsonFolder = `${projectFolder}/node_modules`;
+  const pnpmSyncJsonPath = `${pnpmSyncJsonFolder}/.pnpm-sync.json`;
+  const expectedPnpmSyncJsonVersion: string = pnpmSyncGetJsonVersion();
+
+  let pnpmSyncJsonFile: IPnpmSyncJson = {
+    version: expectedPnpmSyncJsonVersion,
+    postbuildInjectedCopy: {
+      sourceFolder: '..', // path from pnpmSyncJsonFolder to projectFolder
+      targetFolders: []
+    }
+  };
+
+  // if .pnpm-sync.json already exists, read it first
+  if (fs.existsSync(pnpmSyncJsonPath)) {
+    let existingPnpmSyncJsonFile: IPnpmSyncJson | undefined;
+    try {
+      existingPnpmSyncJsonFile = JSON.parse(fs.readFileSync(pnpmSyncJsonPath).toString());
+    } catch (e) {
+      // no-catch
+      // Regenerate .pnpm-sync.json when failed to load the current one
+    }
+
+    if (existingPnpmSyncJsonFile) {
+      const actualPnpmSyncJsonVersion: string = existingPnpmSyncJsonFile.version;
+      if (actualPnpmSyncJsonVersion === expectedPnpmSyncJsonVersion) {
+        // If a lockfileId is provided
+        // then all entries with this lockfileId should be deleted
+        // they will be regenerated later
+        if (lockfileId) {
+          const filteredTargetFolders = existingPnpmSyncJsonFile.postbuildInjectedCopy.targetFolders.filter(
+            (targetFolder) => targetFolder?.lockfileId !== lockfileId
+          );
+          existingPnpmSyncJsonFile.postbuildInjectedCopy.targetFolders = filteredTargetFolders;
+        }
+        pnpmSyncJsonFile = existingPnpmSyncJsonFile;
+      } else {
+        logMessageCallback({
+          message: `The .pnpm-sync.json file in ${pnpmSyncJsonFolder} has an incompatible version; pnpm-sync will regenerate it.`,
+          messageKind: LogMessageKind.VERBOSE,
+          details: {
+            messageIdentifier: LogMessageIdentifier.PREPARE_REPLACING_FILE,
+            pnpmSyncJsonPath,
+            projectFolder,
+            actualVersion: actualPnpmSyncJsonVersion,
+            expectedVersion: expectedPnpmSyncJsonVersion
+          }
+        });
+      }
+    }
+  }
+
+  const existingTargetFolderSet: Set<string> = new Set();
+
+  for (const targetFolder of pnpmSyncJsonFile.postbuildInjectedCopy.targetFolders) {
+    existingTargetFolderSet.add(targetFolder.folderPath);
+  }
+
+  for (const targetFolder of targetFolderSet) {
+    let relativePath: string = path.relative(pnpmSyncJsonFolder, targetFolder);
+
+    // the final path in .pnpm-sync.json will always in posix style
+    relativePath = relativePath.split(path.sep).join(path.posix.sep);
+
+    if (!existingTargetFolderSet.has(relativePath)) {
+      const targetFolderItem: ITargetFolder = {
+        folderPath: relativePath
+      };
+
+      if (lockfileId) {
+        targetFolderItem.lockfileId = lockfileId;
+      }
+
+      pnpmSyncJsonFile.postbuildInjectedCopy.targetFolders.push(targetFolderItem);
+    }
+  }
+
+  await fs.promises.writeFile(pnpmSyncJsonPath, JSON.stringify(pnpmSyncJsonFile, null, 2));
 }
 
 /**
@@ -202,81 +307,11 @@ export async function pnpmSyncPrepareAsync(options: IPnpmSyncPrepareOptions): Pr
       await ensureFolderAsync(pnpmSyncJsonFolder);
     }
 
-    const expectedPnpmSyncJsonVersion: string = pnpmSyncGetJsonVersion();
-
-    let pnpmSyncJsonFile: IPnpmSyncJson = {
-      version: expectedPnpmSyncJsonVersion,
-      postbuildInjectedCopy: {
-        sourceFolder: '..', // path from pnpmSyncJsonFolder to projectFolder
-        targetFolders: []
-      }
-    };
-
-    // if .pnpm-sync.json already exists, read it first
-    if (fs.existsSync(pnpmSyncJsonPath)) {
-      let existingPnpmSyncJsonFile: IPnpmSyncJson | undefined;
-      try {
-        existingPnpmSyncJsonFile = JSON.parse(fs.readFileSync(pnpmSyncJsonPath).toString());
-      } catch (e) {
-        // no-catch
-        // Regenerate .pnpm-sync.json when failed to load the current one
-      }
-
-      if (existingPnpmSyncJsonFile) {
-        const actualPnpmSyncJsonVersion: string = existingPnpmSyncJsonFile.version;
-        if (actualPnpmSyncJsonVersion === expectedPnpmSyncJsonVersion) {
-          // If a lockfileId is provided
-          // then all entries with this lockfileId should be deleted
-          // they will be regenerated later
-          if (lockfileId) {
-            const filteredTargetFolders = existingPnpmSyncJsonFile.postbuildInjectedCopy.targetFolders.filter(
-              (targetFolder) => targetFolder?.lockfileId !== lockfileId
-            );
-            existingPnpmSyncJsonFile.postbuildInjectedCopy.targetFolders = filteredTargetFolders;
-          }
-          pnpmSyncJsonFile = existingPnpmSyncJsonFile;
-        } else {
-          logMessageCallback({
-            message: `The .pnpm-sync.json file in ${pnpmSyncJsonFolder} has an incompatible version; pnpm-sync will regenerate it.`,
-            messageKind: LogMessageKind.VERBOSE,
-            details: {
-              messageIdentifier: LogMessageIdentifier.PREPARE_REPLACING_FILE,
-              pnpmSyncJsonPath,
-              projectFolder,
-              actualVersion: actualPnpmSyncJsonVersion,
-              expectedVersion: expectedPnpmSyncJsonVersion
-            }
-          });
-        }
-      }
-    }
-
-    const existingTargetFolderSet: Set<string> = new Set();
-
-    for (const targetFolder of pnpmSyncJsonFile.postbuildInjectedCopy.targetFolders) {
-      existingTargetFolderSet.add(targetFolder.folderPath);
-    }
-
-    for (const targetFolder of targetFolderSet) {
-      let relativePath: string = path.relative(pnpmSyncJsonFolder, targetFolder);
-
-      // the final path in .pnpm-sync.json will always in posix style
-      relativePath = relativePath.split(path.sep).join(path.posix.sep);
-
-      if (!existingTargetFolderSet.has(relativePath)) {
-        const targetFolderItem: ITargetFolder = {
-          folderPath: relativePath
-        };
-
-        if (lockfileId) {
-          targetFolderItem.lockfileId = lockfileId;
-        }
-
-        pnpmSyncJsonFile.postbuildInjectedCopy.targetFolders.push(targetFolderItem);
-      }
-    }
-
-    await fs.promises.writeFile(pnpmSyncJsonPath, JSON.stringify(pnpmSyncJsonFile, null, 2));
+    await writePnpmSyncFileAsync({
+      projectFolder,
+      targetFolderSet,
+      logMessageCallback
+    });
   }
 
   const endTime = process.hrtime.bigint();
