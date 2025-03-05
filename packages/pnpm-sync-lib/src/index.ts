@@ -9,6 +9,7 @@ export { pnpmSyncCopyAsync, type IPnpmSyncCopyOptions } from './pnpmSyncCopy';
 export {
   pnpmSyncPrepareAsync,
   writePnpmSyncFileAsync,
+  type IPnpmSyncPrepareBaseOptions,
   type IPnpmSyncPrepareOptions
 } from './pnpmSyncPrepare';
 export { LogMessageIdentifier, LogMessageKind, LogMessageDetails } from './interfaces';

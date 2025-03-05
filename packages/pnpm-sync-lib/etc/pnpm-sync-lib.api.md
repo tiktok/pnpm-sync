@@ -57,8 +57,12 @@ export interface IPnpmSyncCopyOptions {
     pnpmSyncJsonPath: string;
 }
 
-// Warning: (ae-forgotten-export) The symbol "IPnpmSyncPrepareBaseOptions" needs to be exported by the entry point index.d.ts
-//
+// @beta (undocumented)
+export interface IPnpmSyncPrepareBaseOptions {
+    lockfileId?: string;
+    logMessageCallback: (options: ILogMessageCallbackOptions) => void;
+}
+
 // @beta (undocumented)
 export interface IPnpmSyncPrepareOptions extends IPnpmSyncPrepareBaseOptions {
     dotPnpmFolder: string;
