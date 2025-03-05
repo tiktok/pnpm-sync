@@ -10,7 +10,8 @@ export {
   pnpmSyncPrepareAsync,
   writePnpmSyncFileAsync,
   type IPnpmSyncPrepareBaseOptions,
-  type IPnpmSyncPrepareOptions
+  type IPnpmSyncPrepareOptions,
+  type ICreatePnpmSyncOptions
 } from './pnpmSyncPrepare';
 export { LogMessageIdentifier, LogMessageKind, LogMessageDetails } from './interfaces';
 export { pnpmSyncGetJsonVersion } from './utilities';

@@ -5,6 +5,12 @@
 ```ts
 
 // @beta (undocumented)
+export interface ICreatePnpmSyncOptions extends IPnpmSyncPrepareBaseOptions {
+    projectFolder: string;
+    targetFolderSet: Set<string>;
+}
+
+// @beta (undocumented)
 export interface IDependencyMeta {
     // (undocumented)
     injected?: boolean;
@@ -177,8 +183,6 @@ export function pnpmSyncGetJsonVersion(): string;
 // @beta
 export function pnpmSyncPrepareAsync(options: IPnpmSyncPrepareOptions): Promise<void>;
 
-// Warning: (ae-forgotten-export) The symbol "ICreatePnpmSyncOptions" needs to be exported by the entry point index.d.ts
-//
 // @beta (undocumented)
 export function writePnpmSyncFileAsync(options: ICreatePnpmSyncOptions): Promise<void>;
 
