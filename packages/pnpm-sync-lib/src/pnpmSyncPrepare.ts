@@ -143,7 +143,7 @@ export async function pnpmSyncUpdateFileAsync(options: IPnpmSyncUpdateFileOption
           details: {
             messageIdentifier: LogMessageIdentifier.PREPARE_REPLACING_FILE,
             pnpmSyncJsonPath,
-            projectFolder: sourceProjectFolder,
+            sourceProjectFolder,
             actualVersion: actualPnpmSyncJsonVersion,
             expectedVersion: expectedPnpmSyncJsonVersion
           }
@@ -309,7 +309,7 @@ export async function pnpmSyncPrepareAsync(options: IPnpmSyncPrepareOptions): Pr
       details: {
         messageIdentifier: LogMessageIdentifier.PREPARE_WRITING_FILE,
         pnpmSyncJsonPath,
-        projectFolder: sourceProjectFolder
+        sourceProjectFolder
       }
     });
 
