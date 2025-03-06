@@ -75,8 +75,8 @@ export interface IPnpmSyncUpdateFileBaseOptions {
 
 // @beta (undocumented)
 export interface IPnpmSyncUpdateFileOptions extends IPnpmSyncUpdateFileBaseOptions {
-    projectFolder: string;
-    targetFolderSet: Set<string>;
+    sourceProjectFolder: string;
+    targetFolders: Array<string>;
 }
 
 // @beta (undocumented)
@@ -105,13 +105,13 @@ export type LogMessageDetails = {
 } | {
     messageIdentifier: LogMessageIdentifier.PREPARE_REPLACING_FILE;
     pnpmSyncJsonPath: string;
-    projectFolder: string;
+    sourceProjectFolder: string;
     actualVersion: string;
     expectedVersion: string;
 } | {
     messageIdentifier: LogMessageIdentifier.PREPARE_WRITING_FILE;
     pnpmSyncJsonPath: string;
-    projectFolder: string;
+    sourceProjectFolder: string;
 } | {
     messageIdentifier: LogMessageIdentifier.PREPARE_FINISHING;
     lockfilePath: string;
