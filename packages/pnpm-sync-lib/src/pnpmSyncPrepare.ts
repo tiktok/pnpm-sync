@@ -19,7 +19,7 @@ import { pnpmSyncGetJsonVersion } from './utilities';
 /**
  * @beta
  */
-export interface IPnpmSyncPrepareBaseOptions {
+export interface IPnpmSyncUpdateFileBaseOptions {
   /**
    * A lockfileId that can be used to recognize the `pnpm-lock.yaml`
    */
@@ -38,7 +38,7 @@ export interface IPnpmSyncPrepareBaseOptions {
 /**
  * @beta
  */
-export interface IPnpmSyncPrepareOptions extends IPnpmSyncPrepareBaseOptions {
+export interface IPnpmSyncPrepareOptions extends IPnpmSyncUpdateFileBaseOptions {
   /**
    * The path to the `pnpm-lock.yaml` file
    */
@@ -68,7 +68,7 @@ export interface IPnpmSyncPrepareOptions extends IPnpmSyncPrepareBaseOptions {
 /**
  * @beta
  */
-export interface IPnpmSyncUpdateFileOptions extends IPnpmSyncPrepareBaseOptions {
+export interface IPnpmSyncUpdateFileOptions extends IPnpmSyncUpdateFileBaseOptions {
   /**
    * The folder path of the project whose build outputs will get synced into the node_modules folder
    * of dependent projects.

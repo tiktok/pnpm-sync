@@ -58,13 +58,7 @@ export interface IPnpmSyncCopyOptions {
 }
 
 // @beta (undocumented)
-export interface IPnpmSyncPrepareBaseOptions {
-    lockfileId?: string;
-    logMessageCallback: (options: ILogMessageCallbackOptions) => void;
-}
-
-// @beta (undocumented)
-export interface IPnpmSyncPrepareOptions extends IPnpmSyncPrepareBaseOptions {
+export interface IPnpmSyncPrepareOptions extends IPnpmSyncUpdateFileBaseOptions {
     dotPnpmFolder: string;
     ensureFolderAsync: (folderPath: string) => Promise<void>;
     lockfilePath: string;
@@ -74,7 +68,13 @@ export interface IPnpmSyncPrepareOptions extends IPnpmSyncPrepareBaseOptions {
 }
 
 // @beta (undocumented)
-export interface IPnpmSyncUpdateFileOptions extends IPnpmSyncPrepareBaseOptions {
+export interface IPnpmSyncUpdateFileBaseOptions {
+    lockfileId?: string;
+    logMessageCallback: (options: ILogMessageCallbackOptions) => void;
+}
+
+// @beta (undocumented)
+export interface IPnpmSyncUpdateFileOptions extends IPnpmSyncUpdateFileBaseOptions {
     projectFolder: string;
     targetFolderSet: Set<string>;
 }

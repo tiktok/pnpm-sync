@@ -9,7 +9,7 @@ export { pnpmSyncCopyAsync, type IPnpmSyncCopyOptions } from './pnpmSyncCopy';
 export {
   pnpmSyncPrepareAsync,
   pnpmSyncUpdateFileAsync,
-  type IPnpmSyncPrepareBaseOptions,
+  type IPnpmSyncUpdateFileBaseOptions,
   type IPnpmSyncPrepareOptions,
   type IPnpmSyncUpdateFileOptions
 } from './pnpmSyncPrepare';
