@@ -48,7 +48,7 @@ export function scrubLog(log: Record<string, any>): Record<string, any> {
       case 'dotPnpmFolderPath':
       case 'lockfilePath':
       case 'pnpmSyncJsonPath':
-      case 'projectFolder':
+      case 'sourceProjectFolder':
       case 'sourcePath':
         let scrubbedPath = scrubbedLog[key];
         scrubbedPath = scrubbedPath.replace(repoRootFolder, '<root>');
