@@ -6,7 +6,13 @@
  */
 
 export { pnpmSyncCopyAsync, type IPnpmSyncCopyOptions } from './pnpmSyncCopy';
-export { pnpmSyncPrepareAsync, type IPnpmSyncPrepareOptions } from './pnpmSyncPrepare';
+export {
+  pnpmSyncPrepareAsync,
+  pnpmSyncUpdateFileAsync,
+  type IPnpmSyncUpdateFileBaseOptions,
+  type IPnpmSyncPrepareOptions,
+  type IPnpmSyncUpdateFileOptions
+} from './pnpmSyncPrepare';
 export { LogMessageIdentifier, LogMessageKind, LogMessageDetails } from './interfaces';
 export { pnpmSyncGetJsonVersion } from './utilities';
 export type {

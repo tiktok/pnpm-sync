@@ -43,7 +43,10 @@ describe('pnpm-sync-api prepare test', () => {
         // in this test case, we only care projects under tests/test-fixtures folder
         if (
           options.details.messageIdentifier !== LogMessageIdentifier.PREPARE_WRITING_FILE ||
-          options.details.projectFolder.split(path.sep).join(path.posix.sep).includes('tests/test-fixtures')
+          options.details.sourceProjectFolder
+            .split(path.sep)
+            .join(path.posix.sep)
+            .includes('tests/test-fixtures')
         ) {
           logs.push(options);
         }
@@ -51,46 +54,46 @@ describe('pnpm-sync-api prepare test', () => {
     });
 
     expect(logs.map((x) => scrubLog(x))).toMatchInlineSnapshot(`
-      Array [
-        Object {
-          "details": Object {
-            "dotPnpmFolder": "<root>/pnpm-sync/node_modules/.pnpm",
-            "lockfilePath": "<root>/pnpm-sync/pnpm-lock.yaml",
-            "messageIdentifier": "prepare-starting",
-          },
-          "message": "Starting...",
-          "messageKind": "verbose",
-        },
-        Object {
-          "details": Object {
-            "messageIdentifier": "prepare-writing-file",
-            "pnpmSyncJsonPath": "<root>/pnpm-sync/tests/test-fixtures/sample-lib1/node_modules/.pnpm-sync.json",
-            "projectFolder": "<root>/pnpm-sync/tests/test-fixtures/sample-lib1",
-          },
-          "message": "Writing...",
-          "messageKind": "verbose",
-        },
-        Object {
-          "details": Object {
-            "messageIdentifier": "prepare-writing-file",
-            "pnpmSyncJsonPath": "<root>/pnpm-sync/tests/test-fixtures/sample-lib2/node_modules/.pnpm-sync.json",
-            "projectFolder": "<root>/pnpm-sync/tests/test-fixtures/sample-lib2",
-          },
-          "message": "Writing...",
-          "messageKind": "verbose",
-        },
-        Object {
-          "details": Object {
-            "dotPnpmFolder": "<root>/pnpm-sync/node_modules/.pnpm",
-            "executionTimeInMs": "[TIMING]",
-            "lockfilePath": "<root>/pnpm-sync/pnpm-lock.yaml",
-            "messageIdentifier": "prepare-finishing",
-          },
-          "message": "Regenerated...",
-          "messageKind": "info",
-        },
-      ]
-    `);
+Array [
+  Object {
+    "details": Object {
+      "dotPnpmFolder": "<root>/pnpm-sync/node_modules/.pnpm",
+      "lockfilePath": "<root>/pnpm-sync/pnpm-lock.yaml",
+      "messageIdentifier": "prepare-starting",
+    },
+    "message": "Starting...",
+    "messageKind": "verbose",
+  },
+  Object {
+    "details": Object {
+      "messageIdentifier": "prepare-writing-file",
+      "pnpmSyncJsonPath": "<root>/pnpm-sync/tests/test-fixtures/sample-lib1/node_modules/.pnpm-sync.json",
+      "sourceProjectFolder": "<root>/pnpm-sync/tests/test-fixtures/sample-lib1",
+    },
+    "message": "Writing...",
+    "messageKind": "verbose",
+  },
+  Object {
+    "details": Object {
+      "messageIdentifier": "prepare-writing-file",
+      "pnpmSyncJsonPath": "<root>/pnpm-sync/tests/test-fixtures/sample-lib2/node_modules/.pnpm-sync.json",
+      "sourceProjectFolder": "<root>/pnpm-sync/tests/test-fixtures/sample-lib2",
+    },
+    "message": "Writing...",
+    "messageKind": "verbose",
+  },
+  Object {
+    "details": Object {
+      "dotPnpmFolder": "<root>/pnpm-sync/node_modules/.pnpm",
+      "executionTimeInMs": "[TIMING]",
+      "lockfilePath": "<root>/pnpm-sync/pnpm-lock.yaml",
+      "messageIdentifier": "prepare-finishing",
+    },
+    "message": "Regenerated...",
+    "messageKind": "info",
+  },
+]
+`);
 
     // now, read .pnpm-sync.json and check the fields
     expect(fs.existsSync(dotPnpmSyncJsonPathForSampleLib1)).toBe(true);
@@ -158,7 +161,7 @@ describe('pnpm-sync-api prepare test', () => {
         // and the logs related to write files
         if (
           options.details.messageIdentifier === LogMessageIdentifier.PREPARE_REPLACING_FILE &&
-          options.details.projectFolder
+          options.details.sourceProjectFolder
             .split(path.sep)
             .join(path.posix.sep)
             .includes('tests/test-fixtures/sample-lib1')
@@ -169,20 +172,20 @@ describe('pnpm-sync-api prepare test', () => {
     });
 
     expect(logs.map((x) => scrubLog(x))).toMatchInlineSnapshot(`
-      Array [
-        Object {
-          "details": Object {
-            "actualVersion": "incompatible-version",
-            "expectedVersion": "${pnpmSyncLibVersion}",
-            "messageIdentifier": "prepare-replacing-file",
-            "pnpmSyncJsonPath": "<root>/pnpm-sync/tests/test-fixtures/sample-lib1/node_modules/.pnpm-sync.json",
-            "projectFolder": "<root>/pnpm-sync/tests/test-fixtures/sample-lib1",
-          },
-          "message": "The...",
-          "messageKind": "verbose",
-        },
-      ]
-    `);
+Array [
+  Object {
+    "details": Object {
+      "actualVersion": "incompatible-version",
+      "expectedVersion": "0.3.0",
+      "messageIdentifier": "prepare-replacing-file",
+      "pnpmSyncJsonPath": "<root>/pnpm-sync/tests/test-fixtures/sample-lib1/node_modules/.pnpm-sync.json",
+      "sourceProjectFolder": "<root>/pnpm-sync/tests/test-fixtures/sample-lib1",
+    },
+    "message": "The...",
+    "messageKind": "verbose",
+  },
+]
+`);
 
     // now, read .pnpm-sync.json and check the fields
     expect(fs.existsSync(pnpmSyncJsonPath)).toBe(true);

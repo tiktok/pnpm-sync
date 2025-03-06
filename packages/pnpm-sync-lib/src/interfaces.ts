@@ -80,14 +80,14 @@ export type LogMessageDetails =
   | {
       messageIdentifier: LogMessageIdentifier.PREPARE_REPLACING_FILE;
       pnpmSyncJsonPath: string;
-      projectFolder: string;
+      sourceProjectFolder: string;
       actualVersion: string;
       expectedVersion: string;
     }
   | {
       messageIdentifier: LogMessageIdentifier.PREPARE_WRITING_FILE;
       pnpmSyncJsonPath: string;
-      projectFolder: string;
+      sourceProjectFolder: string;
     }
   | {
       messageIdentifier: LogMessageIdentifier.PREPARE_FINISHING;

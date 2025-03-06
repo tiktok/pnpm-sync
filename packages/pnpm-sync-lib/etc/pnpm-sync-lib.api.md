@@ -58,15 +58,25 @@ export interface IPnpmSyncCopyOptions {
 }
 
 // @beta (undocumented)
-export interface IPnpmSyncPrepareOptions {
+export interface IPnpmSyncPrepareOptions extends IPnpmSyncUpdateFileBaseOptions {
     dotPnpmFolder: string;
     ensureFolderAsync: (folderPath: string) => Promise<void>;
-    lockfileId?: string;
     lockfilePath: string;
-    logMessageCallback: (options: ILogMessageCallbackOptions) => void;
     readPnpmLockfile: (lockfilePath: string, options: {
         ignoreIncompatible: boolean;
     }) => Promise<ILockfile | undefined>;
+}
+
+// @beta (undocumented)
+export interface IPnpmSyncUpdateFileBaseOptions {
+    lockfileId?: string;
+    logMessageCallback: (options: ILogMessageCallbackOptions) => void;
+}
+
+// @beta (undocumented)
+export interface IPnpmSyncUpdateFileOptions extends IPnpmSyncUpdateFileBaseOptions {
+    sourceProjectFolder: string;
+    targetFolders: Array<string>;
 }
 
 // @beta (undocumented)
@@ -95,13 +105,13 @@ export type LogMessageDetails = {
 } | {
     messageIdentifier: LogMessageIdentifier.PREPARE_REPLACING_FILE;
     pnpmSyncJsonPath: string;
-    projectFolder: string;
+    sourceProjectFolder: string;
     actualVersion: string;
     expectedVersion: string;
 } | {
     messageIdentifier: LogMessageIdentifier.PREPARE_WRITING_FILE;
     pnpmSyncJsonPath: string;
-    projectFolder: string;
+    sourceProjectFolder: string;
 } | {
     messageIdentifier: LogMessageIdentifier.PREPARE_FINISHING;
     lockfilePath: string;
@@ -172,5 +182,8 @@ export function pnpmSyncGetJsonVersion(): string;
 
 // @beta
 export function pnpmSyncPrepareAsync(options: IPnpmSyncPrepareOptions): Promise<void>;
+
+// @beta (undocumented)
+export function pnpmSyncUpdateFileAsync(options: IPnpmSyncUpdateFileOptions): Promise<void>;
 
 ```
