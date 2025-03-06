@@ -68,7 +68,7 @@ Array [
     "details": Object {
       "messageIdentifier": "prepare-writing-file",
       "pnpmSyncJsonPath": "<root>/pnpm-sync/tests/test-fixtures/sample-lib1/node_modules/.pnpm-sync.json",
-      "sourceProjectFolder": "/workspaces/pnpm-sync/tests/test-fixtures/sample-lib1",
+      "sourceProjectFolder": "<root>/pnpm-sync/tests/test-fixtures/sample-lib1",
     },
     "message": "Writing...",
     "messageKind": "verbose",
@@ -77,7 +77,7 @@ Array [
     "details": Object {
       "messageIdentifier": "prepare-writing-file",
       "pnpmSyncJsonPath": "<root>/pnpm-sync/tests/test-fixtures/sample-lib2/node_modules/.pnpm-sync.json",
-      "sourceProjectFolder": "/workspaces/pnpm-sync/tests/test-fixtures/sample-lib2",
+      "sourceProjectFolder": "<root>/pnpm-sync/tests/test-fixtures/sample-lib2",
     },
     "message": "Writing...",
     "messageKind": "verbose",
@@ -176,10 +176,10 @@ Array [
   Object {
     "details": Object {
       "actualVersion": "incompatible-version",
-      "expectedVersion": "0.3.0",
+      "expectedVersion": "${pnpmSyncLibVersion}",
       "messageIdentifier": "prepare-replacing-file",
       "pnpmSyncJsonPath": "<root>/pnpm-sync/tests/test-fixtures/sample-lib1/node_modules/.pnpm-sync.json",
-      "sourceProjectFolder": "/workspaces/pnpm-sync/tests/test-fixtures/sample-lib1",
+      "sourceProjectFolder": "<root>/pnpm-sync/tests/test-fixtures/sample-lib1",
     },
     "message": "The...",
     "messageKind": "verbose",
