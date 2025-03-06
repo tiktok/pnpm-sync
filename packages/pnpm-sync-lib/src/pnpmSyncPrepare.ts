@@ -108,7 +108,7 @@ export async function pnpmSyncUpdateFileAsync(options: IPnpmSyncUpdateFileOption
   let pnpmSyncJsonFile: IPnpmSyncJson = {
     version: expectedPnpmSyncJsonVersion,
     postbuildInjectedCopy: {
-      sourceFolder: '..', // path from pnpmSyncJsonFolder to projectFolder
+      sourceFolder: '..', // path from pnpmSyncJsonFolder to sourceProjectFolder
       targetFolders: []
     }
   };
