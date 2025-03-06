@@ -68,14 +68,29 @@ export interface IPnpmSyncPrepareOptions extends IPnpmSyncPrepareBaseOptions {
 /**
  * @beta
  */
-export interface ICreatePnpmSyncOptions extends IPnpmSyncPrepareBaseOptions {
+export interface IPnpmSyncUpdateFileOptions extends IPnpmSyncPrepareBaseOptions {
   /**
-   * The root folder path of the project.
+   * The folder path of the project whose build outputs will get synced into the node_modules folder
+   * of dependent projects.
+   * @remarks
+   * It be an absolute file path, such as `/path/to/my-library`, which will have a sync file
+   * `/path/to/my-library/node_modules/.pnpm-sync.json`
    */
   projectFolder: string;
 
   /**
-   * A set of target folders that need to be synchronized.
+   * A list of destination folders that `pnpmSyncCopyAsync()` will copy into.
+   *
+   * @remarks
+   * Each string should be an absolute file path to a folder, whose name will generally
+   * be the same as the `sourceProjectFolder`'s directory name.
+   *
+   * For example:
+   * `/path/to/my-workspace/node_modules/.pnpm/my-library@1.2.3/node_modules/my-library`
+   *
+   * When your tool needs to update this set of files, providing the `IPnpmSyncUpdateFileBaseOptions.lockfileId`
+   * will enable `pnpmSyncUpdateFileAsync()` to clear the old target folders from `.pnpm-sync.json`
+   * before adding the new ones.
    */
   targetFolderSet: Set<string>;
 }
@@ -83,7 +98,7 @@ export interface ICreatePnpmSyncOptions extends IPnpmSyncPrepareBaseOptions {
 /**
  * @beta
  */
-export async function writePnpmSyncFileAsync(options: ICreatePnpmSyncOptions): Promise<void> {
+export async function pnpmSyncUpdateFileAsync(options: IPnpmSyncUpdateFileOptions): Promise<void> {
   const { lockfileId, logMessageCallback, projectFolder, targetFolderSet } = options;
 
   const pnpmSyncJsonFolder = `${projectFolder}/node_modules`;
@@ -307,7 +322,7 @@ export async function pnpmSyncPrepareAsync(options: IPnpmSyncPrepareOptions): Pr
       await ensureFolderAsync(pnpmSyncJsonFolder);
     }
 
-    await writePnpmSyncFileAsync({
+    await pnpmSyncUpdateFileAsync({
       projectFolder,
       targetFolderSet,
       logMessageCallback,

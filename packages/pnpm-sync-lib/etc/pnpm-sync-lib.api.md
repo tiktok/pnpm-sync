@@ -5,12 +5,6 @@
 ```ts
 
 // @beta (undocumented)
-export interface ICreatePnpmSyncOptions extends IPnpmSyncPrepareBaseOptions {
-    projectFolder: string;
-    targetFolderSet: Set<string>;
-}
-
-// @beta (undocumented)
 export interface IDependencyMeta {
     // (undocumented)
     injected?: boolean;
@@ -77,6 +71,12 @@ export interface IPnpmSyncPrepareOptions extends IPnpmSyncPrepareBaseOptions {
     readPnpmLockfile: (lockfilePath: string, options: {
         ignoreIncompatible: boolean;
     }) => Promise<ILockfile | undefined>;
+}
+
+// @beta (undocumented)
+export interface IPnpmSyncUpdateFileOptions extends IPnpmSyncPrepareBaseOptions {
+    projectFolder: string;
+    targetFolderSet: Set<string>;
 }
 
 // @beta (undocumented)
@@ -184,6 +184,6 @@ export function pnpmSyncGetJsonVersion(): string;
 export function pnpmSyncPrepareAsync(options: IPnpmSyncPrepareOptions): Promise<void>;
 
 // @beta (undocumented)
-export function writePnpmSyncFileAsync(options: ICreatePnpmSyncOptions): Promise<void>;
+export function pnpmSyncUpdateFileAsync(options: IPnpmSyncUpdateFileOptions): Promise<void>;
 
 ```
