@@ -76,7 +76,7 @@ export interface IPnpmSyncUpdateFileOptions extends IPnpmSyncUpdateFileBaseOptio
    * It be an absolute file path, such as `/path/to/my-library`, which will have a sync file
    * `/path/to/my-library/node_modules/.pnpm-sync.json`
    */
-  projectFolder: string;
+  sourceProjectFolder: string;
 
   /**
    * A list of destination folders that `pnpmSyncCopyAsync()` will copy into.
@@ -92,16 +92,16 @@ export interface IPnpmSyncUpdateFileOptions extends IPnpmSyncUpdateFileBaseOptio
    * will enable `pnpmSyncUpdateFileAsync()` to clear the old target folders from `.pnpm-sync.json`
    * before adding the new ones.
    */
-  targetFolderSet: Set<string>;
+  targetFolders: Array<string>;
 }
 
 /**
  * @beta
  */
 export async function pnpmSyncUpdateFileAsync(options: IPnpmSyncUpdateFileOptions): Promise<void> {
-  const { lockfileId, logMessageCallback, projectFolder, targetFolderSet } = options;
+  const { lockfileId, logMessageCallback, sourceProjectFolder, targetFolders } = options;
 
-  const pnpmSyncJsonFolder = `${projectFolder}/node_modules`;
+  const pnpmSyncJsonFolder = `${sourceProjectFolder}/node_modules`;
   const pnpmSyncJsonPath = `${pnpmSyncJsonFolder}/.pnpm-sync.json`;
   const expectedPnpmSyncJsonVersion: string = pnpmSyncGetJsonVersion();
 
@@ -143,7 +143,7 @@ export async function pnpmSyncUpdateFileAsync(options: IPnpmSyncUpdateFileOption
           details: {
             messageIdentifier: LogMessageIdentifier.PREPARE_REPLACING_FILE,
             pnpmSyncJsonPath,
-            projectFolder,
+            projectFolder: sourceProjectFolder,
             actualVersion: actualPnpmSyncJsonVersion,
             expectedVersion: expectedPnpmSyncJsonVersion
           }
@@ -158,7 +158,7 @@ export async function pnpmSyncUpdateFileAsync(options: IPnpmSyncUpdateFileOption
     existingTargetFolderSet.add(targetFolder.folderPath);
   }
 
-  for (const targetFolder of targetFolderSet) {
+  for (const targetFolder of targetFolders) {
     let relativePath: string = path.relative(pnpmSyncJsonFolder, targetFolder);
 
     // the final path in .pnpm-sync.json will always in posix style
@@ -270,7 +270,7 @@ export async function pnpmSyncPrepareAsync(options: IPnpmSyncPrepareOptions): Pr
   const pnpmLockFolder = path.dirname(lockfilePath);
 
   // generate a map, where key is the absolute path of the injectedDependency, value is all available paths in .pnpm folder
-  const injectedDependencyToFilePathSet: Map<string, Set<string>> = new Map();
+  const injectedDependencyToFilePathSet: Map<string, Array<string>> = new Map();
   for (const [injectedDependency, injectedDependencyVersionSet] of injectedDependencyToVersion) {
     for (const injectedDependencyVersion of injectedDependencyVersionSet) {
       // this logic is heavily depends on pnpm-lock formate
@@ -279,7 +279,7 @@ export async function pnpmSyncPrepareAsync(options: IPnpmSyncPrepareOptions): Pr
       let injectedDependencyPath = injectedDependencyVersion.split('(')[0].slice('file:'.length);
       injectedDependencyPath = path.resolve(pnpmLockFolder, injectedDependencyPath);
       if (!injectedDependencyToFilePathSet.has(injectedDependencyPath)) {
-        injectedDependencyToFilePathSet.set(injectedDependencyPath, new Set());
+        injectedDependencyToFilePathSet.set(injectedDependencyPath, []);
       }
 
       const fullPackagePath = path.join(
@@ -289,18 +289,18 @@ export async function pnpmSyncPrepareAsync(options: IPnpmSyncPrepareOptions): Pr
         injectedDependency
       );
 
-      injectedDependencyToFilePathSet.get(injectedDependencyPath)?.add(fullPackagePath);
+      injectedDependencyToFilePathSet.get(injectedDependencyPath)?.push(fullPackagePath);
     }
   }
 
   // now, we have everything we need to generate the the .pnpm-sync.json
   // console.log('injectedDependencyToFilePathSet =>', injectedDependencyToFilePathSet);
-  for (const [projectFolder, targetFolderSet] of injectedDependencyToFilePathSet) {
-    if (targetFolderSet.size === 0) {
+  for (const [sourceProjectFolder, targetFolders] of injectedDependencyToFilePathSet) {
+    if (targetFolders.length === 0) {
       continue;
     }
 
-    const pnpmSyncJsonFolder = `${projectFolder}/node_modules`;
+    const pnpmSyncJsonFolder = `${sourceProjectFolder}/node_modules`;
     const pnpmSyncJsonPath = `${pnpmSyncJsonFolder}/.pnpm-sync.json`;
 
     logMessageCallback({
@@ -309,7 +309,7 @@ export async function pnpmSyncPrepareAsync(options: IPnpmSyncPrepareOptions): Pr
       details: {
         messageIdentifier: LogMessageIdentifier.PREPARE_WRITING_FILE,
         pnpmSyncJsonPath,
-        projectFolder
+        projectFolder: sourceProjectFolder
       }
     });
 
@@ -323,8 +323,8 @@ export async function pnpmSyncPrepareAsync(options: IPnpmSyncPrepareOptions): Pr
     }
 
     await pnpmSyncUpdateFileAsync({
-      projectFolder,
-      targetFolderSet,
+      sourceProjectFolder,
+      targetFolders,
       logMessageCallback,
       lockfileId
     });
