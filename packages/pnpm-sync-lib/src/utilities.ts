@@ -37,3 +37,9 @@ async function getFilesInDirectoryHelper(directory: string, returnFileList: ISyn
     });
   }
 }
+
+export const isPnpmV8 = (pnpmVersion: string): boolean => pnpmVersion.startsWith('8.');
+
+export const isPnpmV9 = (pnpmVersion: string): boolean => pnpmVersion.startsWith('9.');
+
+export const isPnpmV10 = (pnpmVersion: string): boolean => pnpmVersion.startsWith('10.');

@@ -1,0 +1,145 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`pnpm multi version test pnpm v8 1`] = `
+Array [
+  Object {
+    "details": Object {
+      "dotPnpmFolder": "<root>/pnpm-sync/tests/test-fixtures/pnpm-v8/node_modules/.pnpm",
+      "lockfilePath": "<root>/pnpm-sync/tests/test-fixtures/pnpm-v8/pnpm-lock.yaml",
+      "messageIdentifier": "prepare-starting",
+    },
+    "message": "Starting...",
+    "messageKind": "verbose",
+  },
+  Object {
+    "details": Object {
+      "messageIdentifier": "prepare-writing-file",
+      "pnpmSyncJsonPath": "<root>/pnpm-sync/tests/test-fixtures/pnpm-v8/packages/sample-lib1/node_modules/.pnpm-sync.json",
+      "sourceProjectFolder": "<root>/pnpm-sync/tests/test-fixtures/pnpm-v8/packages/sample-lib1",
+    },
+    "message": "Writing...",
+    "messageKind": "verbose",
+  },
+  Object {
+    "details": Object {
+      "dotPnpmFolder": "<root>/pnpm-sync/tests/test-fixtures/pnpm-v8/node_modules/.pnpm",
+      "executionTimeInMs": "[TIMING]",
+      "lockfilePath": "<root>/pnpm-sync/tests/test-fixtures/pnpm-v8/pnpm-lock.yaml",
+      "messageIdentifier": "prepare-finishing",
+    },
+    "message": "Regenerated...",
+    "messageKind": "info",
+  },
+]
+`;
+
+exports[`pnpm multi version test pnpm v8 2`] = `
+Object {
+  "postbuildInjectedCopy": Object {
+    "sourceFolder": "..",
+    "targetFolders": Array [
+      Object {
+        "folderPath": "../../../node_modules/.pnpm/file+packages+sample-lib1_@rushstack+eslint-patch@1.11.0_@rushstack+node-core-library@5.13.1__erd7quj6pkdyrimanex2flseii/node_modules/sample-lib1",
+      },
+      Object {
+        "folderPath": "../../../node_modules/.pnpm/file+packages+sample-lib1_@rushstack+eslint-patch@1.11.0_@rushstack+node-core-library@5.13.1__bpmmrb36cawsk5lk5xjymvbs2e/node_modules/sample-lib1",
+      },
+    ],
+  },
+  "version": "0.3.3",
+}
+`;
+
+exports[`pnpm multi version test pnpm v9 1`] = `
+Array [
+  Object {
+    "details": Object {
+      "dotPnpmFolder": "<root>/pnpm-sync/tests/test-fixtures/pnpm-v9/node_modules/.pnpm",
+      "lockfilePath": "<root>/pnpm-sync/tests/test-fixtures/pnpm-v9/pnpm-lock.yaml",
+      "messageIdentifier": "prepare-starting",
+    },
+    "message": "Starting...",
+    "messageKind": "verbose",
+  },
+  Object {
+    "details": Object {
+      "messageIdentifier": "prepare-writing-file",
+      "pnpmSyncJsonPath": "<root>/pnpm-sync/tests/test-fixtures/pnpm-v9/packages/sample-lib1/node_modules/.pnpm-sync.json",
+      "sourceProjectFolder": "<root>/pnpm-sync/tests/test-fixtures/pnpm-v9/packages/sample-lib1",
+    },
+    "message": "Writing...",
+    "messageKind": "verbose",
+  },
+  Object {
+    "details": Object {
+      "dotPnpmFolder": "<root>/pnpm-sync/tests/test-fixtures/pnpm-v9/node_modules/.pnpm",
+      "executionTimeInMs": "[TIMING]",
+      "lockfilePath": "<root>/pnpm-sync/tests/test-fixtures/pnpm-v9/pnpm-lock.yaml",
+      "messageIdentifier": "prepare-finishing",
+    },
+    "message": "Regenerated...",
+    "messageKind": "info",
+  },
+]
+`;
+
+exports[`pnpm multi version test pnpm v9 2`] = `
+Object {
+  "postbuildInjectedCopy": Object {
+    "sourceFolder": "..",
+    "targetFolders": Array [
+      Object {
+        "folderPath": "../../../node_modules/.pnpm/sample-lib1@file+packages+sample-lib1_@rushstack+eslint-patch@1.11.0_@rushstack+node-core-lib_jde5jrdqngnzmj5pih5jgr6htu/node_modules/sample-lib1",
+      },
+    ],
+  },
+  "version": "0.3.3",
+}
+`;
+
+exports[`pnpm multi version test pnpm v10 1`] = `
+Array [
+  Object {
+    "details": Object {
+      "dotPnpmFolder": "<root>/pnpm-sync/tests/test-fixtures/pnpm-v10/node_modules/.pnpm",
+      "lockfilePath": "<root>/pnpm-sync/tests/test-fixtures/pnpm-v10/pnpm-lock.yaml",
+      "messageIdentifier": "prepare-starting",
+    },
+    "message": "Starting...",
+    "messageKind": "verbose",
+  },
+  Object {
+    "details": Object {
+      "messageIdentifier": "prepare-writing-file",
+      "pnpmSyncJsonPath": "<root>/pnpm-sync/tests/test-fixtures/pnpm-v10/packages/sample-lib1/node_modules/.pnpm-sync.json",
+      "sourceProjectFolder": "<root>/pnpm-sync/tests/test-fixtures/pnpm-v10/packages/sample-lib1",
+    },
+    "message": "Writing...",
+    "messageKind": "verbose",
+  },
+  Object {
+    "details": Object {
+      "dotPnpmFolder": "<root>/pnpm-sync/tests/test-fixtures/pnpm-v10/node_modules/.pnpm",
+      "executionTimeInMs": "[TIMING]",
+      "lockfilePath": "<root>/pnpm-sync/tests/test-fixtures/pnpm-v10/pnpm-lock.yaml",
+      "messageIdentifier": "prepare-finishing",
+    },
+    "message": "Regenerated...",
+    "messageKind": "info",
+  },
+]
+`;
+
+exports[`pnpm multi version test pnpm v10 2`] = `
+Object {
+  "postbuildInjectedCopy": Object {
+    "sourceFolder": "..",
+    "targetFolders": Array [
+      Object {
+        "folderPath": "../../../node_modules/.pnpm/sample-lib1@file+packages+sample-lib1_@rushstack+eslint-patch@1.11.0_@rushstack+node-co_1e4bcf53d5aa94d05e51dfd3fe5a8859/node_modules/sample-lib1",
+      },
+    ],
+  },
+  "version": "0.3.3",
+}
+`;

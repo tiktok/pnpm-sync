@@ -1,0 +1,22 @@
+{
+  "name": "sample-app2",
+  "version": "0.0.0",
+  "scripts": {
+    "build": "tsc"
+  },
+  "dependencies": {
+    "@types/react": "^17.0.0",
+    "@types/react-dom": "^17.0.0",
+    "react": "^17.0.0",
+    "react-dom": "^17.0.0",
+    "sample-lib1": "workspace:*"
+  },
+  "devDependencies": {
+    "typescript": "^5.8.3"
+  },
+  "dependenciesMeta": {
+    "sample-lib1": {
+      "injected": true
+    }
+  }
+}

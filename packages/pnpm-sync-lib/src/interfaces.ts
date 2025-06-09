@@ -1,3 +1,6 @@
+import { Lockfile as LockfileObjectV6 } from '@pnpm/lockfile-types-pnpm-lock-v6';
+import { LockfileObject as LockfileObjectV9 } from '@pnpm/lockfile.types-pnpm-lock-v9';
+
 export interface IPnpmSyncCliArgs {
   prepare: boolean;
   lockfile: string;
@@ -172,20 +175,4 @@ export interface ILockfilePackage {
  *
  * @beta
  */
-export interface ILockfile {
-  /**
-   * The version of the `pnpm-lock.yaml` file format.
-   *
-   * Example: `6.0`
-   */
-  lockfileVersion: number | string;
-  importers: Record<string, ILockfileImporter>;
-  /**
-   * The `packages` section stores the installation plan for external (non-workspace)
-   * packages.  The key is a `node_modules/.pnpm` version path, which in lockfile version 6
-   * encodes the installed package name, package version, and any peer dependency qualifiers.
-   *
-   * Example key: `/webpack-filter-warnings-plugin@1.2.1(webpack@4.47.0)`
-   */
-  packages: Record<string, ILockfilePackage>;
-}
+export type ILockfile = LockfileObjectV6 | LockfileObjectV9;
