@@ -2,7 +2,8 @@ import path from 'path';
 import fs from 'fs';
 import YAML from 'yaml';
 import process from 'node:process';
-import { depPathToFilename } from '@pnpm/dependency-path';
+import { depPathToFilename as depPathToFilename2 } from '@pnpm/dependency-path-2';
+import { depPathToFilename as depPathToFilename5 } from '@pnpm/dependency-path-5';
 
 import {
   ILockfile,
@@ -11,7 +12,6 @@ import {
   LogMessageIdentifier,
   IPnpmSyncJson,
   IVersionSpecifier,
-  ILockfilePackage,
   ITargetFolder
 } from './interfaces';
 import { pnpmSyncGetJsonVersion } from './utilities';
@@ -220,9 +220,9 @@ export async function pnpmSyncPrepareAsync(options: IPnpmSyncPrepareOptions): Pr
   const pnpmVersion: string | undefined = pnpmModulesYaml?.packageManager?.split('@')[1];
 
   // currently, only support pnpm v8
-  if (!pnpmVersion || !pnpmVersion.startsWith('8')) {
+  if (!pnpmVersion || !(pnpmVersion.startsWith('8') || !pnpmVersion.startsWith('9'))) {
     logMessageCallback({
-      message: `The pnpm version is not supported; pnpm-sync requires pnpm version 8.x`,
+      message: `The pnpm version is not supported; pnpm-sync requires pnpm version 8.x, 9.x`,
       messageKind: LogMessageKind.ERROR,
       details: {
         messageIdentifier: LogMessageIdentifier.PREPARE_ERROR_UNSUPPORTED_PNPM_VERSION,
@@ -240,9 +240,13 @@ export async function pnpmSyncPrepareAsync(options: IPnpmSyncPrepareOptions): Pr
 
   // currently, only support lockfileVersion 6.x, which is pnpm v8
   const lockfileVersion: string | undefined = pnpmLockfile?.lockfileVersion.toString();
-  if (!lockfileVersion || !lockfileVersion.startsWith('6')) {
+  if (
+    !pnpmLockfile ||
+    !lockfileVersion ||
+    !(lockfileVersion.startsWith('6') || !lockfileVersion.startsWith('9'))
+  ) {
     logMessageCallback({
-      message: `The pnpm-lock.yaml format is not supported; pnpm-sync requires lockfile version 6`,
+      message: `The pnpm-lock.yaml format is not supported; pnpm-sync requires lockfile version 6, 9`,
       messageKind: LogMessageKind.ERROR,
       details: {
         messageIdentifier: LogMessageIdentifier.PREPARE_ERROR_UNSUPPORTED_FORMAT,
@@ -255,7 +259,7 @@ export async function pnpmSyncPrepareAsync(options: IPnpmSyncPrepareOptions): Pr
 
   // find injected dependency and all its available versions
   const injectedDependencyToVersion: Map<string, Set<string>> = new Map();
-  for (const importerItem of Object.values(pnpmLockfile?.importers || {})) {
+  for (const importerItem of Object.values(pnpmLockfile.importers || {})) {
     // based on https://pnpm.io/package_json#dependenciesmeta
     // the injected dependencies could available inside dependencies, optionalDependencies, and devDependencies.
     getInjectedDependencyToVersion(importerItem?.dependencies, injectedDependencyToVersion);
@@ -282,12 +286,17 @@ export async function pnpmSyncPrepareAsync(options: IPnpmSyncPrepareOptions): Pr
         injectedDependencyToFilePathSet.set(injectedDependencyPath, []);
       }
 
-      const fullPackagePath = path.join(
-        dotPnpmFolder,
-        depPathToFilename(injectedDependencyVersion),
-        'node_modules',
-        injectedDependency
-      );
+      const packageDirname = (() => {
+        if (pnpmVersion.startsWith('8')) {
+          return depPathToFilename2(injectedDependencyVersion);
+        }
+        if (pnpmVersion.startsWith('9')) {
+          return depPathToFilename5(injectedDependency + '@' + injectedDependencyVersion, 120);
+        }
+        return '';
+      })();
+
+      const fullPackagePath = path.join(dotPnpmFolder, packageDirname, 'node_modules', injectedDependency);
 
       injectedDependencyToFilePathSet.get(injectedDependencyPath)?.push(fullPackagePath);
     }
@@ -373,42 +382,52 @@ function getInjectedDependencyToVersion(
 // process all dependencies and devDependencies to find potential transitive injected dependencies
 // and add to injectedDependencyToFilePath map
 function processTransitiveInjectedDependency(
-  pnpmLockfile: ILockfile | undefined,
+  pnpmLockfile: ILockfile,
   injectedDependencyToVersion: Map<string, Set<string>>
 ): void {
+  const { lockfileVersion } = pnpmLockfile;
+
   const potentialTransitiveInjectedDependencyVersionQueue: Array<string> = [];
-  for (const injectedDependencyVersion of [...injectedDependencyToVersion.values()]) {
-    potentialTransitiveInjectedDependencyVersionQueue.push(...injectedDependencyVersion);
+  for (const [packageName, injectedDependencyVersion] of [...injectedDependencyToVersion.entries()]) {
+    if (lockfileVersion.toString().startsWith('6')) {
+      potentialTransitiveInjectedDependencyVersionQueue.push(...injectedDependencyVersion);
+    } else if (lockfileVersion.toString().startsWith('9')) {
+      potentialTransitiveInjectedDependencyVersionQueue.push(
+        ...[...injectedDependencyVersion].map((version) => packageName + '@' + version)
+      );
+    }
   }
 
-  const lockfilePackages: Record<string, ILockfilePackage> | undefined = pnpmLockfile?.packages;
+  const { packages: lockfilePackages } = pnpmLockfile;
 
-  if (lockfilePackages) {
-    while (potentialTransitiveInjectedDependencyVersionQueue.length > 0) {
-      const transitiveInjectedDependencyVersion: string | undefined =
-        potentialTransitiveInjectedDependencyVersionQueue.shift();
-      if (transitiveInjectedDependencyVersion) {
-        const { dependencies, optionalDependencies } = lockfilePackages[transitiveInjectedDependencyVersion];
-        processInjectedDependencies(
-          dependencies,
-          injectedDependencyToVersion,
-          potentialTransitiveInjectedDependencyVersionQueue
-        );
-        processInjectedDependencies(
-          optionalDependencies,
-          injectedDependencyToVersion,
-          potentialTransitiveInjectedDependencyVersionQueue
-        );
-      }
+  while (potentialTransitiveInjectedDependencyVersionQueue.length > 0) {
+    const transitiveInjectedDependencyVersion: string | undefined =
+      potentialTransitiveInjectedDependencyVersionQueue.shift();
+    if (transitiveInjectedDependencyVersion) {
+      const { dependencies, optionalDependencies } = lockfilePackages[transitiveInjectedDependencyVersion];
+      processInjectedDependencies(
+        dependencies,
+        injectedDependencyToVersion,
+        potentialTransitiveInjectedDependencyVersionQueue,
+        pnpmLockfile
+      );
+      processInjectedDependencies(
+        optionalDependencies,
+        injectedDependencyToVersion,
+        potentialTransitiveInjectedDependencyVersionQueue,
+        pnpmLockfile
+      );
     }
   }
 }
 function processInjectedDependencies(
   dependencies: Record<string, string> | undefined,
   injectedDependencyToVersion: Map<string, Set<string>>,
-  potentialTransitiveInjectedDependencyVersionQueue: Array<string>
+  potentialTransitiveInjectedDependencyVersionQueue: Array<string>,
+  pnpmLockfile: ILockfile
 ): void {
   if (dependencies) {
+    const { lockfileVersion } = pnpmLockfile;
     for (const [dependency, version] of Object.entries(dependencies)) {
       // if the version is set with file: protocol, then it is a transitive injected dependency
       if (version.startsWith('file:')) {
@@ -416,7 +435,11 @@ function processInjectedDependencies(
           injectedDependencyToVersion.set(dependency, new Set());
         }
         injectedDependencyToVersion.get(dependency)?.add(version);
-        potentialTransitiveInjectedDependencyVersionQueue.push(version);
+        if (lockfileVersion.toString().startsWith('6')) {
+          potentialTransitiveInjectedDependencyVersionQueue.push(version);
+        } else if (lockfileVersion.toString().startsWith('9')) {
+          potentialTransitiveInjectedDependencyVersionQueue.push(dependency + '@' + version);
+        }
       }
     }
   }
