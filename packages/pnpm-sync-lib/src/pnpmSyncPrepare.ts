@@ -219,8 +219,8 @@ export async function pnpmSyncPrepareAsync(options: IPnpmSyncPrepareOptions): Pr
   const pnpmModulesYaml = YAML.parse(fs.readFileSync(`${pnpmModulesYamlPath}/.modules.yaml`, 'utf8'));
   const pnpmVersion: string | undefined = pnpmModulesYaml?.packageManager?.split('@')[1];
 
-  // currently, only support pnpm v8
-  if (!pnpmVersion || !(pnpmVersion.startsWith('8') || !pnpmVersion.startsWith('9'))) {
+  // currently, only support pnpm v8 and v9
+  if (!pnpmVersion || !(pnpmVersion.startsWith('8') || pnpmVersion.startsWith('9'))) {
     logMessageCallback({
       message: `The pnpm version is not supported; pnpm-sync requires pnpm version 8.x, 9.x`,
       messageKind: LogMessageKind.ERROR,
@@ -238,12 +238,12 @@ export async function pnpmSyncPrepareAsync(options: IPnpmSyncPrepareOptions): Pr
     ignoreIncompatible: true
   });
 
-  // currently, only support lockfileVersion 6.x, which is pnpm v8
+  // currently, only support lockfileVersion 6.x, which is pnpm v8 and lockfileVersion 9.x, which is pnpm v9
   const lockfileVersion: string | undefined = pnpmLockfile?.lockfileVersion.toString();
   if (
     !pnpmLockfile ||
     !lockfileVersion ||
-    !(lockfileVersion.startsWith('6') || !lockfileVersion.startsWith('9'))
+    !(lockfileVersion.startsWith('6') || lockfileVersion.startsWith('9'))
   ) {
     logMessageCallback({
       message: `The pnpm-lock.yaml format is not supported; pnpm-sync requires lockfile version 6, 9`,
