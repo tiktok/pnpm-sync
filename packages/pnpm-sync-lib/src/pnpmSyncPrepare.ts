@@ -2,8 +2,11 @@ import path from 'path';
 import fs from 'fs';
 import YAML from 'yaml';
 import process from 'node:process';
-import { depPathToFilename as depPathToFilename2 } from '@pnpm/dependency-path-2';
-import { depPathToFilename as depPathToFilename5 } from '@pnpm/dependency-path-5';
+import { depPathToFilename as depPathToFilenameV8 } from '@pnpm/dependency-path-pnpm-v8';
+import { depPathToFilename as depPathToFilenameV9 } from '@pnpm/dependency-path-pnpm-v9';
+import { depPathToFilename as depPathToFilenameV10 } from '@pnpm/dependency-path-pnpm-v10';
+import { ProjectSnapshot as ProjectSnapshotV6 } from '@pnpm/lockfile-types-pnpm-lock-v6';
+import { ProjectSnapshot as ProjectSnapshotV9 } from '@pnpm/lockfile.types-pnpm-lock-v9';
 
 import {
   ILockfile,
@@ -14,7 +17,7 @@ import {
   IVersionSpecifier,
   ITargetFolder
 } from './interfaces';
-import { pnpmSyncGetJsonVersion } from './utilities';
+import { isPnpmV10, isPnpmV8, isPnpmV9, pnpmSyncGetJsonVersion } from './utilities';
 
 /**
  * @beta
@@ -58,6 +61,8 @@ export interface IPnpmSyncPrepareOptions extends IPnpmSyncUpdateFileBaseOptions 
   /**
    * Environment-provided API to avoid an NPM dependency.
    * The "pnpm-sync" NPM package provides a reference implementation.
+   *
+   * @remarks Use `@pnpm/lockfile-file` for pnpm-lock v6 and `@pnpm/lockfile.fs` for pnpm-lock v9
    */
   readPnpmLockfile: (
     lockfilePath: string,
@@ -219,10 +224,9 @@ export async function pnpmSyncPrepareAsync(options: IPnpmSyncPrepareOptions): Pr
   const pnpmModulesYaml = YAML.parse(fs.readFileSync(`${pnpmModulesYamlPath}/.modules.yaml`, 'utf8'));
   const pnpmVersion: string | undefined = pnpmModulesYaml?.packageManager?.split('@')[1];
 
-  // currently, only support pnpm v8 and v9
-  if (!pnpmVersion || !(pnpmVersion.startsWith('8') || pnpmVersion.startsWith('9'))) {
+  if (!pnpmVersion || !(isPnpmV8(pnpmVersion) || isPnpmV9(pnpmVersion) || isPnpmV10(pnpmVersion))) {
     logMessageCallback({
-      message: `The pnpm version is not supported; pnpm-sync requires pnpm version 8.x, 9.x`,
+      message: `The pnpm version is not supported; pnpm-sync requires pnpm version 8.x, 9.x, 10.x`,
       messageKind: LogMessageKind.ERROR,
       details: {
         messageIdentifier: LogMessageIdentifier.PREPARE_ERROR_UNSUPPORTED_PNPM_VERSION,
@@ -287,11 +291,18 @@ export async function pnpmSyncPrepareAsync(options: IPnpmSyncPrepareOptions): Pr
       }
 
       const packageDirname = (() => {
-        if (pnpmVersion.startsWith('8')) {
-          return depPathToFilename2(injectedDependencyVersion);
+        if (isPnpmV8(pnpmVersion)) {
+          return depPathToFilenameV8(injectedDependencyVersion);
         }
-        if (pnpmVersion.startsWith('9')) {
-          return depPathToFilename5(injectedDependency + '@' + injectedDependencyVersion, 120);
+        if (isPnpmV9(pnpmVersion)) {
+          return depPathToFilenameV9(injectedDependency + '@' + injectedDependencyVersion, 120);
+        }
+        if (isPnpmV10(pnpmVersion)) {
+          return depPathToFilenameV10(
+            injectedDependency + '@' + injectedDependencyVersion,
+            // for v10 default is 120 on Linux/MacOS and 60 on Windows https://pnpm.io/next/settings#virtualstoredirmaxlength
+            process.platform === 'win32' ? 60 : 120
+          );
         }
         return '';
       })();
@@ -398,13 +409,16 @@ function processTransitiveInjectedDependency(
     }
   }
 
-  const { packages: lockfilePackages } = pnpmLockfile;
+  const { packages: lockfilePackages = {} } = pnpmLockfile;
 
   while (potentialTransitiveInjectedDependencyVersionQueue.length > 0) {
     const transitiveInjectedDependencyVersion: string | undefined =
       potentialTransitiveInjectedDependencyVersionQueue.shift();
     if (transitiveInjectedDependencyVersion) {
-      const { dependencies, optionalDependencies } = lockfilePackages[transitiveInjectedDependencyVersion];
+      // ProjectSnapshots type in pnpm-lock v9 use a branded type as record key, so we need to cast it to Record<string, ProjectSnapshotV6 | ProjectSnapshotV9>
+      const { dependencies, optionalDependencies } = (
+        lockfilePackages as unknown as Record<string, ProjectSnapshotV6 | ProjectSnapshotV9>
+      )[transitiveInjectedDependencyVersion];
       processInjectedDependencies(
         dependencies,
         injectedDependencyToVersion,

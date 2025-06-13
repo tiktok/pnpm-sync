@@ -4,6 +4,9 @@
 
 ```ts
 
+import { Lockfile } from '@pnpm/lockfile-types-pnpm-lock-v6';
+import { LockfileObject } from '@pnpm/lockfile.types-pnpm-lock-v9';
+
 // @beta (undocumented)
 export interface IDependencyMeta {
     // (undocumented)
@@ -11,12 +14,7 @@ export interface IDependencyMeta {
 }
 
 // @beta
-export interface ILockfile {
-    // (undocumented)
-    importers: Record<string, ILockfileImporter>;
-    lockfileVersion: number | string;
-    packages: Record<string, ILockfilePackage>;
-}
+export type ILockfile = Lockfile | LockfileObject;
 
 // @beta
 export interface ILockfileImporter {

@@ -7,7 +7,7 @@ import {
   LogMessageIdentifier,
   pnpmSyncGetJsonVersion
 } from 'pnpm-sync-lib';
-import { readPnpmLockfile, scrubLog } from './testUtilities';
+import { readPnpmLockfile, scrubLog } from './testUtilities.js';
 
 const pnpmSyncLibVersion: string = pnpmSyncGetJsonVersion();
 
@@ -176,7 +176,7 @@ Array [
   Object {
     "details": Object {
       "actualVersion": "incompatible-version",
-      "expectedVersion": "0.3.2",
+      "expectedVersion": "0.3.3",
       "messageIdentifier": "prepare-replacing-file",
       "pnpmSyncJsonPath": "<root>/pnpm-sync/tests/test-fixtures/sample-lib1/node_modules/.pnpm-sync.json",
       "sourceProjectFolder": "<root>/pnpm-sync/tests/test-fixtures/sample-lib1",

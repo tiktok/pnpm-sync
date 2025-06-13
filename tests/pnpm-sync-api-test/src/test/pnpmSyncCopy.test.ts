@@ -2,7 +2,7 @@ import fs from 'fs';
 import path from 'path';
 import { Async, FileSystem } from '@rushstack/node-core-library';
 import { PackageExtractor } from '@rushstack/package-extractor';
-import { readPnpmLockfile, scrubLog } from './testUtilities';
+import { readPnpmLockfile, scrubLog } from './testUtilities.js';
 import {
   ILogMessageCallbackOptions,
   pnpmSyncGetJsonVersion,

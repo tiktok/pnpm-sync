@@ -1,7 +1,11 @@
 import path from 'path';
-import { Lockfile, readWantedLockfile } from '@pnpm/lockfile-file';
+import { readWantedLockfile as readWantedLockfileV6 } from '@pnpm/lockfile-file-pnpm-lock-v6';
+import { readWantedLockfile as readWantedLockfileV9 } from '@pnpm/lockfile.fs-pnpm-lock-v9';
 import { Path } from '@rushstack/node-core-library';
-import type { ILockfile, ILockfilePackage } from 'pnpm-sync-lib';
+import type { ILockfile } from 'pnpm-sync-lib';
+import { fileURLToPath } from 'url';
+
+export const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
 export async function readPnpmLockfile(
   lockfilePath: string,
@@ -10,22 +14,19 @@ export async function readPnpmLockfile(
   }
 ): Promise<ILockfile | undefined> {
   const pnpmLockFolder = path.dirname(lockfilePath);
-  const lockfile: Lockfile | null = await readWantedLockfile(pnpmLockFolder, options);
+  const lockfileV6 = await readWantedLockfileV6(pnpmLockFolder, options);
 
-  if (lockfile === null) {
-    return undefined;
-  } else {
-    const lockfilePackages: Record<string, ILockfilePackage> = lockfile.packages as Record<
-      string,
-      ILockfilePackage
-    >;
-    const result: ILockfile = {
-      lockfileVersion: lockfile.lockfileVersion,
-      importers: lockfile.importers,
-      packages: lockfilePackages
-    };
-    return result;
+  if (lockfileV6?.lockfileVersion.toString().startsWith('6')) {
+    return lockfileV6;
   }
+
+  const lockfileV9 = await readWantedLockfileV9(pnpmLockFolder, options);
+
+  if (lockfileV9?.lockfileVersion.toString().startsWith('9')) {
+    return lockfileV9;
+  }
+
+  return undefined;
 }
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any

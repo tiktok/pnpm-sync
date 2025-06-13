@@ -1,14 +1,9 @@
 import { Command } from 'commander';
-import {
-  type ILockfile,
-  type ILockfilePackage,
-  pnpmSyncCopyAsync,
-  pnpmSyncPrepareAsync,
-  type ILogMessageCallbackOptions
-} from 'pnpm-sync-lib';
+import { pnpmSyncCopyAsync, pnpmSyncPrepareAsync, type ILogMessageCallbackOptions } from 'pnpm-sync-lib';
 import { FileSystem, Async } from '@rushstack/node-core-library';
 import { PackageExtractor } from '@rushstack/package-extractor';
-import { readWantedLockfile, Lockfile } from '@pnpm/lockfile-file';
+import { readWantedLockfile as readWantedLockfileV6 } from '@pnpm/lockfile-file-pnpm-lock-v6';
+import { readWantedLockfile as readWantedLockfileV9 } from '@pnpm/lockfile.fs-pnpm-lock-v9';
 
 const program: Command = new Command();
 
@@ -83,22 +78,19 @@ program
         ) => {
           const pnpmLockFolder = lockfilePath.slice(0, lockfilePath.length - 'pnpm-lock.yaml'.length);
 
-          const lockfile: Lockfile | null = await readWantedLockfile(pnpmLockFolder, options);
+          const lockfileV6 = await readWantedLockfileV6(pnpmLockFolder, options);
 
-          if (lockfile === null) {
-            return undefined;
-          } else {
-            const lockfilePackages: Record<string, ILockfilePackage> = lockfile.packages as Record<
-              string,
-              ILockfilePackage
-            >;
-            const result: ILockfile = {
-              lockfileVersion: lockfile.lockfileVersion,
-              importers: lockfile.importers,
-              packages: lockfilePackages
-            };
-            return result;
+          if (lockfileV6?.lockfileVersion.toString().startsWith('6')) {
+            return lockfileV6;
           }
+
+          const lockfileV9 = await readWantedLockfileV9(pnpmLockFolder, options);
+
+          if (lockfileV9?.lockfileVersion.toString().startsWith('9')) {
+            return lockfileV9;
+          }
+
+          return undefined;
         },
         logMessageCallback: logMessage
       });

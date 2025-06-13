@@ -1,6 +1,6 @@
 {
   "name": "pnpm-sync-lib",
-  "version": "0.3.2",
+  "version": "0.3.3",
   "description": "API library for integrating \"pnpm-sync\" with your toolchain",
   "repository": {
     "type": "git",
@@ -17,8 +17,11 @@
     "test": "heft test --clean"
   },
   "dependencies": {
-    "@pnpm/dependency-path-2": "npm:@pnpm/dependency-path@^2.1.8",
-    "@pnpm/dependency-path-5": "npm:@pnpm/dependency-path@^5.1.7",
+    "@pnpm/dependency-path-pnpm-v10": "npm:@pnpm/dependency-path@^1000.0.9",
+    "@pnpm/dependency-path-pnpm-v8": "npm:@pnpm/dependency-path@^2.1.8",
+    "@pnpm/dependency-path-pnpm-v9": "npm:@pnpm/dependency-path@^5.1.7",
+    "@pnpm/lockfile-types-pnpm-lock-v6": "npm:@pnpm/lockfile-types@^5.1.5",
+    "@pnpm/lockfile.types-pnpm-lock-v9": "npm:@pnpm/lockfile.types@^1001.0.8",
     "yaml": "2.4.1"
   },
   "devDependencies": {
