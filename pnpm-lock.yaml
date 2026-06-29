@@ -75,8 +75,8 @@ importers:
         specifier: npm:@pnpm/lockfile.types@^1001.0.8
         version: /@pnpm/lockfile.types@1001.0.8
       yaml:
-        specifier: 2.4.1
-        version: 2.4.1
+        specifier: ^2.8.3
+        version: 2.9.0
     devDependencies:
       '@rushstack/eslint-config':
         specifier: ^3.6.2
@@ -5284,9 +5284,9 @@ packages:
   /yallist@4.0.0:
     resolution: {integrity: sha512-3wdGidZyq5PB084XLES5TpOSRA3wjXAlIWMhum2kRcv/41Sn2emQ0dycQW4uZXLejwKvg6EsvbdlVL+FYEct7A==}
 
-  /yaml@2.4.1:
-    resolution: {integrity: sha512-pIXzoImaqmfOrL7teGUBt/T7ZDnyeGBWyXQBvOVhLkWLN37GXv8NMLK406UY6dS51JfcQHsmcW5cJ441bHg6Lg==}
-    engines: {node: '>= 14'}
+  /yaml@2.9.0:
+    resolution: {integrity: sha512-2AvhNX3mb8zd6Zy7INTtSpl1F15HW6Wnqj0srWlkKLcpYl/gMIMJiyuGq2KeI2YFxUPjdlB+3Lc10seMLtL4cA==}
+    engines: {node: '>= 14.6'}
     hasBin: true
     dev: false
 
