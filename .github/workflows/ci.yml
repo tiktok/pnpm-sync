@@ -14,9 +14,7 @@ jobs:
       - uses: actions/setup-node@v3
         with:
           node-version: 22.14.0
-      - uses: pnpm/action-setup@v4
-        with:
-          version: 8.15.1
+      - uses: pnpm/action-setup@v6
       - name: Install Depdendencies
         run: pnpm install
       - name: Build all projects
