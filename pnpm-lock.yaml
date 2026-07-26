@@ -219,6 +219,8 @@ importers:
 
   tests/test-fixtures/pnpm-v10: {}
 
+  tests/test-fixtures/pnpm-v11: {}
+
   tests/test-fixtures/pnpm-v8: {}
 
   tests/test-fixtures/pnpm-v9: {}

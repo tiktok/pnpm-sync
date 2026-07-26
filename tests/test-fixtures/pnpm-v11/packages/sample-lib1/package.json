@@ -1,0 +1,34 @@
+{
+  "name": "sample-lib1",
+  "version": "0.0.0",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "default": "./dist/index.js"
+    }
+  },
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "build": "tsc"
+  },
+  "dependencies": {},
+  "devDependencies": {
+    "@rushstack/eslint-patch": "^1.11.0",
+    "@rushstack/node-core-library": "^5.13.0",
+    "@types/react": "^18.0.0",
+    "@types/react-dom": "^18.0.0",
+    "react": "^18.0.0",
+    "react-dom": "^18.0.0",
+    "typescript": "^5.8.3"
+  },
+  "peerDependencies": {
+    "@rushstack/eslint-patch": "*",
+    "@rushstack/node-core-library": "*",
+    "@types/react": "17 || 18",
+    "@types/react-dom": "17 || 18",
+    "react": "17 || 18",
+    "react-dom": "17 || 18"
+  }
+}

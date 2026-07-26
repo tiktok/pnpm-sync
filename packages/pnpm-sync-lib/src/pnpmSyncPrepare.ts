@@ -17,7 +17,7 @@ import {
   IVersionSpecifier,
   ITargetFolder
 } from './interfaces';
-import { isPnpmV10, isPnpmV8, isPnpmV9, pnpmSyncGetJsonVersion } from './utilities';
+import { isPnpmV10, isPnpmV11, isPnpmV8, isPnpmV9, pnpmSyncGetJsonVersion } from './utilities';
 
 /**
  * @beta
@@ -224,9 +224,12 @@ export async function pnpmSyncPrepareAsync(options: IPnpmSyncPrepareOptions): Pr
   const pnpmModulesYaml = YAML.parse(fs.readFileSync(`${pnpmModulesYamlPath}/.modules.yaml`, 'utf8'));
   const pnpmVersion: string | undefined = pnpmModulesYaml?.packageManager?.split('@')[1];
 
-  if (!pnpmVersion || !(isPnpmV8(pnpmVersion) || isPnpmV9(pnpmVersion) || isPnpmV10(pnpmVersion))) {
+  if (
+    !pnpmVersion ||
+    !(isPnpmV8(pnpmVersion) || isPnpmV9(pnpmVersion) || isPnpmV10(pnpmVersion) || isPnpmV11(pnpmVersion))
+  ) {
     logMessageCallback({
-      message: `The pnpm version is not supported; pnpm-sync requires pnpm version 8.x, 9.x, 10.x`,
+      message: `The pnpm version is not supported; pnpm-sync requires pnpm version 8.x, 9.x, 10.x, 11.x`,
       messageKind: LogMessageKind.ERROR,
       details: {
         messageIdentifier: LogMessageIdentifier.PREPARE_ERROR_UNSUPPORTED_PNPM_VERSION,
@@ -242,7 +245,7 @@ export async function pnpmSyncPrepareAsync(options: IPnpmSyncPrepareOptions): Pr
     ignoreIncompatible: true
   });
 
-  // currently, only support lockfileVersion 6.x, which is pnpm v8 and lockfileVersion 9.x, which is pnpm v9
+  // pnpm v8 uses lockfile version 6.x; pnpm v9 through v11 use lockfile version 9.x.
   const lockfileVersion: string | undefined = pnpmLockfile?.lockfileVersion.toString();
   if (
     !pnpmLockfile ||
@@ -297,10 +300,11 @@ export async function pnpmSyncPrepareAsync(options: IPnpmSyncPrepareOptions): Pr
         if (isPnpmV9(pnpmVersion)) {
           return depPathToFilenameV9(injectedDependency + '@' + injectedDependencyVersion, 120);
         }
-        if (isPnpmV10(pnpmVersion)) {
+        if (isPnpmV10(pnpmVersion) || isPnpmV11(pnpmVersion)) {
           return depPathToFilenameV10(
             injectedDependency + '@' + injectedDependencyVersion,
-            // for v10 default is 120 on Linux/MacOS and 60 on Windows https://pnpm.io/next/settings#virtualstoredirmaxlength
+            // For pnpm v10 and v11 the default is 120 on Linux/macOS and 60 on Windows.
+            // https://pnpm.io/settings#virtualstoredirmaxlength
             process.platform === 'win32' ? 60 : 120
           );
         }
