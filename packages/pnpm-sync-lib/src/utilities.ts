@@ -43,3 +43,5 @@ export const isPnpmV8 = (pnpmVersion: string): boolean => pnpmVersion.startsWith
 export const isPnpmV9 = (pnpmVersion: string): boolean => pnpmVersion.startsWith('9.');
 
 export const isPnpmV10 = (pnpmVersion: string): boolean => pnpmVersion.startsWith('10.');
+
+export const isPnpmV11 = (pnpmVersion: string): boolean => pnpmVersion.startsWith('11.');

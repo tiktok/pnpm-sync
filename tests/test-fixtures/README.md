@@ -67,7 +67,7 @@ Each pnpm version directory contains:
    Update the test file to include the new version:
    ```typescript
    // tests/pnpm-sync-api-test/src/test/pnpmMultiVersion.test.ts
-   it.each(['8', '9', '10', 'X'])('pnpm v%s', async (version) => {
+   it.each(['8', '9', '10', '11', 'X'])('pnpm v%s', async (version) => {
    ```
 
 7. **Run tests to verify**:
@@ -107,4 +107,3 @@ These fixtures are used by the pnpm-sync test suite to:
 - Ensure proper handling of different project structures
 
 Each fixture represents a specific test scenario and should be maintained to reflect real-world usage patterns.
-        

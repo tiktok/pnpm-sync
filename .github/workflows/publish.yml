@@ -12,9 +12,7 @@ jobs:
       - uses: actions/setup-node@v3
         with:
           node-version: 20.11.0
-      - uses: pnpm/action-setup@v2
-        with:
-          version: 8.15.1
+      - uses: pnpm/action-setup@v6
       - name: Install Depdendencies
         run: pnpm install
       - name: Build and run tests for pnpm-sync-lib
